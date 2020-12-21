@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>873285277734-f0dr1g108k5s1d2k8r4ii6nf8q7k87sg.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.873285277734-f0dr1g108k5s1d2k8r4ii6nf8q7k87sg</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA7Ga_vOpZ25kwhfssvTfd8dmMnPvbjJq8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>873285277734</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.srewa.apnaClassroomApp</string>
+	<key>PROJECT_ID</key>
+	<string>apna-classroom</string>
+	<key>STORAGE_BUCKET</key>
+	<string>apna-classroom.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:873285277734:ios:3bf19b8fe6ebc6c6fbeee7</string>
+	<key>DATABASE_URL</key>
+	<string>https://apna-classroom.firebaseio.com</string>
+</dict>
+</plist>

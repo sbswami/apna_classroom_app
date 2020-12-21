@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "873285277734",
+    "firebase_url": "https://apna-classroom.firebaseio.com",
+    "project_id": "apna-classroom",
+    "storage_bucket": "apna-classroom.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:873285277734:android:9ecc6340f61ef18afbeee7",
+        "android_client_info": {
+          "package_name": "com.srewa.apna_classroom_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "873285277734-uc2345l9k61hk3e1p7obfk2pmqb473v6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQtCVy5f13oW2ldbV5yWgLyKBgYrOLmwI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "873285277734-uc2345l9k61hk3e1p7obfk2pmqb473v6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
