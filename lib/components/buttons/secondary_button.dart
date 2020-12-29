@@ -14,6 +14,7 @@ class SecondaryButton extends StatelessWidget {
       color: Theme.of(context).cardColor,
       onPressed: onPress,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
           if (iconData != null)
             Icon(

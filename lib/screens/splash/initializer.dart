@@ -4,6 +4,7 @@ import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/screens/home/home.dart';
 import 'package:apna_classroom_app/screens/login/login.dart';
 import 'package:apna_classroom_app/screens/profile/profile.dart';
+import 'package:apna_classroom_app/screens/quiz/quiz_tab_controller.dart';
 import 'package:apna_classroom_app/screens/splash/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -21,6 +22,7 @@ class _InitializerState extends State<Initializer> {
   void initState() {
     Get.put(UserController());
     Get.put(RecentlyUsedController());
+    Get.put(QuizTabController());
     super.initState();
     _checkUser();
   }

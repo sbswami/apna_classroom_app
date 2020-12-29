@@ -1,16 +1,24 @@
 import 'package:apna_classroom_app/components/chips/group_chips.dart';
+import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/notes/detailed_note.dart';
 import 'package:apna_classroom_app/util/c.dart';
-import 'package:apna_classroom_app/util/constants.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class NotesCard extends StatelessWidget {
   final Map<String, dynamic> note;
-  final Function onTap;
-  const NotesCard({Key key, this.note, this.onTap}) : super(key: key);
+  const NotesCard({Key key, this.note}) : super(key: key);
+
+  onTapNote() {
+    Get.to(DetailedNote(
+      note: note,
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: onTapNote,
       child: Container(
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
@@ -37,7 +45,7 @@ class NotesCard extends StatelessWidget {
                 ],
               ),
               Icon(
-                note[C.PRIVACY] == E.PUBLIC ? Icons.public : Icons.lock,
+                getPrivacy(note[C.PRIVACY]),
                 color: Theme.of(context).primaryColor,
                 size: 18,
               )

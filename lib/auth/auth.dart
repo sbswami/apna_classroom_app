@@ -119,7 +119,7 @@ handleAuthResult(UserCredential authResult) async {
 
 postLoginLoadData() async {
   List subjects = await getSubjectsNote();
-  await RecentlyUsedController.to.addAllSubject(subjects);
+  await RecentlyUsedController.to.addAllSubject(subjects.cast<String>());
 }
 
 signOut() async {

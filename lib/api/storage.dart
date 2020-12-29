@@ -34,26 +34,26 @@ Future<String> uploadFileAndGetPath(File file, String path) async {
 
 /// Upload Images to [IMAGE_PATH]
 Future<String> uploadImage(File file) async {
-  return uploadFileAndGetPath(
-      file, '${getUserId()}/$IMAGE_PATH/${getFileNameWithExtension(file)}');
+  return uploadFileAndGetPath(file,
+      '${getUserId()}/$IMAGE_PATH/${getFileNameWithExtension(file: file)}');
 }
 
 /// Upload PDF to [PDF_PATH]
 Future<String> uploadPdf(File file) async {
   return uploadFileAndGetPath(
-      file, '${getUserId()}/$PDF_PATH/${getFileNameWithExtension(file)}');
+      file, '${getUserId()}/$PDF_PATH/${getFileNameWithExtension(file: file)}');
 }
 
 /// Upload Image Thumbnail to [IMAGE_THUMBNAIL_PATH]
 Future<String> uploadImageThumbnail(File file) async {
   return uploadFileAndGetPath(file,
-      '${getUserId()}/$IMAGE_THUMBNAIL_PATH/${getFileNameWithExtension(file)}');
+      '${getUserId()}/$IMAGE_THUMBNAIL_PATH/${getFileNameWithExtension(file: file)}');
 }
 
 /// Upload PDF to [PDF_THUMBNAIL_PATH]
 Future<String> uploadPdfThumbnail(File file) async {
   return uploadFileAndGetPath(file,
-      '${getUserId()}/$PDF_THUMBNAIL_PATH/${getFileNameWithExtension(file)}');
+      '${getUserId()}/$PDF_THUMBNAIL_PATH/${getFileNameWithExtension(file: file)}');
 }
 
 Future<String> getDownloadUrl(String fullPath) async {
@@ -62,17 +62,33 @@ Future<String> getDownloadUrl(String fullPath) async {
 
 //--------------------------------+++++++++++++++++++++++++++++++--------------
 /// Get File Name With Extension
-String getFileNameWithExtension(File file) {
-  return file.path.substring(file.path.lastIndexOf('/') + 1);
+String getFileNameWithExtension({File file, String filePath}) {
+  String path = filePath ?? file.path;
+  return path.substring(path.lastIndexOf('/') + 1);
 }
 
 /// Get File Name Without Extension
-String getFileName(File file) {
-  return removeExtension(getFileNameWithExtension(file));
+String getFileName({File file, String filePath}) {
+  return removeExtension(
+      getFileNameWithExtension(file: file, filePath: filePath));
 }
 
+/// Remove File extension from file name
 String removeExtension(String name) {
   var names = name.split('.');
   names.removeLast();
   return names.join('.');
+}
+
+/// Remove File name from file path
+String removeFileName(String fullPath) {
+  var path = fullPath.split('/');
+  path.removeLast();
+  return path.join('/');
+}
+
+/// Get extension from file name or path
+String getExtension(String name) {
+  var names = name.split('.');
+  return '.' + names.last;
 }

@@ -81,7 +81,11 @@ Future<File> getFile(String fullPath) async {
   Directory appDocDirectory = await getApplicationDocumentsDirectory();
   String localPath =
       fullPath.replaceFirst(UserController.to.currentUser[C.ID], '');
-  File file = File(appDocDirectory.path + localPath);
+  Directory directory =
+      await Directory(appDocDirectory.path + removeFileName(localPath))
+          .create(recursive: true);
+  File file = File(
+      directory.path + '/' + getFileNameWithExtension(filePath: localPath));
   if (await file.exists()) return file;
   String downloadUrl = await getDownloadUrl(fullPath);
   http.Response response = await http.get(downloadUrl);

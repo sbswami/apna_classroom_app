@@ -1,13 +1,9 @@
 import 'package:apna_classroom_app/api/notes.dart';
-import 'package:apna_classroom_app/components/editor/text_viewer.dart';
 import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/notes_card.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/single_note.dart';
-import 'package:apna_classroom_app/screens/pdf_viewer/pdf_viewer.dart';
 import 'package:apna_classroom_app/util/c.dart';
-import 'package:apna_classroom_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -36,28 +32,6 @@ class _DetailedNoteState extends State<DetailedNote> {
 
   shareNote() {}
 
-  openNote(Map<String, dynamic> _note) {
-    if (_note[C.MEDIA] != null) {
-      String url = _note[C.MEDIA][C.URL];
-      switch (_note[C.MEDIA][C.TYPE]) {
-        case E.PDF:
-          Get.to(PdfViewer(
-            url: url,
-          ));
-          break;
-        case E.IMAGE:
-          Get.to(ImageViewer(
-            url: url,
-          ));
-          break;
-      }
-    } else if (_note[C.TEXT] != null) {
-      Get.to(TextViewer(
-        text: _note[C.TEXT],
-      ));
-    }
-  }
-
   @override
   void initState() {
     super.initState();
@@ -80,11 +54,7 @@ class _DetailedNoteState extends State<DetailedNote> {
             child: ListView.builder(
               itemCount: listCount,
               itemBuilder: (BuildContext context, int position) {
-                var _note = note[C.LIST][position];
-                return SingleNote(
-                  note: note[C.LIST][position],
-                  onTap: () => openNote(_note),
-                );
+                return SingleNote(note: note[C.LIST][position]);
               },
             ),
           )

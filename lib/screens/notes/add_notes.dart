@@ -1,30 +1,21 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/components/apna_file_picker.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
-import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
-import 'package:apna_classroom_app/components/chips/wrap_action_chips.dart';
-import 'package:apna_classroom_app/components/chips/wrap_chips.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
 import 'package:apna_classroom_app/components/editor/text_editor.dart';
-import 'package:apna_classroom_app/components/editor/text_viewer.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
+import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/note_view.dart';
-import 'package:apna_classroom_app/screens/pdf_viewer/pdf_viewer.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
-import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:apna_classroom_app/util/validators.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:image/image.dart' as ImageLib;
 
 const int MAX_RECENTLY_SUBJECTS = 5;
 
@@ -40,7 +31,6 @@ class _AddNotesState extends State<AddNotes> {
 
   // Variables
   Map<String, dynamic> notesData;
-  Set<String> subjects = {};
   bool _loading = false;
   List<Map<String, dynamic>> notes = [];
   String subjectError;
@@ -136,15 +126,11 @@ class _AddNotesState extends State<AddNotes> {
   // Title of Notes
 
   // Subjects of Notes
+  Set<String> subjects = {};
   addSubject(String value) {
-    value = value.trim();
-    if (value.isNotEmpty) {
-      setState(() {
-        subjects.add(value);
-        RecentlyUsedController.to.addSubject(value);
-      });
-    }
-    subjectController.clear();
+    setState(() {
+      subjects.add(value);
+    });
   }
 
   removeSubject(String value) {
@@ -165,17 +151,7 @@ class _AddNotesState extends State<AddNotes> {
   }
 
   // Text Editor
-  /// Notes list can contains Text, PDF, IMAGE, MP4
-  /// The Map has key
-  /// 1. index -> the position in the list -> is list index
-  /// 2. text
-  /// 3. thumbnail
-  /// 4. File pdf, image, mp4
-  /// 5. type -> TEXT, PDF, IMAGE, MP4
-  /// 6. title: file Names + text filt 20 latters
-  ///
   getNotesFromEditor({List<Map<String, dynamic>> list, int index}) async {
-    // https://github.com/neuencer/Flutter_Medium_Text_Editor
     var data = await Get.to(TextEditor(
       data: list,
     ));
@@ -193,76 +169,15 @@ class _AddNotesState extends State<AddNotes> {
 
   // File Picker
   pickFile() async {
-    try {
-      FilePickerResult result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf', 'jpg'],
-        allowCompression: true,
-        allowMultiple: false,
-      );
-      if (result == null) return;
-      setState(() {
-        _loading = true;
-      });
-      var newNotes = await Future.wait(result.files.map((single) async {
-        String _filePath = single.path;
-        switch (single.extension) {
-          case 'pdf':
-            File thumbnailImage = await getPdfCoverImage(path: _filePath);
-            File pdfFile = await saveToDevice(
-                path: PDF_PATH, file: File(_filePath), extension: '.pdf');
-            return {
-              C.TYPE: E.PDF,
-              C.FILE: pdfFile,
-              C.THUMBNAIL: thumbnailImage,
-              C.TITLE: removeExtension(single.name)
-            };
-          case 'jpg':
-            ImageLib.Image thumbnail = await compressImage(path: _filePath);
-            File thumbnailImage = await saveToDevice(
-              path: IMAGE_THUMBNAIL_PATH,
-              bytes: ImageLib.encodePng(thumbnail),
-              extension: '.png',
-            );
-            File image = await saveToDevice(
-                path: IMAGE_PATH, file: File(_filePath), extension: '.jpg');
-            return {
-              C.TYPE: E.IMAGE,
-              C.FILE: image,
-              C.THUMBNAIL: thumbnailImage,
-              C.TITLE: removeExtension(single.name)
-            };
-            break;
-          case 'mp4':
-            break;
-        }
-      }).toList());
-
-      setState(() {
-        notes.addAll(newNotes);
-      });
-    } on PlatformException catch (e) {
-      print("Error while picking the file: " + e.toString());
-    } finally {
-      setState(() {
-        _loading = false;
-      });
-    }
-  }
-
-  onCardTap(int index, Map<String, dynamic> note) {
-    switch (note[C.TYPE]) {
-      case E.TEXT:
-        Get.to(TextViewer(text: note));
-        // getNotesFromEditor(list: note[C.TEXT], index: index);
-        break;
-      case E.IMAGE:
-        Get.to(ImageViewer(image: note[C.FILE]));
-        break;
-      case E.PDF:
-        Get.to(PdfViewer(pdf: note[C.FILE]));
-        break;
-    }
+    setState(() {
+      _loading = true;
+    });
+    var newNotes = await showApnaFilePicker(true);
+    setState(() {
+      _loading = false;
+      if (newNotes == null) return;
+      notes.addAll(newNotes);
+    });
   }
 
   onNoteDelete(int index) {
@@ -297,8 +212,6 @@ class _AddNotesState extends State<AddNotes> {
 
   @override
   Widget build(BuildContext context) {
-    Set<String> subjectSuggestions =
-        RecentlyUsedController.to.subjects.toSet().difference(subjects);
     return Scaffold(
       appBar: AppBar(
         title: Text(S.ADD_NOTES.tr),
@@ -320,43 +233,19 @@ class _AddNotesState extends State<AddNotes> {
                           InputDecoration(labelText: S.ENTER_NOTES_TITLE.tr),
                       validator: validTitle,
                       onSaved: (value) => notesData[C.TITLE] = value,
+                      maxLength: 30,
                     ),
                     SizedBox(height: 8),
                     // Add Subjects list
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Flexible(
-                          child: TextFormField(
-                            controller: subjectController,
-                            decoration: InputDecoration(
-                              labelText: S.ENTER_SUBJECT.tr,
-                              errorText: subjectError,
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 20.0),
-                        SecondaryButton(
-                          onPress: () => addSubject(subjectController.text),
-                          iconData: Icons.add,
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    WrapChips(list: subjects, onDeleted: removeSubject),
-                    Divider(),
-                    if (RecentlyUsedController.to.lastUsedSubjects.length != 0)
-                      TextButton(
-                        onPressed: addAllLastUsed,
-                        child: Text(S.ADD_ALL_LAST_USED.tr),
-                      ),
-                    WrapActionChips(
-                      list: subjectSuggestions.take(5).toSet(),
-                      onAction: addSubject,
-                      actionIcon: Icons.add,
+                    SubjectTagInput(
+                      subjects: subjects,
+                      subjectError: subjectError,
+                      subjectController: subjectController,
+                      addSubject: addSubject,
+                      removeSubject: removeSubject,
+                      addAllLastUsed: addAllLastUsed,
                     ),
                     RadioGroup(
-                      margin: const EdgeInsets.all(0.0),
                       list: {
                         E.PUBLIC: S.PUBLIC.tr,
                         E.PRIVATE: S.PRIVATE.tr,
@@ -395,11 +284,12 @@ class _AddNotesState extends State<AddNotes> {
                           i,
                           NoteView(
                             note: e,
-                            onTap: () => onCardTap(i, e),
                             onChangeTitle: (title) => onChangeTitle(i, title),
                             onDelete: () => onNoteDelete(i),
                             onNoteMove: (AxisDirection direction, bool end) =>
                                 onNoteMove(i, direction, end),
+                            onEdit: () =>
+                                getNotesFromEditor(list: e[C.TEXT], index: i),
                           ),
                         ),
                       )

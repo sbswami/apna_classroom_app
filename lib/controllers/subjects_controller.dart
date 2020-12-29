@@ -13,6 +13,9 @@ class RecentlyUsedController extends GetxController {
   RecentlyUsedController() {
     getRecentlyAddedSubjects().then((value) => subjects = value);
     getLastAddedSubjects().then((value) => lastUsedSubjects = value);
+
+    getRecentlyAddedExams().then((value) => exams = value);
+    getLastAddedExams().then((value) => lastUsedExams = value);
   }
 
   void setSubjects(List<String> list) {
@@ -26,9 +29,9 @@ class RecentlyUsedController extends GetxController {
   }
 
   Future addAllSubject(List<String> subjects) async {
-    subjects.removeWhere((element) => subjects.contains(element));
-    subjects.insertAll(0, subjects);
-    await addRecentlyAddedSubjects(subjects);
+    this.subjects.removeWhere((element) => subjects.contains(element));
+    this.subjects.insertAll(0, subjects);
+    await addRecentlyAddedSubjects(this.subjects);
   }
 
   void setExams(List<String> list) {
@@ -36,11 +39,15 @@ class RecentlyUsedController extends GetxController {
   }
 
   void addExam(String exam) {
-    subjects.insert(0, exam);
+    exams.remove(exam);
+    exams.insert(0, exam);
+    addRecentlyAddedExams(exams);
   }
 
-  void addAllExam(List<String> exams) {
-    subjects.insertAll(0, exams);
+  void addAllExam(List<String> exams) async {
+    this.exams.removeWhere((element) => exams.contains(element));
+    this.exams.insertAll(0, exams);
+    await addRecentlyAddedExams(this.exams);
   }
 
   void setLastUsedSubjects(List<String> list) {
@@ -50,5 +57,6 @@ class RecentlyUsedController extends GetxController {
 
   void setLastUsedExams(List<String> list) {
     lastUsedExams = list;
+    setLastAddedExams(list);
   }
 }

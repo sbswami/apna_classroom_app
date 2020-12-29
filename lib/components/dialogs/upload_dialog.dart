@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 const String NOTES_CONTROLLER_TAG = 'NOTES_UPLOAD_TAG';
+const String QUESTION_CONTROLLER_TAG = 'QUESTION_UPLOAD_TAG';
 
 class UploadDialog extends StatefulWidget {
   final String tag;
@@ -48,7 +49,7 @@ class _UploadDialogState extends State<UploadDialog> {
 showUploadDialog(String tag) {
   return showDialog(
     context: Get.context,
-    barrierDismissible: false,
+    barrierDismissible: true,
     builder: (BuildContext context) => UploadDialog(
       tag: tag,
     ),

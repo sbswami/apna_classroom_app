@@ -22,8 +22,29 @@ String validName(String value) {
 String validTitle(String value) {
   if (!RegExp(r'^[A-Za-z0-9]+([\ A-Za-z0-9]+)*').hasMatch(value) ||
       value.isEmpty ||
-      value.length > 30) {
+      value.length > 100) {
     return S.NOT_A_VALID_TITLE.tr;
+  }
+  return null;
+}
+
+String validQuestion(String value) {
+  if (value.isEmpty || value.length > 500) {
+    return S.NOT_A_VALID_QUESTION.tr;
+  }
+  return null;
+}
+
+String validAnswer(String value) {
+  if (value.isEmpty || value.length > 500) {
+    return S.NOT_A_VALID_ANSWER.tr;
+  }
+  return null;
+}
+
+String validRequired(String value) {
+  if (value.isEmpty) {
+    return S.THIS_FIELD_IS_REQUIRED.tr;
   }
   return null;
 }

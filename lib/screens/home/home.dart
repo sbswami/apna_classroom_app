@@ -3,8 +3,10 @@ import 'package:apna_classroom_app/screens/classroom/classroom.dart';
 import 'package:apna_classroom_app/screens/home/widgets/bottom_nav_button.dart';
 import 'package:apna_classroom_app/screens/notes/add_notes.dart';
 import 'package:apna_classroom_app/screens/notes/notes.dart';
+import 'package:apna_classroom_app/screens/quiz/exam/add_exam.dart';
+import 'package:apna_classroom_app/screens/quiz/question/add_question.dart';
 import 'package:apna_classroom_app/screens/quiz/quiz.dart';
-import 'package:apna_classroom_app/util/assets.dart';
+import 'package:apna_classroom_app/screens/quiz/quiz_tab_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
@@ -19,8 +21,7 @@ class _HomeState extends State<Home> {
   int _activeTab = 0;
 
   _changeTab(int tab) {
-    _pageController.animateToPage(tab,
-        duration: Duration(seconds: 1), curve: Curves.ease);
+    _pageController.jumpToPage(tab);
     setState(() {
       _activeTab = tab;
     });
@@ -31,10 +32,17 @@ class _HomeState extends State<Home> {
       case 0:
         break;
       case 1:
+        switch (QuizTabController.to.activeTab) {
+          case 0:
+            await Get.to(AddExam());
+            break;
+          case 1:
+            await Get.to(AddQuestion());
+            break;
+        }
         break;
       case 2:
         await Get.to(AddNotes());
-        setState(() {});
         break;
     }
   }
@@ -42,30 +50,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Image.asset(
-          A.MINI_ICON,
-          scale: 2.5,
-        ),
-        brightness: Brightness.light,
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.search,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Icon(
-              Icons.notifications,
-              color: Theme.of(context).primaryColor,
-            ),
-          ),
-        ],
-      ),
       body: PageView(
         controller: _pageController,
         physics: NeverScrollableScrollPhysics(),

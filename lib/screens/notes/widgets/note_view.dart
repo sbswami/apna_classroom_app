@@ -1,6 +1,10 @@
+import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/editor/text_field.dart';
+import 'package:apna_classroom_app/components/editor/text_viewer.dart';
 import 'package:apna_classroom_app/components/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
+import 'package:apna_classroom_app/screens/pdf_viewer/pdf_viewer.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
 import 'package:apna_classroom_app/util/validators.dart';
@@ -9,18 +13,20 @@ import 'package:get/get.dart';
 
 class NoteView extends StatefulWidget {
   final Map<String, dynamic> note;
-  final Function onTap;
   final Function(String value) onChangeTitle;
   final Function onDelete;
   final Function(AxisDirection direction, bool end) onNoteMove;
+  final Function onEdit;
+  final bool isQuestion;
 
   NoteView(
       {Key key,
       this.note,
-      this.onTap,
       this.onChangeTitle,
       this.onDelete,
-      this.onNoteMove})
+      this.onNoteMove,
+      this.isQuestion,
+      this.onEdit})
       : super(key: key);
 
   @override
@@ -52,7 +58,7 @@ class _NoteViewState extends State<NoteView> {
   onChangeTitle(String value) {
     if (value.isEmpty) {
       setState(() {
-        titleError = 'Please enter the note Title';
+        titleError = S.PLEASE_ENTER_THE_NOTE_TITLE.tr;
       });
     } else if (value.isNotEmpty && titleError != null) {
       setState(() {
@@ -63,67 +69,69 @@ class _NoteViewState extends State<NoteView> {
   }
 
   onLongPress() {
-    RenderBox box = context.findRenderObject();
-    Offset position = box.localToGlobal(Offset.zero);
-    showMenu(
-      context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        box.size.width - position.dx,
-        box.size.height - position.dy,
-      ),
-      items: [
-        PopupMenuItem(
-          value: 0,
-          child: MenuItem(
-            text: S.DELETE.tr,
-            iconData: Icons.delete,
-            onTap: () {
-              widget.onDelete();
-              Get.back();
-            },
-          ),
+    List<MenuItem> items = [
+      MenuItem(
+        text: S.DELETE.tr,
+        iconData: Icons.delete,
+        onTap: () {
+          Get.back();
+          widget.onDelete();
+        },
+      )
+    ];
+
+    if (widget.note[C.TYPE] == E.TEXT) {
+      items.add(MenuItem(
+        text: S.EDIT.tr,
+        iconData: Icons.edit,
+        onTap: () => widget.onEdit(),
+      ));
+    }
+
+    if (!(widget.isQuestion ?? false)) {
+      items.addAll([
+        MenuItem(
+          text: S.MOVE_UP.tr,
+          iconData: Icons.arrow_upward,
+          onTap: () => widget.onNoteMove(AxisDirection.up, false),
         ),
-        PopupMenuItem(
-          value: 1,
-          child: MenuItem(
-            text: S.MOVE_UP.tr,
-            iconData: Icons.arrow_upward,
-            onTap: () => widget.onNoteMove(AxisDirection.up, false),
-          ),
+        MenuItem(
+          text: S.MOVE_DOWN.tr,
+          iconData: Icons.arrow_downward,
+          onTap: () => widget.onNoteMove(AxisDirection.down, false),
         ),
-        PopupMenuItem(
-          value: 2,
-          child: MenuItem(
-            text: S.MOVE_DOWN.tr,
-            iconData: Icons.arrow_downward,
-            onTap: () => widget.onNoteMove(AxisDirection.down, false),
-          ),
+        MenuItem(
+          text: S.MOVE_TO_TOP.tr,
+          iconData: Icons.arrow_circle_up,
+          onTap: () => widget.onNoteMove(AxisDirection.up, true),
         ),
-        PopupMenuItem(
-          value: 3,
-          child: MenuItem(
-            text: S.MOVE_TO_TOP.tr,
-            iconData: Icons.arrow_circle_up,
-            onTap: () => widget.onNoteMove(AxisDirection.up, true),
-          ),
-        ),
-        PopupMenuItem(
-          value: 4,
-          child: MenuItem(
-            text: S.MOVE_TO_BOTTOM.tr,
-            iconData: Icons.arrow_circle_down,
-            onTap: () => widget.onNoteMove(AxisDirection.down, true),
-          ),
-        ),
-      ],
-    );
+        MenuItem(
+          text: S.MOVE_TO_BOTTOM.tr,
+          iconData: Icons.arrow_circle_down,
+          onTap: () => widget.onNoteMove(AxisDirection.down, true),
+        )
+      ]);
+    }
+    showApnaMenu(context, items);
+  }
+
+  onTap() {
+    switch (widget.note[C.TYPE]) {
+      case E.TEXT:
+        Get.to(TextViewer(text: widget.note));
+        break;
+      case E.IMAGE:
+        Get.to(ImageViewer(image: widget.note[C.FILE]));
+        break;
+      case E.PDF:
+        Get.to(PdfViewer(pdf: widget.note[C.FILE]));
+        break;
+    }
   }
 
   @override
   void didUpdateWidget(covariant NoteView oldWidget) {
-    if(oldWidget.note[C.TITLE] != widget.note[C.TITLE]){
+    if (oldWidget.note[C.TITLE] != widget.note[C.TITLE]) {
       titleController.text = widget.note[C.TITLE];
     }
     super.didUpdateWidget(oldWidget);
@@ -132,7 +140,7 @@ class _NoteViewState extends State<NoteView> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: widget.onTap,
+      onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
         margin: const EdgeInsets.only(bottom: 24.0),
@@ -146,15 +154,16 @@ class _NoteViewState extends State<NoteView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                TextField(
-                  // textAlign: TextAlign.center,
-                  controller: titleController,
-                  decoration: InputDecoration(
-                    errorText: titleError,
-                    labelText: S.NOTE_TITLE.tr,
+                if (!(widget.isQuestion ?? false))
+                  TextField(
+                    // textAlign: TextAlign.center,
+                    controller: titleController,
+                    decoration: InputDecoration(
+                      errorText: titleError,
+                      labelText: S.NOTE_TITLE.tr,
+                    ),
+                    onChanged: onChangeTitle,
                   ),
-                  onChanged: onChangeTitle,
-                ),
                 Card(
                   elevation: 4.0,
                   margin: const EdgeInsets.symmetric(vertical: 8.0),

@@ -8,6 +8,7 @@ import 'state_management.dart';
 import 'text_field.dart';
 import 'toolbar.dart';
 
+// https://github.com/neuencer/Flutter_Medium_Text_Editor
 class TextEditor extends StatelessWidget {
   final data;
 

@@ -1,9 +1,9 @@
 import 'package:apna_classroom_app/internationalization/strings.dart';
 
 const EN_US = {
-  'hello': 'Hello World',
   // Basic
   S.APP_NAME: 'Apna Classroom',
+  S.APP_N: 'Apna',
 
   // Design
   S.SOMETHING_WENT_WRONG: 'Something Went Wrong',
@@ -41,10 +41,15 @@ const EN_US = {
   S.ADD_ALL_LAST_USED: 'Add all last used',
   S.PUBLIC: 'Public',
   S.PRIVATE: 'Private',
-  S.NOT_A_VALID_TITLE: 'Please enter valid title, Character limit to 30',
-  S.ADD_AT_LEAST_ONE_SUBJECT: 'Add at least one subject',
+  S.NOT_A_VALID_TITLE: 'Please enter valid title, Character limit to 100',
+  S.ADD_AT_LEAST_ONE_SUBJECT: 'Add at least one subject!',
   S.PDF_VIEWER: 'PDF Viewer',
   S.IMAGE_VIEWER: 'Image Viewer',
+  S.SEARCH: 'Search',
+  S.OPEN_IMAGE: 'Open Image',
+  S.EDIT: 'Edit',
+  S.ADD_AT_LEAST_ONE_EXAM: 'Add at lease one exam!',
+  S.SUBJECT: 'Subject',
 
   // Notes + Quiz
   S.OPEN_EDITOR: 'Open Editor',
@@ -62,10 +67,62 @@ const EN_US = {
   S.MOVE_DOWN: 'Move down',
   S.MOVE_TO_TOP: 'Move to top',
   S.MOVE_TO_BOTTOM: 'Move to bottom',
+  S.PLEASE_ENTER_THE_NOTE_TITLE: 'Please enter the note Title',
+
+  // Quiz + Exam
+  S.EXAM: 'Exam',
+  S.ADD_EXAM: 'Add Exam',
+  S.ENTER_EXAM: 'Enter Exam',
+  S.EXAM_TITLE: 'Exam Title',
+  S.EXAM_INSTRUCTION: 'Exam Instruction',
+  S.PLUS_QUESTION: '+ Question',
+  S.MINUS_MARKING: 'Minus Marking',
+  S.MINUS_MARKS_PER_QUESTION: 'Minus marking per question',
+  S.EXAM_SOLVING_TIME: 'Exam Solving Time',
+  S.EXAM_MARKS: 'Exam Marks',
+  S.EXAM_PRIVACY: 'Exam Privacy',
+  S.DIFFICULTY_LEVEL: 'Difficulty Level',
+  S.THIS_FIELD_IS_REQUIRED: 'This field is required!',
+  S.EASY: 'Easy',
+  S.NORMAL: 'Normal',
+  S.HARD: 'Hard',
+  S.SOLVING_TIME_HELPER_TEXT: 'Time will be equally divided for each question.',
+  S.EXAM_MARKS_HELPER_TEXT: 'Marks will be equally divided for each question.',
+  S.PLEASE_ADD_AT_LEAST_1_QUESTION: 'Please add at least 1 Question',
+  S.QUESTION_ADDED: 'Question Added',
+  S.CREATE_EXAM: 'Create Exam',
+
+  // Quiz + Question
+  S.QUESTION: 'Question',
+  S.ADD_QUESTION: 'Add Question',
+  S.NOT_A_VALID_QUESTION: 'Please enter valid question, Character limit to 500',
+  S.ADD_IMAGE: '+ Image',
+  S.IMAGE_NAME: 'Image name',
+  S.PLEASE_ENTER_IMAGE_NAME: 'Please enter image name',
+  S.ANSWER_TYPE: 'Answer Type',
+  S.MULTI_CHOICE: 'Multi choice',
+  S.SINGLE_CHOICE: 'Single choice',
+  S.DIRECT_ANSWER: 'Direct answer',
+  S.ENTER_OPTION: 'Enter Option',
+  S.NOT_A_VALID_ANSWER: 'Not a valid answer',
+  S.ENTER_ANSWER: 'Enter Answer',
+  S.ANSWER_FORMAT: 'Answer Format',
+  S.ANSWER_FORMAT_HINT: 'eg. Only Number',
+  S.ANSWER_HINT: 'Answer Hint',
+  S.SOLVING_TIME: 'Solving Time',
+  S.HOUR: 'Hour',
+  S.MINUTE: 'Minute',
+  S.SECOND: 'Second',
+  S.ENTER_MARKS: 'Enter Marks',
+  S.ADD_SOLUTION: 'Add Solution',
+  S.PLEASE_SELECT_CORRECT_ANSWER: 'Please select correct answer!',
+  S.PLEASE_ADD_AT_LEAST_OPTIONS: 'Please add at least 2 options',
+  S.MARKS: 'Marks',
+  S.OPTION: 'Option',
+  S.ANSWER: 'Answer',
 
   // Buttons
   S.CONTINUE: 'Continue',
   S.OKAY: 'Okay',
-
-  S.EXAM: 'Exam'
+  S.PLUS_ADD: '+ Add',
 };

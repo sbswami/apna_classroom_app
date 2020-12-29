@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 
 class RadioGroup extends StatefulWidget {
   final Map<String, String> list;
-  final Function(String) onChange;
+  final Function(String value) onChange;
   final String defaultValue;
-  final EdgeInsetsGeometry margin;
   final bool fixed;
   final String errorMessage;
+  final bool isVertical;
 
   const RadioGroup(
       {Key key,
       this.list,
       this.onChange,
       this.defaultValue,
-      this.margin,
       this.fixed,
-      this.errorMessage})
+      this.errorMessage,
+      this.isVertical})
       : super(key: key);
 
   @override
@@ -43,38 +43,44 @@ class _RadioGroupState extends State<RadioGroup> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: widget.margin ?? const EdgeInsets.all(8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        if (!(widget.isVertical ?? false))
           Row(
-            children: <Widget>[
-              ...widget.list.entries.map((e) => Row(
-                    children: <Widget>[
-                      Radio(
-                        onChanged: _onChange,
-                        value: e.key,
-                        groupValue: groupValue,
-                      ),
-                      GestureDetector(
-                        child: Text(e.value),
-                        onTap: () => _onChange(e.key),
-                      ),
-                    ],
-                  )),
-            ],
+            children: getRadioList(),
           ),
-          widget.errorMessage != null
-              ? Text(
-                  widget.errorMessage ?? '',
-                  style: TextStyle(
-                    color: Theme.of(context).errorColor,
-                  ),
-                )
-              : SizedBox(),
-        ],
-      ),
+        if (widget.isVertical ?? false)
+          Column(
+            children: getRadioList(),
+          ),
+        widget.errorMessage != null
+            ? Text(
+                widget.errorMessage ?? '',
+                style: TextStyle(
+                  color: Theme.of(context).errorColor,
+                ),
+              )
+            : SizedBox(),
+      ],
     );
+  }
+
+  List<Widget> getRadioList() {
+    return widget.list.entries
+        .map((e) => Row(
+              children: <Widget>[
+                Radio(
+                  onChanged: _onChange,
+                  value: e.key,
+                  groupValue: groupValue,
+                ),
+                GestureDetector(
+                  child: Text(e.value),
+                  onTap: () => _onChange(e.key),
+                ),
+              ],
+            ))
+        .toList();
   }
 }
