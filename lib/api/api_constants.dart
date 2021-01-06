@@ -8,6 +8,7 @@ const String USER_CREATE = '$USER_ROOT/create';
 const String USER_GET = '$USER_ROOT/get';
 const String USER_CHECK_USERNAME = '$USER_ROOT/check-username';
 const String USER_UPDATE = '$USER_ROOT/update';
+const String USER_SEARCH_PERSON = '$USER_ROOT/search';
 
 // Notes Routes
 const String NOTE_ROOT = '/note';
@@ -34,3 +35,18 @@ const String EXAM_GET = '$EXAM_ROOT/get';
 const String EXAM_LIST = '$EXAM_ROOT/list';
 const String EXAM_DELETE = '$EXAM_ROOT/delete';
 const String EXAM_SUBJECTS = '$EXAM_ROOT/subjects';
+
+// Classroom
+const String CLASSROOM_ROOT = '/classroom';
+
+const String CLASSROOM_CREATE = '$CLASSROOM_ROOT/create';
+const String CLASSROOM_GET = '$CLASSROOM_ROOT/get';
+const String CLASSROOM_LIST = '$CLASSROOM_ROOT/list';
+
+// Exam Conducted Routes
+const String EXAM_CONDUCTED_ROOT = '/exam-conducted';
+
+const String EXAM_CONDUCTED_CREATE = '$EXAM_CONDUCTED_ROOT/create';
+const String EXAM_CONDUCTED_GET = '$EXAM_CONDUCTED_ROOT/get';
+const String EXAM_CONDUCTED_LIST = '$EXAM_CONDUCTED_ROOT/list';
+const String EXAM_CONDUCTED_DELETE = '$EXAM_CONDUCTED_ROOT/delete';

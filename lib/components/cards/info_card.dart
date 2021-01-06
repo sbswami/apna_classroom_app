@@ -10,7 +10,8 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (data == null && child == null) return SizedBox.shrink();
+    if ((data == null || data.toString().isEmpty) && child == null)
+      return SizedBox.shrink();
     return Card(
       elevation: 4.0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),

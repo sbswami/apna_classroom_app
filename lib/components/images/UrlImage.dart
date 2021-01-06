@@ -5,14 +5,18 @@ import 'package:flutter/material.dart';
 
 class UrlImage extends StatelessWidget {
   final String url;
+  final BoxFit fit;
 
-  const UrlImage({Key key, this.url}) : super(key: key);
+  const UrlImage({Key key, this.url, this.fit}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
         if (snapshot.hasData) {
-          return Image.file(snapshot.data);
+          return Image.file(
+            snapshot.data,
+            fit: fit,
+          );
         }
         return Padding(
           padding: const EdgeInsets.all(16.0),

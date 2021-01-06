@@ -36,4 +36,10 @@ class E {
   // Join Permission
   static const String ANYONE = 'ANYONE';
   static const String REQUEST_BEFORE_JOIN = 'REQUEST_BEFORE_JOIN';
+
+  // Message Type
+  static const String MESSAGE = 'MESSAGE';
+  static const String EXAM_CONDUCTED = 'EXAM_CONDUCTED';
+  static const String NOTE = 'NOTE';
+  static const String MEDIA = 'MEDIA';
 }

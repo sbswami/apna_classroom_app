@@ -1,4 +1,5 @@
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/classroom/add_classroom.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom.dart';
 import 'package:apna_classroom_app/screens/home/widgets/bottom_nav_button.dart';
 import 'package:apna_classroom_app/screens/notes/add_notes.dart';
@@ -30,6 +31,7 @@ class _HomeState extends State<Home> {
   _add() async {
     switch (_activeTab) {
       case 0:
+        Get.to(AddClassroom());
         break;
       case 1:
         switch (QuizTabController.to.activeTab) {
@@ -79,13 +81,13 @@ class _HomeState extends State<Home> {
               onTap: () => _changeTab(0),
             ),
             BottomNavButton(
-              iconData: Icons.receipt,
+              iconData: Icons.receipt_rounded,
               text: S.QUIZ.tr,
               selected: _activeTab == 1,
               onTap: () => _changeTab(1),
             ),
             BottomNavButton(
-              iconData: Icons.local_library,
+              iconData: Icons.local_library_rounded,
               text: S.NOTES.tr,
               selected: _activeTab == 2,
               onTap: () => _changeTab(2),

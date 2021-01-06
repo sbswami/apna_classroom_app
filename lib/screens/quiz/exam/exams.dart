@@ -2,16 +2,19 @@ import 'package:apna_classroom_app/api/exam.dart';
 import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
+import 'package:apna_classroom_app/screens/quiz/exam/detailed_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
-const String PER_PAGE_QUESTION = '10';
+const String PER_PAGE_EXAMS = '10';
 
 class Exams extends StatefulWidget {
   final String examTitle;
+  final Function(Map exam) onSelect;
 
-  const Exams({Key key, this.examTitle}) : super(key: key);
+  const Exams({Key key, this.examTitle, this.onSelect}) : super(key: key);
   @override
   _ExamsState createState() => _ExamsState();
 }
@@ -24,7 +27,13 @@ class _ExamsState extends State<Exams>
   List exams = [];
   String searchTitle;
 
-  loadQuestion() async {
+  @override
+  void initState() {
+    super.initState();
+    loadExams();
+  }
+
+  loadExams() async {
     if (isLoading == true) return;
     setState(() {
       isLoading = true;
@@ -32,7 +41,7 @@ class _ExamsState extends State<Exams>
     int present = exams.length;
     Map<String, String> payload = {
       C.PRESENT: present.toString(),
-      C.PER_PAGE: PER_PAGE_QUESTION,
+      C.PER_PAGE: PER_PAGE_EXAMS,
     };
     if (searchTitle != null) payload[C.TITLE] = searchTitle;
     var questionList = await listExam(payload, selectedSubjects, selectedExams);
@@ -40,12 +49,6 @@ class _ExamsState extends State<Exams>
       isLoading = false;
       exams.addAll(questionList);
     });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    loadQuestion();
   }
 
   // Exam and Subject filters
@@ -58,7 +61,7 @@ class _ExamsState extends State<Exams>
       }
       exams.clear();
     });
-    loadQuestion();
+    loadExams();
   }
 
   onSelectedExam(String subject, bool selected) {
@@ -70,7 +73,7 @@ class _ExamsState extends State<Exams>
       }
       exams.clear();
     });
-    loadQuestion();
+    loadExams();
   }
 
   // on Search
@@ -90,7 +93,7 @@ class _ExamsState extends State<Exams>
       else
         searchTitle = value;
     });
-    loadQuestion();
+    loadExams();
   }
 
   // On refresh
@@ -98,7 +101,14 @@ class _ExamsState extends State<Exams>
     setState(() {
       exams.clear();
     });
-    await loadQuestion();
+    await loadExams();
+  }
+
+  onSelect(exam) {
+    if (widget.onSelect != null) return widget.onSelect(exam);
+    Get.to(DetailedExam(
+      exam: exam,
+    ));
   }
 
   @override
@@ -122,7 +132,7 @@ class _ExamsState extends State<Exams>
               if ((scrollInfo.metrics.pixels ==
                       scrollInfo.metrics.maxScrollExtent) &&
                   !isLoading) {
-                loadQuestion();
+                loadExams();
               }
               return true;
             },
@@ -133,6 +143,7 @@ class _ExamsState extends State<Exams>
                 itemBuilder: (context, position) {
                   return ExamCard(
                     exam: exams[position],
+                    onTap: () => onSelect(exams[position]),
                   );
                 },
               ),

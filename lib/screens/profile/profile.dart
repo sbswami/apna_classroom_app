@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/api/user.dart';
-import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
+import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/home/home.dart';
@@ -13,7 +11,6 @@ import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -38,64 +35,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         usernameError = null;
       });
-      _formData[C.PHOTO_URL] = await uploadProfileImage(_formData[C.IMAGE]);
-      _formData.remove(C.IMAGE);
+      if (_formData[C.IMAGE] != null && _formData[C.THUMBNAIL] != null) {
+        _formData[C.PHOTO_URL] = await uploadImage(_formData[C.IMAGE]);
+        _formData[C.THUMBNAIL_URL] =
+            await uploadImageThumbnail(_formData[C.THUMBNAIL]);
+        _formData.remove(C.IMAGE);
+        _formData.remove(C.THUMBNAIL);
+      } else {
+        _formData.remove(C.THUMBNAIL_URL);
+        _formData.remove(C.PHOTO_URL);
+      }
       await updateUser(_formData);
       Get.offAll(Home());
     }
   }
 
   pickProfilePick() async {
-    var result = await showModalBottomSheet(
-        context: context,
-        builder: (BuildContext context) {
-          return Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                FlatIconTextButton(
-                  iconData: Icons.camera_alt,
-                  text: S.CAMERA.tr,
-                  onPressed: () => Get.back(result: _CAMERA),
-                ),
-                FlatIconTextButton(
-                  iconData: Icons.photo_library,
-                  text: S.GALLERY.tr,
-                  onPressed: () => Get.back(result: _GALLERY),
-                ),
-                FlatIconTextButton(
-                  iconData: Icons.delete,
-                  text: S.DELETE.tr,
-                  onPressed: () => Get.back(result: _DELETE),
-                ),
-              ],
-            ),
-          );
-        });
-    final picker = ImagePicker();
-    PickedFile pickedFile;
-    switch (result) {
-      case _CAMERA:
-        pickedFile = await picker.getImage(
-            source: ImageSource.camera, maxWidth: 200, maxHeight: 200);
-        break;
-      case _GALLERY:
-        pickedFile = await picker.getImage(
-            source: ImageSource.gallery, maxWidth: 200, maxHeight: 200);
-        break;
-      case _DELETE:
-        setState(() {
-          _formData[C.IMAGE] = null;
-        });
-        break;
-      default:
-        return;
+    var result = await showApnaImagePicker(context, showDelete: true);
+    if (result == null) return;
+
+    if (result[3]) {
+      return setState(() {
+        _formData[C.IMAGE] = null;
+        _formData[C.THUMBNAIL] = null;
+      });
     }
 
-    if (pickedFile == null) return;
     setState(() {
-      _formData[C.IMAGE] = File(pickedFile.path);
+      _formData[C.THUMBNAIL] = result[1];
+      _formData[C.IMAGE] = result[2];
     });
   }
 
@@ -119,8 +87,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   PersonImage(
                     editMode: true,
+                    thumbnailImage: _formData[C.THUMBNAIL],
                     image: _formData[C.IMAGE],
-                    onTap: pickProfilePick,
+                    onPhotoSelect: pickProfilePick,
                   ),
                   SizedBox(height: 16),
                   TextFormField(

@@ -1,16 +1,13 @@
-import 'package:apna_classroom_app/components/chips/group_chips.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class ExamCard extends StatelessWidget {
-  final Map<String, dynamic> exam;
-  final Function onTap;
+class ExamConductedCard extends StatelessWidget {
+  final Map examConducted;
 
-  const ExamCard({Key key, this.exam, this.onTap}) : super(key: key);
-
+  const ExamConductedCard({Key key, this.examConducted}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,40 +25,24 @@ class ExamCard extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              getMinuteSt(exam[C.SOLVING_TIME]),
+              getMinuteSt(examConducted[C.EXAM][C.SOLVING_TIME]),
               style: Theme.of(context).textTheme.caption,
             ),
             Text(
-              '${S.MARKS.tr} ${exam[C.MARKS]}',
+              '${S.MARKS.tr} ${examConducted[C.EXAM][C.MARKS]}',
               style: Theme.of(context).textTheme.caption,
             ),
             Text(
-              getDifficulty(exam[C.DIFFICULTY]).tr,
+              getDifficulty(examConducted[C.EXAM][C.DIFFICULTY]).tr,
               style: Theme.of(context).textTheme.caption,
-            ),
-            Icon(
-              getPrivacy(exam[C.PRIVACY]),
-              size: 18,
-              color: Theme.of(context).primaryColor,
             ),
           ],
         ),
-        title: GestureDetector(
-          onTap: onTap,
-          child: Text(
-            exam[C.TITLE],
-            maxLines: 1,
-            style: Theme.of(context).textTheme.subtitle2,
-          ),
+        title: Text(
+          examConducted[C.EXAM][C.TITLE],
+          maxLines: 1,
+          style: Theme.of(context).textTheme.subtitle2,
         ),
-        children: [
-          GroupChips(
-            list: exam[C.EXAM].cast<String>().toList(),
-          ),
-          GroupChips(
-            list: exam[C.SUBJECT].cast<String>().toList(),
-          ),
-        ],
       ),
     );
   }

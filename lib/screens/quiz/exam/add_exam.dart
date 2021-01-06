@@ -111,7 +111,6 @@ class _AddExamState extends State<AddExam> {
       var exam = await createExam(formData);
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
-      Get.back();
       if (exam != null) Get.back();
     }
   }

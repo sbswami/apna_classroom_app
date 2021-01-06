@@ -127,10 +127,61 @@ class S {
   static const String OPTION = 'option';
   static const String ANSWER = 'answer';
 
+  // Classroom
+  static const String ADD_CLASSROOM = 'add_classroom';
+  static const String CLASSROOM_TITLE = 'classroom_title';
+  static const String CLASSROOM_DESCRIPTION = 'classroom_description';
+  static const String CLASSROOM_PRIVACY = 'classroom_privacy';
+  static const String WHO_CAN_JOIN = 'who_can_join';
+  static const String ANYONE_CAN_JOIN = 'anyone_can_join';
+  static const String ACCEPT_JOIN_REQUESTS = 'accept_join_requests';
+  static const String WHO_CAN_SHARE_NOTES = 'who_can_share_notes';
+  static const String WHO_CAN_SHARE_MESSAGES = 'WHO_CAN_SHARE_MESSAGES';
+  static const String ADMIN_ONLY = 'admin_only';
+  static const String ALL = 'all';
+  static const String ADD_MEMBER = 'add_member';
+  static const String IMPORT_VIA_EXCEL = 'import_via_excel';
+  static const String ADMIN = 'admin';
+  static const String SEARCH_PERSON = 'SEARCH_PERSON';
+  static const String REMOVE = 'remove';
+  static const String MAKE_ADMIN = 'make_admin';
+  static const String NOT_ADMIN = 'not_admin';
+  static const String MEMBERS = 'members';
+  static const String GO_TO_CHAT = 'go_to_chat';
+  static const String SCHEDULE_EXAM = 'schedule_exam';
+  static const String CLASSROOM_NOTES = 'classroom_notes';
+
+  static const String RUNNING_EXAM = 'running_exam';
+  static const String UPCOMING_EXAM = 'upcoming_exam';
+  static const String COMPLETED_EXAM = 'completed_exam';
+
+  // Exam Conducted
+  static const String SELECT_EXAM = 'select_exam';
+  static const String CREATE_NEW_EXAM = 'create_new_exam';
+  static const String RANDOM_QUESTION_EXAM = 'random_question_exam';
+  static const String MUST_JOIN_ON_START = 'must_join_on_start';
+  static const String DELAY_ALLOWED = 'delay_allowed';
+  static const String MUST_FINISH_WITHIN_TIME = 'must_finish_within_time';
+  static const String ALLOW_RESUME_EXAM = 'allow_resume_exam';
+  static const String ALLOW_TO_ATTEND_MULTIPLE_TIME =
+      'allow_to_attend_multiple_time';
+  static const String SCHEDULE_EXAM_FOR_LATER = 'schedule_exam_for_later';
+  static const String EXAM_START_TIME = 'exam_start_time';
+  static const String SELECT_START_TIME = 'select_start_time';
+  static const String CAN_EXAM_EXPIRE = 'can_exam_expire';
+  static const String EXAM_EXPIRE_TIME = 'exam_expire_time';
+  static const String SELECT_EXPIRE_TIME = 'select_expire_time';
+  static const String SHOW_SOLUTION_AND_ANSWER = 'show_solution_and_answer';
+  static const String CAN_ASK_DOUBT = 'can_ask_doubt';
+  static const String PLEASE_SELECT_DATE_TIME = 'please_select_date_time';
+  static const String PLEASE_EXPIRE_TIME_AFTER_START_TIME =
+      'please_expire_time_after_start_time';
+
   // Buttons
   static const String CONTINUE = 'continue';
   static const String OKAY = 'okay';
   static const String PLUS_ADD = 'plus_add';
+  static const String CANCEL = 'cancel';
 }
 
 String getDifficulty(String key) {
@@ -158,4 +209,24 @@ String getPrivacySt(String key) {
 IconData getPrivacy(String key) {
   if (key == E.PRIVATE) return Icons.lock;
   return Icons.public;
+}
+
+String getWhoCanJoin(String key) {
+  switch (key) {
+    case E.ANYONE:
+      return S.ANYONE_CAN_JOIN;
+    case E.REQUEST_BEFORE_JOIN:
+      return S.ACCEPT_JOIN_REQUESTS;
+  }
+  return '';
+}
+
+String getWhoCanShare(String key) {
+  switch (key) {
+    case E.ADMIN_ONLY:
+      return S.ADMIN_ONLY;
+    case E.ALL:
+      return S.ALL;
+  }
+  return '';
 }

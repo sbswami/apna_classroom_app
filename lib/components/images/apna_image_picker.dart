@@ -61,7 +61,8 @@ showApnaImagePicker(BuildContext context,
           source: ImageSource.gallery, maxWidth: maxSize, maxHeight: maxSize);
       break;
     case _DELETE:
-      return _DELETE;
+      // index 3 = true // only to delete the image
+      return ['', '', '', true];
       break;
     default:
       return;
@@ -79,7 +80,7 @@ showApnaImagePicker(BuildContext context,
       path: IMAGE_PATH,
       file: File(filePath),
       extension: getExtension(filePath));
-  return [filePath, thumbnailImage, image];
+  return [filePath, thumbnailImage, image, false];
 }
 
 const String _CAMERA = 'CAMERA';

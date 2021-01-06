@@ -4,14 +4,18 @@ class PrimaryButton extends StatelessWidget {
   final Function onPress;
   final String text;
   final IconData iconData;
+  final bool destructive;
 
-  const PrimaryButton({Key key, this.onPress, this.text, this.iconData})
+  const PrimaryButton(
+      {Key key, this.onPress, this.text, this.iconData, this.destructive})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
       onPressed: onPress,
-      color: Theme.of(context).primaryColor,
+      color: (destructive ?? false)
+          ? Theme.of(context).errorColor
+          : Theme.of(context).primaryColor,
       elevation: 4.0,
       child: Row(
         mainAxisSize: MainAxisSize.min,

@@ -3,8 +3,9 @@ import 'package:skeleton_loader/skeleton_loader.dart';
 
 class ListSkeleton extends StatelessWidget {
   final int size;
+  final bool person;
 
-  const ListSkeleton({Key key, this.size}) : super(key: key);
+  const ListSkeleton({Key key, this.size, this.person}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SkeletonLoader(
@@ -14,6 +15,11 @@ class ListSkeleton extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            if (person ?? false)
+              CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: 25,
+              ),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,10 +67,11 @@ class ListSkeleton extends StatelessWidget {
               ],
             ),
             SizedBox(width: 10),
-            CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 14,
-            ),
+            if (!(person ?? false))
+              CircleAvatar(
+                backgroundColor: Colors.white,
+                radius: 14,
+              ),
           ],
         ),
       ),

@@ -35,3 +35,11 @@ Future checkUsername(Map<String, String> payload) async {
     return json.decode(response.body)[C.USER];
   }
 }
+
+Future searchPerson(Map<String, String> payload) async {
+  http.Response response =
+      await apiGetCall(url: USER_SEARCH_PERSON, payload: payload, isUser: true);
+  if (response.statusCode == 200) {
+    return json.decode(response.body)[C.LIST];
+  }
+}

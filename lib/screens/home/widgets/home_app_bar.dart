@@ -7,12 +7,14 @@ class HomeAppBar extends StatefulWidget implements PreferredSizeWidget {
   final Function(String value) onSearch;
   final TextEditingController searchController;
   final PreferredSizeWidget bottom;
+  final bool searchActive;
 
   const HomeAppBar({
     Key key,
     this.onSearch,
     this.bottom,
     this.searchController,
+    this.searchActive,
   }) : super(key: key);
   @override
   _HomeAppBarState createState() => _HomeAppBarState();
@@ -75,10 +77,21 @@ class _HomeAppBarState extends State<HomeAppBar> {
     );
   }
 
+  // Search Back Press
+  onBackIconClick() {
+    if (widget.searchActive ?? false) {
+      return Get.back();
+    }
+    switchSearch(false);
+  }
+
   @override
   void initState() {
     if (widget.searchController != null) {
       searchController = widget.searchController;
+    }
+    if (widget.searchActive != null) {
+      searchActive = widget.searchActive;
     }
     super.initState();
   }
@@ -92,7 +105,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
                 Icons.arrow_back_ios,
                 color: Theme.of(context).primaryColor,
               ),
-              onPressed: () => switchSearch(false),
+              onPressed: onBackIconClick,
             )
           : null,
       title: getTitle(),

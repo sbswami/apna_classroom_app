@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:apna_classroom_app/components/images/UrlImage.dart';
+import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
 import 'package:apna_classroom_app/util/assets.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 const DEFAULT_IMAGE_SIZE = 150.0;
 
@@ -11,15 +15,34 @@ class PersonImage extends StatelessWidget {
   final bool editMode;
   final File image;
   final String url;
-  final Function onTap;
+  final File thumbnailImage;
+  final String thumbnailUrl;
+  final Function onPhotoSelect;
 
   const PersonImage(
-      {Key key, this.size, this.editMode, this.image, this.url, this.onTap})
+      {Key key,
+      this.size,
+      this.editMode,
+      this.image,
+      this.url,
+      this.thumbnailImage,
+      this.thumbnailUrl,
+      this.onPhotoSelect})
       : super(key: key);
+
+  onTap() {
+    if ((image ?? url) != null) {
+      Get.to(ImageViewer(
+        image: image,
+        url: url,
+      ));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: (image ?? url) != null ? onTap : null,
       child: Stack(
         children: [
           Container(
@@ -27,43 +50,44 @@ class PersonImage extends StatelessWidget {
               child: getImage(),
               borderRadius: BorderRadius.circular(size ?? DEFAULT_IMAGE_SIZE),
             ),
-            height: 150,
-            width: 150,
+            height: size ?? DEFAULT_IMAGE_SIZE,
+            width: size ?? DEFAULT_IMAGE_SIZE,
             decoration: BoxDecoration(
               border: Border.all(width: 1, color: Colors.grey),
               borderRadius: BorderRadius.circular(size ?? DEFAULT_IMAGE_SIZE),
             ),
           ),
-          ...((editMode ?? false)
-              ? [
-                  BlackArc(diameter: size ?? DEFAULT_IMAGE_SIZE),
-                  Positioned(
-                    child: Container(
-                      width: size ?? DEFAULT_IMAGE_SIZE,
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                        ),
-                      ),
+          if (editMode ?? false) BlackArc(diameter: size ?? DEFAULT_IMAGE_SIZE),
+          if (editMode ?? false)
+            Positioned(
+              child: GestureDetector(
+                onTap: onPhotoSelect,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  width: size ?? DEFAULT_IMAGE_SIZE,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(
+                      Icons.camera_alt,
+                      color: Colors.white,
                     ),
-                    bottom: 1,
-                    // left: 67,
-                  )
-                ]
-              : []),
+                  ),
+                ),
+              ),
+              bottom: 1,
+              // left: 67,
+            ),
         ],
       ),
     );
   }
 
   Widget getImage() {
-    if (image != null) {
-      return Image.file(image);
+    if (thumbnailImage != null) {
+      return Image.file(thumbnailImage, fit: BoxFit.cover);
     }
-    if (url != null) {
-      return Image.network(url);
+    if (thumbnailUrl != null) {
+      return UrlImage(url: thumbnailUrl, fit: BoxFit.cover);
     }
     return Image.asset(A.PERSON);
   }

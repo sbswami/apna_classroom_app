@@ -1,19 +1,16 @@
 import 'package:apna_classroom_app/screens/home/widgets/home_app_bar.dart';
-import 'package:apna_classroom_app/screens/quiz/question/questions.dart';
+import 'package:apna_classroom_app/screens/quiz/exam/exams.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class QuestionPicker extends StatefulWidget {
-  final List<String> selectedQuestion;
-
-  const QuestionPicker({Key key, this.selectedQuestion}) : super(key: key);
+class ExamPicker extends StatefulWidget {
   @override
-  _QuestionPickerState createState() => _QuestionPickerState();
+  _ExamPickerState createState() => _ExamPickerState();
 }
 
-class _QuestionPickerState extends State<QuestionPicker> {
-  onSelect(List list) {
-    Get.back(result: list);
+class _ExamPickerState extends State<ExamPicker> {
+  onSelect(Map exam) {
+    Get.back(result: exam);
   }
 
   // Search
@@ -29,10 +26,9 @@ class _QuestionPickerState extends State<QuestionPicker> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: HomeAppBar(onSearch: onSearch, searchActive: true),
-      body: Questions(
+      body: Exams(
         onSelect: onSelect,
-        selectedQuestion: widget.selectedQuestion,
-        questionTitle: searchTitle,
+        examTitle: searchTitle,
       ),
     );
   }

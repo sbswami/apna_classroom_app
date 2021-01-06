@@ -15,6 +15,7 @@ class C {
   static const String CREATED_BY = 'createdBy';
   static const String CREATED_AT = 'createdAt';
   static const String UPDATED_AT = 'updatedAt';
+  static const String SEARCH = 'search';
 
   // USER
   static const String USER = 'user';
@@ -96,7 +97,7 @@ class C {
   static const String START_TIME = 'startTime';
   static const String CAN_EXAM_EXPIRE = 'canExamExpire';
   static const String EXPIRE_TIME = 'expireTime';
-  static const String SHOW_SOLUTION_ADN_ANSWER = 'showSolutionAndAnswer';
+  static const String SHOW_SOLUTION_AND_ANSWER = 'showSolutionAndAnswer';
   static const String CAN_ASK_DOUBT = 'canAskDoubt';
 
   static const String FROM_START_TIME = 'fromStartTime';
@@ -111,6 +112,9 @@ class C {
   static const String MARKS_GAINED = 'marksGained';
   static const String MINUS_MARKS = 'minusMarks';
   static const String RESULT = 'result';
+
+  // Message
+  static const String MESSAGE = 'message';
 
   // Pagination
   static const String PRESENT = 'present';
