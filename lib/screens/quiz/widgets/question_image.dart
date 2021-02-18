@@ -1,7 +1,8 @@
 import 'package:apna_classroom_app/components/apna_menu.dart';
+import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
+import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -10,9 +11,14 @@ class QuestionImage extends StatefulWidget {
   final Map<String, dynamic> questionImage;
   final Function(String name) onChangeName;
   final Function onDelete;
+  final bool isEditable;
 
   const QuestionImage(
-      {Key key, this.questionImage, this.onChangeName, this.onDelete})
+      {Key key,
+      this.questionImage,
+      this.onChangeName,
+      this.onDelete,
+      this.isEditable})
       : super(key: key);
 
   @override
@@ -37,16 +43,18 @@ class _QuestionImageState extends State<QuestionImage> {
   }
 
   onLongPress() {
-    showApnaMenu(context, [
-      MenuItem(
-        text: S.DELETE.tr,
-        iconData: Icons.delete,
-        onTap: () {
-          widget.onDelete();
-          Get.back();
-        },
-      ),
-    ]);
+    if (widget.isEditable ?? false) {
+      showApnaMenu(context, [
+        MenuItem(
+          text: S.DELETE.tr,
+          iconData: Icons.delete,
+          onTap: () {
+            widget.onDelete();
+            Get.back();
+          },
+        ),
+      ]);
+    }
   }
 
   @override
@@ -58,7 +66,10 @@ class _QuestionImageState extends State<QuestionImage> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Get.to(ImageViewer(image: widget.questionImage[C.FILE])),
+      onTap: () => Get.to(ImageViewer(
+        image: widget.questionImage[C.FILE],
+        url: widget.questionImage[C.URL],
+      )),
       onLongPress: onLongPress,
       child: Container(
         decoration: BoxDecoration(
@@ -72,20 +83,35 @@ class _QuestionImageState extends State<QuestionImage> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(10.0),
-              child: Image.file(widget.questionImage[C.THUMBNAIL]),
+              child: getThumbnailImage(),
             ),
-            TextField(
-              // textAlign: TextAlign.center,
-              controller: nameController,
-              decoration: InputDecoration(
-                errorText: nameError,
-                labelText: S.IMAGE_NAME.tr,
+            SizedBox(height: 4.0),
+            if (widget.isEditable ?? false)
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  errorText: nameError,
+                  labelText: S.IMAGE_NAME.tr,
+                ),
+                onChanged: onChangeName,
               ),
-              onChanged: onChangeName,
-            ),
+            if (!(widget.isEditable ?? false))
+              SelectableText(widget.questionImage[C.TITLE] ?? ''),
           ],
         ),
       ),
     );
+  }
+
+  getThumbnailImage() {
+    if (widget.questionImage[C.THUMBNAIL] != null) {
+      return Image.file(widget.questionImage[C.THUMBNAIL]);
+    }
+    if (widget.questionImage[C.THUMBNAIL_URL] != null) {
+      return UrlImage(
+        url: widget.questionImage[C.THUMBNAIL_URL],
+      );
+    }
+    return SizedBox();
   }
 }

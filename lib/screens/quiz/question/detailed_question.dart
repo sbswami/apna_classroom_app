@@ -144,6 +144,7 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
                     valueRadio: index,
                     groupValue: question[C.OPTION]
                         .indexWhere((element) => element[C.CORRECT] == true),
+                    isEditable: false,
                   ),
                 );
               },

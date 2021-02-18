@@ -144,10 +144,20 @@ const EN_US = {
   S.GO_TO_CHAT: 'Go to Chat',
   S.SCHEDULE_EXAM: 'Schedule Exam',
   S.CLASSROOM_NOTES: 'Classroom Note',
+  S.PUBLIC_CLASSROOMS: 'Public Classrooms',
 
   S.RUNNING_EXAM: 'Running Exam',
   S.UPCOMING_EXAM: 'Upcoming Exam',
   S.COMPLETED_EXAM: 'Completed Exam',
+
+  S.VIEW_ALL_RUNNING_EXAMS: 'View all running exams',
+  S.VIEW_ALL_UPCOMING_EXAMS: 'View all upcoming exams',
+  S.VIEW_ALL_COMPLETED_EXAMS: 'View all completed exams',
+
+  S.JUST_NOW: 'Just now',
+  S.SECONDS_AGO: 'seconds ago',
+  S.MINUTES_AGO: 'minutes ago',
+  S.HOURS_AGO: 'hours ago',
 
   // Exam Conducted
   S.SELECT_EXAM: 'Select Exam',
@@ -169,6 +179,55 @@ const EN_US = {
   S.PLEASE_SELECT_DATE_TIME: 'Please select date and time.',
   S.PLEASE_EXPIRE_TIME_AFTER_START_TIME:
       'Please select expire time after start time.',
+  S.JOIN: 'Join',
+  S.VIEW_RESULT: 'View Result',
+  S.START_TIME: 'Start Time',
+  S.EXPIRE_TIME: 'Expire Time',
+  S.NO_EXPIRE_TIME: 'No Expire Time',
+  S.SEND_REQUEST: 'Send request',
+
+  // Running Exam
+  S.START: 'Start',
+  S.SUBMIT: 'Submit',
+  S.PREVIOUS: 'Previous',
+  S.NEXT: 'Next',
+  S.CLEAR: 'Clear',
+  S.CORRECT_ANSWER_IS: 'Correct answer is',
+  S.YOU_SUBMITTED_CORRECT_ANSWER: 'Submitted correct answer',
+  S.YOU_SUBMITTED_WRONG_ANSWER: 'Submitted wrong answer',
+  S.I_HAVE_DOUBT: 'I have doubt',
+  S.SHOW_SOLUTION: 'Show Solution',
+  S.PLEASE_SELECT_ANSWER_AND_THEN_SUBMIT:
+      'Please select answer and then submit.',
+  S.PLEASE_ENTER_ANSWER_AND_THEN_SUBMIT: 'Please enter answer and then submit.',
+  S.RESULT: 'Result',
+  S.STARTED_AT: 'Started at',
+  S.EXAM_COMPLETED_IN: 'Exam complete in',
+  S.MINUS_MARKS: 'Minus marks',
+  S.MAXIMUM_MARKS: 'Maximum marks',
+  S.PERCENTAGE: 'Percentage',
+  S.WITHOUT_MINUS_MARKS: 'Without minus marks',
+  S.SHOW_ANSWERS: 'Show answers',
+  S.YOU_LATE: 'You\'r late',
+  S.EXAM_ENDED: 'Exam Ended',
+  S.OUT_OF_TIME_EXAM_WLL_BE_SAVED: 'You are out of time. Exam will be save.',
+  S.YOU_ARE_LATE_CAN_NOT_JOIN_EXAM_NOW:
+      'Sorry, You are late for this exam. You can\'t Join Exam now.',
+  S.EXAM_EXPIRED: 'Exam Expired',
+  S.THIS_EXAM_IS_EXPIRED: 'Sorry, This exam is expired.',
+  S.ATTEND_AGAIN: 'Attend Again',
+  S.WOULD_YOU_GIVE_EXAM_AGAIN_OLD_EXAM_DELETED:
+      'Would you like to give the exam again? The old exam will be deleted.',
+  S.NO: 'No',
+  S.YES: 'Yes',
+  S.YOU_CAN_NOT_GIVE_EXAM_AGAIN: 'You Can\'t give the exam again.',
+  S.RESUME_EXAM: 'Resume Exam',
+  S.YOU_CAN_NOT_RESUME_EXAM_BECAUSE_YOU_ARE_OUT_OF_TIME:
+      'You Can\'t resume the exam. Because you are out of time.',
+  S.YOU_CAN_NOT_RESUME_EXAM: 'You Can\'t resume the exam.',
+
+  // Chat
+  S.TYPE_HERE: 'Type here...',
 
   // Buttons
   S.CONTINUE: 'Continue',

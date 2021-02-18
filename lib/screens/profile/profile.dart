@@ -1,6 +1,7 @@
 import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
+import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -45,7 +46,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _formData.remove(C.THUMBNAIL_URL);
         _formData.remove(C.PHOTO_URL);
       }
+      showProgress();
       await updateUser(_formData);
+      Get.back();
       Get.offAll(Home());
     }
   }

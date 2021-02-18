@@ -1,4 +1,7 @@
+import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/constants.dart';
 import 'package:device_info/device_info.dart';
 import 'package:get/get.dart';
 
@@ -27,6 +30,16 @@ String getMinuteSt(int seconds) {
   return '${getMinute(seconds)} ${S.MINUTE.tr} $second ${S.SECOND.tr}';
 }
 
+isAdmin(List members) {
+  return members.any((element) =>
+      (element[C.ID][C.ID] == UserController.to.currentUser[C.ID]) &&
+      (element[C.ROLE] == E.ADMIN));
+}
+
+isCreator(String createdBy) {
+  return createdBy == UserController.to.currentUser[C.ID];
+}
+
 Iterable<T> zip<T>(Iterable<T> a, Iterable<T> b) sync* {
   final ita = a.iterator;
   final itb = b.iterator;
@@ -35,4 +48,9 @@ Iterable<T> zip<T>(Iterable<T> a, Iterable<T> b) sync* {
     if (hasA) yield ita.current;
     if (hasB) yield itb.current;
   }
+}
+
+String getPercentage(gain, max) {
+  if (gain == null || max == null) return '0.0 %';
+  return '${((gain / max) * 100).toStringAsFixed(2)} %';
 }

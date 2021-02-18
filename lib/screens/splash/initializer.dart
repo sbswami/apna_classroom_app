@@ -1,6 +1,9 @@
+import 'package:apna_classroom_app/api/fcm.dart';
 import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
+import 'package:apna_classroom_app/screens/chat/controllers/chat_messages_controller.dart';
+import 'package:apna_classroom_app/screens/classroom/controllers/classroom_list_controller.dart';
 import 'package:apna_classroom_app/screens/home/home.dart';
 import 'package:apna_classroom_app/screens/login/login.dart';
 import 'package:apna_classroom_app/screens/profile/profile.dart';
@@ -23,7 +26,10 @@ class _InitializerState extends State<Initializer> {
     Get.put(UserController());
     Get.put(RecentlyUsedController());
     Get.put(QuizTabController());
+    Get.put(ChatMessagesController());
+    Get.put(ClassroomListController());
     super.initState();
+    configureFirebase();
     _checkUser();
   }
 

@@ -43,7 +43,7 @@ ok(
     String buttonName,
     Function ok,
     bool isDismissible = true}) {
-  showDialog(
+  return showDialog(
     context: Get.context,
     barrierDismissible: isDismissible,
     builder: (BuildContext context) => InfoDialog(

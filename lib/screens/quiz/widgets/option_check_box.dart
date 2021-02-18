@@ -5,7 +5,7 @@ import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
+import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -24,6 +24,8 @@ class OptionCheckBox extends StatelessWidget {
   final Function(int option) onChangeRadio;
   final int valueRadio;
   final bool isCheckBox;
+  final Color color;
+  final bool isEditable;
 
   const OptionCheckBox(
       {Key key,
@@ -40,7 +42,9 @@ class OptionCheckBox extends StatelessWidget {
       this.groupValue,
       this.onChangeRadio,
       this.valueRadio,
-      this.isCheckBox})
+      this.isCheckBox,
+      this.color,
+      this.isEditable})
       : super(key: key);
 
   onLongPress(BuildContext context) {
@@ -72,20 +76,32 @@ class OptionCheckBox extends StatelessWidget {
   }
 
   onTapBox() {
+    if (!(isEditable ?? false)) return;
     if (isCheckBox && onChanged != null) return onChanged(!checked);
     if (!isCheckBox && onChangeRadio != null) return onChangeRadio(valueRadio);
+  }
+
+  _onChanged(bool _checked) {
+    if (isEditable) onChanged(_checked);
+  }
+
+  _onChangeRadio(int _option) {
+    if (isEditable) onChangeRadio(_option);
   }
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        if (isCheckBox) Checkbox(value: checked, onChanged: onChanged),
+        if (isCheckBox)
+          Checkbox(value: checked, onChanged: _onChanged, activeColor: color),
         if (!isCheckBox)
           Radio(
-              value: valueRadio,
-              groupValue: groupValue,
-              onChanged: onChangeRadio),
+            value: valueRadio,
+            groupValue: groupValue,
+            onChanged: _onChangeRadio,
+            activeColor: color,
+          ),
         GestureDetector(
           child: text != null
               ? Text(text)

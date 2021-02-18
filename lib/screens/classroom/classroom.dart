@@ -1,10 +1,16 @@
 import 'package:apna_classroom_app/api/classroom.dart';
+import 'package:apna_classroom_app/auth/user_controller.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
+import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/chat/chat.dart';
+import 'package:apna_classroom_app/screens/classroom/controllers/classroom_list_controller.dart';
 import 'package:apna_classroom_app/screens/classroom/widgets/classroom_card.dart';
 import 'package:apna_classroom_app/screens/home/widgets/home_app_bar.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
 import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -27,6 +33,9 @@ class _ClassroomState extends State<Classroom>
   List<String> selectedClassroom = [];
   String searchTitle;
 
+  int present = 0;
+  bool isPublic = false;
+
   @override
   void initState() {
     if (widget.selectedClassroom != null) {
@@ -36,26 +45,37 @@ class _ClassroomState extends State<Classroom>
       isSelectable = true;
     }
     super.initState();
+    ClassroomListController.to.resetClassrooms();
+    // The issue is, this screen also used to select classrooms
     loadClassroom();
   }
 
   // Load Classroom
   loadClassroom() async {
-    if (isLoading == true) return;
+    if (isLoading) return;
     setState(() {
       isLoading = true;
     });
-    int present = classrooms.length;
+
     Map<String, String> payload = {
       C.PRESENT: present.toString(),
       C.PER_PAGE: '10',
+      C.PUBLIC: isPublic.toString(),
     };
     if (searchTitle != null) payload[C.TITLE] = searchTitle;
-    var questionList =
+    var _classroom =
         await listClassroom(payload, selectedSubjects, selectedExams);
+
+    if (_classroom[C.PUBLIC] && !isPublic) {
+      isPublic = true;
+      _classroom[C.LIST].add({C.PUBLIC: true});
+      present = 0;
+    } else {
+      present += _classroom[C.LIST].length;
+    }
     setState(() {
       isLoading = false;
-      classrooms.addAll(questionList);
+      classrooms.addAll(_classroom[C.LIST]);
     });
   }
 
@@ -129,10 +149,56 @@ class _ClassroomState extends State<Classroom>
     });
   }
 
+  // On Title Click
+  onTitleClick(Map classroom, bool _public, int index) {
+    if (_public) return joinRequest(classroom, index);
+    Get.to(Chat(classroom: classroom));
+  }
+
+  joinRequest(Map classroom, int index) {
+    if (classroom[C.WHO_CAN_JOIN] == E.ANYONE) {
+      return yesOrNo(
+        title: S.JOIN.tr,
+        msg: '"${classroom[C.TITLE]}", want to join',
+        yesName: S.JOIN.tr,
+        yes: () => join(classroom, index),
+        noName: S.CANCEL.tr,
+      );
+    }
+    if (classroom[C.WHO_CAN_JOIN] == E.REQUEST_BEFORE_JOIN) {
+      return yesOrNo(
+        title: S.JOIN.tr,
+        msg: '"${classroom[C.TITLE]}", do you want send join request?',
+        yesName: S.SEND_REQUEST.tr,
+        yes: () => join(classroom, index),
+        noName: S.CANCEL.tr,
+      );
+    }
+  }
+
+  join(Map classroom, int index) async {
+    await addMembers({
+      C.ID: classroom[C.ID],
+      C.MEMBERS: [
+        {
+          C.ID: UserController.to.currentUser[C.ID],
+          C.ROLE: E.MEMBER,
+        }
+      ]
+    });
+    setState(() {
+      classrooms.removeAt(index);
+      classrooms.insert(0, classroom);
+      --present;
+    });
+  }
+
   // On refresh
   Future<void> onRefresh() async {
     setState(() {
       classrooms.clear();
+      present = 0;
+      isPublic = false;
     });
     await loadClassroom();
   }
@@ -141,6 +207,7 @@ class _ClassroomState extends State<Classroom>
   Widget build(BuildContext context) {
     super.build(context);
     int resultLength = classrooms.length;
+    fromNowPublic = false;
     return Scaffold(
       appBar:
           HomeAppBar(onSearch: onSearch, searchActive: widget.onSelect != null),
@@ -174,18 +241,32 @@ class _ClassroomState extends State<Classroom>
                 child: ListView.builder(
                   itemCount: resultLength,
                   itemBuilder: (context, position) {
+                    var classroom = classrooms[position];
+                    if (classroom[C.PUBLIC] ?? false) {
+                      fromNowPublic = true;
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16.0),
+                        child: Text(
+                          S.PUBLIC_CLASSROOMS.tr,
+                          textAlign: TextAlign.center,
+                        ),
+                      );
+                    }
                     bool isSelected;
                     if (isSelectable) {
                       isSelected = selectedClassroom.any(
                           (element) => element == classrooms[position][C.ID]);
                     }
                     return ClassroomCard(
-                      classroom: classrooms[position],
+                      classroom: classroom,
                       isSelected: isSelected,
                       onChanged: (value) =>
-                          onSelectClassroom(classrooms[position][C.ID], value),
+                          onSelectClassroom(classroom[C.ID], value),
                       onLongPress: ({BuildContext context}) =>
-                          onLongPress(context, classrooms[position][C.ID]),
+                          onLongPress(context, classroom[C.ID]),
+                      isPublic: fromNowPublic,
+                      onTitleTap: (_public) =>
+                          onTitleClick(classroom, _public, position),
                     );
                   },
                 ),
@@ -206,3 +287,5 @@ class _ClassroomState extends State<Classroom>
   @override
   bool get wantKeepAlive => true;
 }
+
+bool fromNowPublic = false;

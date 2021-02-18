@@ -22,10 +22,11 @@ class SecondaryButton extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           if (iconData != null) Icon(iconData, color: color),
-          Text(
-            text ?? '',
-            style: Theme.of(context).textTheme.button.copyWith(color: color),
-          ),
+          if (text != null)
+            Text(
+              text,
+              style: Theme.of(context).textTheme.button.copyWith(color: color),
+            ),
         ],
       ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),

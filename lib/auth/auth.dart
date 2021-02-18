@@ -1,5 +1,7 @@
+import 'package:apna_classroom_app/api/fcm.dart';
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/api/user.dart';
+import 'package:apna_classroom_app/api/user_details.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
@@ -111,13 +113,19 @@ handleAuthResult(UserCredential authResult) async {
       C.UID: authResult.user.uid,
       C.DEVICE_ID: await getDeviceID(),
     });
-    postLoginLoadData();
+    await postLoginLoadData();
     return;
   }
   ok(title: S.LOGIN_FAILED, msg: S.SOMETHING_WENT_WRONG);
 }
 
 postLoginLoadData() async {
+  // Save User Details
+  await createUserDetails({
+    C.ID: UserController.to.currentUser[C.ID],
+    C.FCM_TOKEN: await getToken(),
+  });
+
   List subjects = await getSubjectsNote();
   await RecentlyUsedController.to.addAllSubject(subjects.cast<String>());
 }

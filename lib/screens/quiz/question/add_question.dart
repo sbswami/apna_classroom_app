@@ -388,6 +388,7 @@ class _AddQuestionState extends State<AddQuestion> {
                             onChangeName: (title) =>
                                 onImageTitleChange(index, title),
                             onDelete: () => onRemoveImage(index),
+                            isEditable: true,
                           ),
                         ),
                       )
@@ -461,6 +462,7 @@ class _AddQuestionState extends State<AddQuestion> {
                                 onDelete: () => onDelete(key),
                                 isCheckBox:
                                     formData[C.ANSWER_TYPE] == E.MULTI_CHOICE,
+                                isEditable: true,
                               ),
                             ),
                           )

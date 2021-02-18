@@ -3,6 +3,9 @@ class C {
   static const String PHONE_CODE = 'phoneCode';
   static const String PHONE_NUMBER = 'phoneNumber';
 
+  static const String ON_TAP = 'onTap';
+  static const String PRIMARY = 'primary';
+
   // API END
 
   // HEADERS
@@ -16,6 +19,7 @@ class C {
   static const String CREATED_AT = 'createdAt';
   static const String UPDATED_AT = 'updatedAt';
   static const String SEARCH = 'search';
+  static const String PUBLIC = 'public';
 
   // USER
   static const String USER = 'user';
@@ -25,11 +29,16 @@ class C {
   static const String NAME = 'name';
   static const String PHOTO_URL = 'photoUrl';
   static const String HIDE_MY_NUMBER = 'hideMyNumber';
-  static const String FCM_TOKEN = 'fcmToken';
   static const String DEVICE_ID = 'deviceId';
   static const String ACTIVE_DEVICE = 'activeDevice';
   static const String HIDE_ME = 'hideMe';
+
+  // USER DETAILS
+  static const String USER_DETAILS = 'userDetails';
+  static const String FCM_TOKEN = 'fcmToken';
   static const String ONLINE = 'online';
+  static const String UNSEEN_LIST = 'unseenList';
+  static const String UNSEEN = 'unseen';
 
   // NOTE
   static const String NOTE = 'note';
@@ -86,6 +95,10 @@ class C {
   static const String JOIN_REQUEST = 'joinRequest';
   static const String ADD_TIME = 'ADD_TIME';
 
+  static const String RUNNING_EXAM = 'runningExam';
+  static const String UPCOMING_EXAM = 'upcomingExam';
+  static const String COMPLETED_EXAM = 'completedExam';
+
   // Conducted Exam
   static const String EXAM_CONDUCTED = 'examConducted';
   static const String MUST_JOIN_INSTANTLY = 'mustJoinInstantly';
@@ -112,6 +125,8 @@ class C {
   static const String MARKS_GAINED = 'marksGained';
   static const String MINUS_MARKS = 'minusMarks';
   static const String RESULT = 'result';
+  static const String FINISHED = 'finished';
+  static const String FINISHED_TIME = 'finishedTime';
 
   // Message
   static const String MESSAGE = 'message';
@@ -119,4 +134,11 @@ class C {
   // Pagination
   static const String PRESENT = 'present';
   static const String PER_PAGE = 'perPage';
+
+  // Push Notification
+  static const String BODY = 'body';
+  static const String ACTION = 'action';
+  static const String NOTIFICATION_ID = 'notificationId';
+  static const String CHANNEL_ID = 'channelId';
+  static const String PRIORITY = 'priority';
 }

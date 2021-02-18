@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:apna_classroom_app/util/assets.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -12,6 +13,12 @@ class UrlImage extends StatelessWidget {
   Widget build(BuildContext context) {
     return FutureBuilder(
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
+        if (url == null || snapshot.hasError) {
+          return Image.asset(
+            A.PERSON,
+            fit: fit,
+          );
+        }
         if (snapshot.hasData) {
           return Image.file(
             snapshot.data,

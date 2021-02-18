@@ -17,6 +17,7 @@ Future<http.Response> apiCall({
   if (payload == null) {
     payload = {};
   }
+  payload[C.CREATED_AT] = DateTime.now().toString();
   Map<String, String> headers = {
     C.CONTENT_TYPE: C.APPLICATION_JSON,
   };
@@ -31,7 +32,7 @@ Future<http.Response> apiCall({
           body: json.encoder.convert(payload), headers: headers)
       .catchError(handleAPIError);
   isLoading ? Get.back() : 0;
-  return response;
+  return response ?? {};
 }
 
 Future<http.Response> apiGetCall({

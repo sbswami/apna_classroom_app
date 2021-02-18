@@ -1,3 +1,4 @@
+import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/classroom/add_classroom.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom.dart';
@@ -94,6 +95,14 @@ class _HomeState extends State<Home> {
             ),
             SizedBox(width: 30)
             // SizedBox(width: 64),
+          ],
+        ),
+      ),
+      drawer: Drawer(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(icon: Icon(Icons.logout), onPressed: signOut),
           ],
         ),
       ),

@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
-import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
+import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:apna_classroom_app/util/assets.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';

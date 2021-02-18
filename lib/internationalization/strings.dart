@@ -150,10 +150,20 @@ class S {
   static const String GO_TO_CHAT = 'go_to_chat';
   static const String SCHEDULE_EXAM = 'schedule_exam';
   static const String CLASSROOM_NOTES = 'classroom_notes';
+  static const String PUBLIC_CLASSROOMS = 'public_classrooms';
 
   static const String RUNNING_EXAM = 'running_exam';
   static const String UPCOMING_EXAM = 'upcoming_exam';
   static const String COMPLETED_EXAM = 'completed_exam';
+
+  static const String VIEW_ALL_RUNNING_EXAMS = 'view_all_running_exams';
+  static const String VIEW_ALL_UPCOMING_EXAMS = 'view_all_upcoming_exams';
+  static const String VIEW_ALL_COMPLETED_EXAMS = 'view_all_completed_exams';
+
+  static const String JUST_NOW = 'just_now';
+  static const String SECONDS_AGO = 'seconds_ago';
+  static const String MINUTES_AGO = 'minutes_ago';
+  static const String HOURS_AGO = 'hours_ago';
 
   // Exam Conducted
   static const String SELECT_EXAM = 'select_exam';
@@ -176,6 +186,59 @@ class S {
   static const String PLEASE_SELECT_DATE_TIME = 'please_select_date_time';
   static const String PLEASE_EXPIRE_TIME_AFTER_START_TIME =
       'please_expire_time_after_start_time';
+  static const String JOIN = 'join';
+  static const String VIEW_RESULT = 'view_result';
+  static const String START_TIME = 'start_time';
+  static const String EXPIRE_TIME = 'expire_time';
+  static const String NO_EXPIRE_TIME = 'no_expire_time';
+  static const String SEND_REQUEST = 'send_request';
+
+  // Running Exam
+  static const String START = 'start';
+  static const String SUBMIT = 'submit';
+  static const String PREVIOUS = 'previous';
+  static const String NEXT = 'next';
+  static const String CLEAR = 'clear';
+  static const String CORRECT_ANSWER_IS = 'correct_answer_is';
+  static const String YOU_SUBMITTED_CORRECT_ANSWER =
+      'you_submitted_correct_answer';
+  static const String YOU_SUBMITTED_WRONG_ANSWER = 'you_submitted_wrong_answer';
+  static const String I_HAVE_DOUBT = 'i_have_doubt';
+  static const String SHOW_SOLUTION = 'show_solution';
+  static const String PLEASE_SELECT_ANSWER_AND_THEN_SUBMIT =
+      'please_select_answer_and_then_submit';
+  static const String PLEASE_ENTER_ANSWER_AND_THEN_SUBMIT =
+      'please_enter_answer_and_then_submit';
+  static const String RESULT = 'result';
+  static const String STARTED_AT = 'started_at';
+  static const String EXAM_COMPLETED_IN = 'exam_completed_in';
+  static const String MINUS_MARKS = 'minus_marks';
+  static const String MAXIMUM_MARKS = 'maximum_marks';
+  static const String PERCENTAGE = 'percentage';
+  static const String WITHOUT_MINUS_MARKS = 'without_minus_marks';
+  static const String SHOW_ANSWERS = 'show_answers';
+  static const String YOU_LATE = 'you_late';
+  static const String EXAM_ENDED = 'exam_ended';
+  static const String OUT_OF_TIME_EXAM_WLL_BE_SAVED =
+      'out_of_time_exam_wll_be_saved';
+  static const String YOU_ARE_LATE_CAN_NOT_JOIN_EXAM_NOW =
+      'you_are_late_can_not_join_exam_now';
+  static const String EXAM_EXPIRED = 'exam_expired';
+  static const String THIS_EXAM_IS_EXPIRED = 'this_exam_is_expired';
+  static const String ATTEND_AGAIN = 'attend_again';
+  static const String WOULD_YOU_GIVE_EXAM_AGAIN_OLD_EXAM_DELETED =
+      'would_you_give_exam_again_old_exam_deleted';
+  static const String NO = 'no';
+  static const String YES = 'yes';
+  static const String YOU_CAN_NOT_GIVE_EXAM_AGAIN =
+      'you_can_not_give_exam_again';
+  static const String RESUME_EXAM = 'resume_exam';
+  static const String YOU_CAN_NOT_RESUME_EXAM_BECAUSE_YOU_ARE_OUT_OF_TIME =
+      'you_can_not_resume_exam_because_you_are_out_of_time';
+  static const String YOU_CAN_NOT_RESUME_EXAM = 'you_can_not_resume_exam';
+
+  // Chat
+  static const String TYPE_HERE = 'type_here';
 
   // Buttons
   static const String CONTINUE = 'continue';

@@ -2,7 +2,7 @@ import 'package:apna_classroom_app/api/exam_conducted.dart';
 import 'package:apna_classroom_app/components/buttons/arrow_secondary_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
-import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/labeled_switch.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom.dart';
@@ -45,6 +45,10 @@ class _ScheduleExamState extends State<ScheduleExam> {
     if (form.validate()) {
       form.save();
 
+      if (formData[C.EXAM] == null) {
+        return ok(title: S.SELECT_EXAM, msg: 'Please select exam to schedule.');
+      }
+
       if (formData[C.SCHEDULE_EXAM_FOR_LATER] &&
           formData[C.START_TIME] == null) {
         return setState(() {
@@ -52,7 +56,8 @@ class _ScheduleExamState extends State<ScheduleExam> {
         });
       }
       startTimeError = null;
-      if (formData[C.CAN_EXAM_EXPIRE] && formData[C.EXPIRE_TIME] == null) {
+      if ((formData[C.CAN_EXAM_EXPIRE] ?? false) &&
+          formData[C.EXPIRE_TIME] == null) {
         return setState(() {
           expireTimeError = S.PLEASE_SELECT_DATE_TIME.tr;
         });
@@ -70,15 +75,18 @@ class _ScheduleExamState extends State<ScheduleExam> {
       setState(() {
         expireTimeError = null;
       });
-      Map payload = formData;
-
-      payload[C.CLASSROOM] = classrooms.map((e) => e[C.ID]).toList();
 
       removeDependent(C.MUST_JOIN_INSTANTLY, C.ALLOWED_DELAY);
       removeDependent(C.MUST_JOIN_INSTANTLY, C.MUST_FINISH_WITHIN_TIME);
 
+      if (formData[C.MUST_JOIN_INSTANTLY]) formData.remove(C.CAN_EXAM_EXPIRE);
+
       removeDependent(C.SCHEDULE_EXAM_FOR_LATER, C.START_TIME);
       removeDependent(C.CAN_EXAM_EXPIRE, C.EXPIRE_TIME);
+
+      Map<String, dynamic> payload = Map.from(formData);
+
+      payload[C.CLASSROOM] = classrooms.map((e) => e[C.ID]).toList();
 
       payload[C.START_TIME] =
           (formData[C.START_TIME] ?? DateTime.now()).toString();
@@ -86,17 +94,15 @@ class _ScheduleExamState extends State<ScheduleExam> {
       if (formData[C.EXPIRE_TIME] != null) {
         payload[C.EXPIRE_TIME] = formData[C.EXPIRE_TIME].toString();
       }
-      showProgress();
 
       payload[C.EXAM] = formData[C.EXAM][C.ID];
-      var examConducted = await createExamConducted(formData);
-      Get.back();
-      if (examConducted != null) Get.back();
+      var examConducted = await createExamConducted(payload);
+      if (examConducted != null) Get.back(result: true);
     }
   }
 
   removeDependent(String key, String dependent) {
-    if (!formData[key]) formData.remove(dependent);
+    if (!(formData[key] ?? false)) formData.remove(dependent);
   }
 
   // Select Exam
@@ -338,12 +344,13 @@ class _ScheduleExamState extends State<ScheduleExam> {
                           ],
                         ),
                       SizedBox(height: 8.0),
-                      LabeledSwitch(
-                        value: formData[C.CAN_EXAM_EXPIRE],
-                        onChanged: (value) =>
-                            onSwitch(C.CAN_EXAM_EXPIRE, value),
-                        title: S.CAN_EXAM_EXPIRE.tr,
-                      ),
+                      if (!formData[C.MUST_JOIN_INSTANTLY])
+                        LabeledSwitch(
+                          value: formData[C.CAN_EXAM_EXPIRE],
+                          onChanged: (value) =>
+                              onSwitch(C.CAN_EXAM_EXPIRE, value),
+                          title: S.CAN_EXAM_EXPIRE.tr,
+                        ),
                       SizedBox(height: 8.0),
                       if (formData[C.CAN_EXAM_EXPIRE] ?? false)
                         Column(

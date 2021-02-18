@@ -9,7 +9,9 @@ import 'package:get/get.dart';
 
 class ClassroomCard extends StatelessWidget {
   final Map classroom;
-  final Function onTitleTap;
+  final Function(bool _public) onTitleTap;
+
+  final bool isPublic;
 
   final bool isSelected;
   final Function(bool selected) onChanged;
@@ -21,10 +23,14 @@ class ClassroomCard extends StatelessWidget {
       this.onTitleTap,
       this.isSelected,
       this.onChanged,
-      this.onLongPress})
+      this.onLongPress,
+      this.isPublic})
       : super(key: key);
 
   onIconTap() {
+    if (isPublic ?? false) {
+      return onTitleTap(isPublic);
+    }
     Get.to(ClassroomDetails(classroom: classroom));
   }
 
@@ -58,7 +64,7 @@ class ClassroomCard extends StatelessWidget {
           ),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: onTitleTap,
+            onTap: () => onTitleTap(isPublic),
             onLongPress: onLongPress,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,11 +74,19 @@ class ClassroomCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.subtitle2,
                 ),
                 SizedBox(height: 4.0),
-                Text(
-                  getSubtitleText(classroom[C.MESSAGE]),
-                  style: Theme.of(context).textTheme.caption,
-                  maxLines: 1,
-                )
+                if (isPublic ?? false)
+                  Text(
+                    S.JOIN.tr,
+                    style: TextStyle(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                if (!(isPublic ?? false))
+                  Text(
+                    getSubtitleText(classroom[C.MESSAGE]),
+                    style: Theme.of(context).textTheme.caption,
+                    maxLines: 1,
+                  )
               ],
             ),
           ),
@@ -82,7 +96,7 @@ class ClassroomCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  getFormattedTime(dateString: classroom[C.UPDATED_AT]),
+                  getUpdateTime(dateString: classroom[C.UPDATED_AT]),
                   style: Theme.of(context).textTheme.caption,
                 ),
                 SizedBox(height: 10),

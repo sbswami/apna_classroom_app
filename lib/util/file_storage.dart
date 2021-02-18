@@ -78,6 +78,7 @@ Future<File> getPdfCoverImage({@required String path}) async {
 
 // Get File
 Future<File> getFile(String fullPath) async {
+  if (fullPath == null) return null;
   Directory appDocDirectory = await getApplicationDocumentsDirectory();
   String localPath =
       fullPath.replaceFirst(UserController.to.currentUser[C.ID], '');

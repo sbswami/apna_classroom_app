@@ -1,12 +1,18 @@
 import 'package:apna_classroom_app/api/classroom.dart';
 import 'package:apna_classroom_app/components/buttons/arrow_secondary_button.dart';
+import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/chips/group_chips.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/classroom/person_card.dart';
+import 'package:apna_classroom_app/screens/classroom/search_person.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/schedule_exam.dart';
+import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_list.dart';
 import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/constants.dart';
+import 'package:apna_classroom_app/util/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -28,7 +34,6 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
   loadClassroom() async {
     Map<String, dynamic> _classroom =
         await getClassroom({C.ID: widget.classroom[C.ID]});
-    print(_classroom);
     setState(() {
       classroom = _classroom;
       isLoading = false;
@@ -44,11 +49,51 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
   }
 
   // Schedule Exam
-  scheduleExam() {
-    Get.to(ScheduleExam(
+  scheduleExam() async {
+    var result = await Get.to(ScheduleExam(
       classroom: widget.classroom,
     ));
+    if (result == true) loadClassroom();
   }
+
+  // Add member
+  addMember() async {
+    var result = await Get.to(SearchPerson());
+    if (result == null) return;
+
+    result.removeWhere((element) {
+      bool value =
+          classroom[C.MEMBERS].any((e) => e[C.ID][C.ID] == element[C.ID]);
+      return value;
+    });
+
+    if (result.isEmpty) return;
+
+    List membersAll = result
+        .map((e) => {
+              C.ROLE: E.MEMBER,
+              C.ID: e,
+            })
+        .toList();
+
+    List members = result
+        .map((e) => {
+              C.ROLE: E.MEMBER,
+              C.ID: e[C.ID],
+            })
+        .toList();
+
+    await addMembers({
+      C.ID: classroom[C.ID],
+      C.MEMBERS: members,
+    });
+    setState(() {
+      classroom[C.MEMBERS].addAll(membersAll);
+    });
+  }
+
+  // Import from excel via
+  importViaExcel() {}
 
   @override
   Widget build(BuildContext context) {
@@ -60,6 +105,7 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
         body: ListSkeleton(size: 3),
       );
     }
+    bool isItAdmin = isAdmin(classroom[C.MEMBERS]);
     return Scaffold(
       appBar: AppBar(
         title: Text(S.CLASSROOM.tr),
@@ -67,13 +113,16 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
       body: ListView(
         children: [
           Container(
-            decoration: BoxDecoration(boxShadow: [
-              BoxShadow(
-                blurRadius: 5.0,
-                spreadRadius: 1.0,
-                offset: Offset(0, 1.0),
-              ),
-            ]),
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 5.0,
+                  spreadRadius: 1.0,
+                  offset: Offset(0, 1.0),
+                ),
+              ],
+              color: Theme.of(context).cardColor,
+            ),
             height: 200,
             child: UrlImage(
               url: classroom[C.PHOTO_URL],
@@ -100,30 +149,32 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                   preIcon: Icons.message,
                 ),
                 SizedBox(height: 8.0),
-                ArrowSecondaryButton(
-                  onPress: scheduleExam,
-                  text: S.SCHEDULE_EXAM.tr,
-                  preIcon: Icons.school_rounded,
-                ),
+                if (isItAdmin)
+                  ArrowSecondaryButton(
+                    onPress: scheduleExam,
+                    text: S.SCHEDULE_EXAM.tr,
+                    preIcon: Icons.school_rounded,
+                  ),
                 SizedBox(height: 8.0),
                 ArrowSecondaryButton(
                   onPress: () {},
                   text: S.CLASSROOM_NOTES.tr,
                   preIcon: Icons.book,
                 ),
-                SizedBox(height: 8.0),
-                Text(
-                  S.RUNNING_EXAM.tr,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                Text(
-                  S.UPCOMING_EXAM.tr,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
-                Text(
-                  S.COMPLETED_EXAM.tr,
-                  style: Theme.of(context).textTheme.subtitle2,
-                ),
+              ],
+            ),
+          ),
+          ExamConductedList(
+            runningExam: classroom[C.RUNNING_EXAM],
+            upcomingExam: classroom[C.UPCOMING_EXAM],
+            completedExam: classroom[C.COMPLETED_EXAM],
+            classroomId: classroom[C.ID],
+          ),
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+            child: Column(
+              children: [
                 SizedBox(height: 8.0),
                 InfoCard(
                   title: S.WHO_CAN_JOIN.tr,
@@ -151,7 +202,36 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                 ),
               ],
             ),
-          )
+          ),
+          if (isItAdmin)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SecondaryButton(
+                    text: S.ADD_MEMBER.tr,
+                    onPress: addMember,
+                  ),
+                  SecondaryButton(
+                    text: S.IMPORT_VIA_EXCEL.tr,
+                    onPress: importViaExcel,
+                    iconData: Icons.download_rounded,
+                  ),
+                ],
+              ),
+            ),
+          SizedBox(height: 8.0),
+          Column(
+            children: classroom[C.MEMBERS].map<Widget>(
+              (e) {
+                return PersonCard(
+                  person: e[C.ID],
+                  isAdmin: e[C.ROLE] == E.ADMIN,
+                );
+              },
+            ).toList(),
+          ),
         ],
       ),
     );

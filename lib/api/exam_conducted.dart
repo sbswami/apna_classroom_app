@@ -10,9 +10,9 @@ Future createExamConducted(Map<String, dynamic> payload) async {
       url: EXAM_CONDUCTED_CREATE,
       payload: payload,
       isUser: true,
-      isLoading: false);
+      isLoading: true);
   if (response.statusCode == 200) {
-    return json.decode(response.body)[C.EXAM];
+    return json.decode(response.body)[C.EXAM_CONDUCTED];
   }
 }
 
@@ -23,17 +23,13 @@ Future getExamConducted(Map<String, String> payload) async {
     isUser: true,
   );
   if (response.statusCode == 200) {
-    return json.decode(response.body)[C.EXAM];
+    return json.decode(response.body)[C.EXAM_CONDUCTED];
   }
 }
 
-Future listExamConducted(Map<String, String> payload, List<String> subjects,
-    List<String> exams) async {
+Future listExamConducted(Map<String, String> payload) async {
   http.Response response = await apiGetCall(
-      payload: payload,
-      url: EXAM_CONDUCTED_LIST,
-      isUser: true,
-      list: {C.SUBJECT: subjects, C.EXAM: exams});
+      payload: payload, url: EXAM_CONDUCTED_LIST, isUser: true);
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.LIST];
   }

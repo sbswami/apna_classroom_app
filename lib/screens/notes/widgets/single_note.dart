@@ -2,10 +2,8 @@ import 'dart:io';
 
 import 'package:apna_classroom_app/components/editor/text_field.dart';
 import 'package:apna_classroom_app/components/editor/text_viewer.dart';
-import 'package:apna_classroom_app/screens/image_viewer/image_viewer.dart';
-import 'package:apna_classroom_app/screens/pdf_viewer/pdf_viewer.dart';
+import 'package:apna_classroom_app/screens/media/media_helper.dart';
 import 'package:apna_classroom_app/util/c.dart';
-import 'package:apna_classroom_app/util/constants.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -43,19 +41,7 @@ class _SingleNoteState extends State<SingleNote> {
 
   openNote() {
     if (widget.note[C.MEDIA] != null) {
-      String url = widget.note[C.MEDIA][C.URL];
-      switch (widget.note[C.MEDIA][C.TYPE]) {
-        case E.PDF:
-          Get.to(PdfViewer(
-            url: url,
-          ));
-          break;
-        case E.IMAGE:
-          Get.to(ImageViewer(
-            url: url,
-          ));
-          break;
-      }
+      showMedia(widget.note[C.MEDIA]);
     } else if (widget.note[C.TEXT] != null) {
       Get.to(TextViewer(
         text: widget.note[C.TEXT],

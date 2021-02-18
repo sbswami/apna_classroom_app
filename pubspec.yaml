@@ -42,6 +42,9 @@ dependencies:
   # Firebase Storage
   firebase_storage: ^5.2.0
 
+  # Firebase Messaging
+  firebase_messaging: ^7.0.3
+
   # Grab the device info
   device_info: ^1.0.0
 
