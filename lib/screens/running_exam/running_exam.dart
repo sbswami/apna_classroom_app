@@ -4,7 +4,7 @@ import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/running_exam/controller/running_exam_controller.dart';
 import 'package:apna_classroom_app/screens/running_exam/running_exam_question.dart';
@@ -155,7 +155,10 @@ class _RunningExamState extends State<RunningExam> {
       ),
       body: Column(
         children: [
-          if (isLoading) ListSkeleton(size: 4),
+          if (isLoading)
+            DetailsSkeleton(
+              type: DetailsType.Info,
+            ),
           if (!isLoading)
             SingleChildScrollView(
               child: Padding(

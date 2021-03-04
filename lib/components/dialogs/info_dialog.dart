@@ -29,7 +29,7 @@ class InfoDialog extends StatelessWidget {
       ),
       actions: <Widget>[
         PrimaryButton(
-          text: buttonName ?? S.OKAY,
+          text: buttonName ?? S.OKAY.tr,
           onPress: ok ?? () => Get.back(),
         )
       ],

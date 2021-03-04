@@ -36,10 +36,9 @@ Future listQuestion(Map<String, String> payload, List<String> subjects,
   }
 }
 
-Future getSubjectsQuestion() async {
-  http.Response response =
-      await apiGetCall(url: QUESTION_SUBJECTS, isUser: true);
-  if (response.statusCode == 200) {
-    return json.decode(response.body)[C.SUBJECT];
-  }
+Future<bool> deleteQuestion(Map<String, dynamic> payload) async {
+  http.Response response = await apiCall(
+      url: QUESTION_DELETE, payload: payload, isUser: true, isLoading: true);
+
+  return response.statusCode == 200;
 }

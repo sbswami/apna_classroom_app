@@ -5,7 +5,7 @@ import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/labeled_switch.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/classroom/classroom.dart';
+import 'package:apna_classroom_app/screens/classroom/classroom_selector.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/classroom_exam_card.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/exam_picker.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
@@ -123,7 +123,7 @@ class _ScheduleExamState extends State<ScheduleExam> {
   // add classroom
   List classrooms = [];
   addClassroom() {
-    Get.to(Classroom(
+    Get.to(ClassroomSelector(
       selectedClassroom: classrooms.map<String>((e) => e[C.ID]).toList(),
       onSelect: onSelect,
     ));

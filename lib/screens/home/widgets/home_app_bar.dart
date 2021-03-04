@@ -39,24 +39,15 @@ class _HomeAppBarState extends State<HomeAppBar> {
         IconButton(
           icon: Icon(Icons.search),
           onPressed: () => widget.onSearch(searchController.text),
-          color: Theme.of(context).primaryColor,
         )
       ];
     return [
       IconButton(
         icon: Icon(
           Icons.search,
-          color: Theme.of(context).primaryColor,
         ),
         onPressed: () => switchSearch(true),
       ),
-      IconButton(
-        icon: Icon(
-          Icons.notifications,
-          color: Theme.of(context).primaryColor,
-        ),
-        onPressed: () {},
-      )
     ];
   }
 
@@ -67,8 +58,15 @@ class _HomeAppBarState extends State<HomeAppBar> {
         autofocus: true,
         decoration: InputDecoration(
           hintText: S.SEARCH.tr,
+          hintStyle: TextStyle(
+            color: Colors.white.withOpacity(0.7),
+          ),
           border: InputBorder.none,
         ),
+        style: TextStyle(
+          color: Colors.white,
+        ),
+        cursorColor: Colors.white,
       );
     }
     return Image.asset(
@@ -103,14 +101,11 @@ class _HomeAppBarState extends State<HomeAppBar> {
           ? IconButton(
               icon: Icon(
                 Icons.arrow_back_ios,
-                color: Theme.of(context).primaryColor,
               ),
               onPressed: onBackIconClick,
             )
           : null,
       title: getTitle(),
-      brightness: Brightness.light,
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       actions: getActions(context),
       bottom: widget.bottom,
     );

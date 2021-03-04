@@ -7,12 +7,20 @@ import 'package:get/get.dart';
 
 class NotesCard extends StatelessWidget {
   final Map<String, dynamic> note;
-  const NotesCard({Key key, this.note}) : super(key: key);
+  final double maxWidth;
+  final bool fromClassroom;
+  final Function onRefresh;
 
-  onTapNote() {
-    Get.to(DetailedNote(
+  const NotesCard(
+      {Key key, this.note, this.maxWidth, this.fromClassroom, this.onRefresh})
+      : super(key: key);
+
+  onTapNote() async {
+    var result = await Get.to(DetailedNote(
       note: note,
+      fromClassroom: fromClassroom,
     ));
+    if ((result ?? false) && onRefresh != null) onRefresh();
   }
 
   @override
@@ -41,6 +49,7 @@ class NotesCard extends StatelessWidget {
                   ),
                   GroupChips(
                     list: note[C.SUBJECT].cast<String>().toList(),
+                    width: maxWidth == null ? null : maxWidth * 0.6,
                   ),
                 ],
               ),

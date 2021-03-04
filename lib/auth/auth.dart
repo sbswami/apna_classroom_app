@@ -1,5 +1,4 @@
 import 'package:apna_classroom_app/api/fcm.dart';
-import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/api/user_details.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
@@ -21,8 +20,8 @@ Future<int> checkUser() async {
   await Firebase.initializeApp();
   // await Future.delayed(Duration(seconds: 2));
   if (FirebaseAuth.instance.currentUser != null) {
-    userLevel++;
-    await getUser();
+    bool isUser = await getUser();
+    if (isUser ?? false) userLevel++;
     if (UserController.to.currentUser[C.USERNAME] != null) {
       userLevel++;
     }
@@ -122,17 +121,20 @@ handleAuthResult(UserCredential authResult) async {
 postLoginLoadData() async {
   // Save User Details
   await createUserDetails({
-    C.ID: UserController.to.currentUser[C.ID],
+    C.ID: getUserId(),
     C.FCM_TOKEN: await getToken(),
   });
 
-  List subjects = await getSubjectsNote();
+  // Fetch all subjects and exams
+  List subjects = await getSubjectsUser();
+  List exams = await getExamsUser();
   await RecentlyUsedController.to.addAllSubject(subjects.cast<String>());
+  await RecentlyUsedController.to.addAllExam(exams.cast<String>());
 }
 
 signOut() async {
-  UserController.to.updateUser({});
   await FirebaseAuth.instance.signOut();
   await clearAllLocalStorage();
-  Get.offAll(Login());
+  await Get.offAll(Login());
+  UserController.to.updateUser({});
 }

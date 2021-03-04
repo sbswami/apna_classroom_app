@@ -1,5 +1,5 @@
 import 'package:apna_classroom_app/api/solved_exam.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
 import 'package:apna_classroom_app/screens/running_exam/single_result.dart';
@@ -53,7 +53,7 @@ class _AllResultState extends State<AllResult> {
       ),
       body: Column(
         children: [
-          if (_result == null) ListSkeleton(size: 4),
+          if (_result == null) DetailsSkeleton(type: DetailsType.CardInfo),
           if (_result != null) ExamCard(exam: _examConducted[C.EXAM]),
           if (_result != null)
             Column(

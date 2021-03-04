@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 
 Future createExam(Map<String, dynamic> payload) async {
   http.Response response = await apiCall(
-      url: EXAM_CREATE, payload: payload, isUser: true, isLoading: false);
+      url: EXAM_CREATE, payload: payload, isUser: true, isLoading: true);
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.EXAM];
   }
@@ -36,9 +36,9 @@ Future listExam(Map<String, String> payload, List<String> subjects,
   }
 }
 
-Future getSubjectsExam() async {
-  http.Response response = await apiGetCall(url: EXAM_SUBJECTS, isUser: true);
-  if (response.statusCode == 200) {
-    return json.decode(response.body)[C.SUBJECT];
-  }
+Future<bool> deleteExam(Map<String, dynamic> payload) async {
+  http.Response response = await apiCall(
+      url: EXAM_DELETE, payload: payload, isUser: true, isLoading: true);
+
+  return response.statusCode == 200;
 }

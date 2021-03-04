@@ -30,7 +30,7 @@ Future listClassroom(Map<String, String> payload, List<String> subjects,
       payload: payload,
       url: CLASSROOM_LIST,
       isUser: true,
-      list: {C.SUBJECT: subjects, C.CLASSROOM: exams});
+      list: {C.SUBJECT: subjects, C.EXAM: exams});
   if (response.statusCode == 200) {
     return json.decode(response.body);
   }
@@ -42,4 +42,11 @@ Future addMembers(Map<String, dynamic> payload) async {
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.MESSAGE];
   }
+}
+
+Future<bool> deleteClassroom(Map<String, dynamic> payload) async {
+  http.Response response = await apiCall(
+      url: CLASSROOM_DELETE, payload: payload, isUser: true, isLoading: true);
+
+  return response.statusCode == 200;
 }

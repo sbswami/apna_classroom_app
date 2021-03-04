@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/util/assets.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
@@ -51,8 +51,8 @@ class _ImageViewerState extends State<ImageViewer> {
         title: Text(S.IMAGE_VIEWER.tr),
       ),
       body: isLoading
-          ? ListSkeleton(
-              size: 4,
+          ? DetailsSkeleton(
+              type: DetailsType.ImageInfo,
             )
           : Center(
               child: PhotoView(

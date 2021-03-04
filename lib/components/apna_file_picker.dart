@@ -12,13 +12,14 @@ showApnaFilePicker(bool multiple) async {
   try {
     FilePickerResult result = await FilePicker.platform.pickFiles(
       type: FileType.custom,
-      allowedExtensions: ['pdf', 'jpg'],
+      allowedExtensions: ['pdf', 'jpg', 'png'],
       allowCompression: true,
       allowMultiple: multiple,
     );
     if (result == null) return;
     var newFiles = await Future.wait(result.files.map((single) async {
       String _filePath = single.path;
+
       switch (single.extension) {
         case 'pdf':
           File thumbnailImage = await getPdfCoverImage(path: _filePath);
@@ -31,6 +32,10 @@ showApnaFilePicker(bool multiple) async {
             C.TITLE: removeExtension(single.name)
           };
         case 'jpg':
+        case 'png':
+        case 'JPEG':
+        case 'JPG':
+        case 'PNG':
           ImageLib.Image thumbnail = await compressImage(path: _filePath);
           File thumbnailImage = await saveToDevice(
             path: IMAGE_THUMBNAIL_PATH,
@@ -38,7 +43,9 @@ showApnaFilePicker(bool multiple) async {
             extension: '.png',
           );
           File image = await saveToDevice(
-              path: IMAGE_PATH, file: File(_filePath), extension: '.jpg');
+              path: IMAGE_PATH,
+              file: File(_filePath),
+              extension: '.${single.extension}');
           return {
             C.TYPE: E.IMAGE,
             C.FILE: image,

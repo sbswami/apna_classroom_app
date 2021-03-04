@@ -28,7 +28,7 @@ Future<http.Response> apiCall({
   isLoading ? showProgress() : 0;
 
   http.Response response = await http
-      .post('http://' + API_ROOT + url,
+      .post(API_ROOT + url,
           body: json.encoder.convert(payload), headers: headers)
       .catchError(handleAPIError);
   isLoading ? Get.back() : 0;
@@ -51,7 +51,7 @@ Future<http.Response> apiGetCall({
 
   isLoading ? showProgress() : 0;
 
-  Uri uri = Uri.http(API_ROOT, url, payload);
+  Uri uri = Uri.http(API_ROOT_GET, url, payload);
   String urlNew = uri.toString();
   if (list != null) {
     String initValue = payload == null ? '?' : '';

@@ -1,21 +1,31 @@
 import 'package:apna_classroom_app/api/notes.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
+import 'package:apna_classroom_app/screens/empty/empty_list.dart';
+import 'package:apna_classroom_app/screens/home/widgets/apna_bottom_navigation_bar.dart';
 import 'package:apna_classroom_app/screens/home/widgets/home_app_bar.dart';
+import 'package:apna_classroom_app/screens/home/widgets/home_drawer.dart';
+import 'package:apna_classroom_app/screens/notes/add_notes.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/notes_card.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 
 const String PER_PAGE_NOTE = '10';
 
 class Notes extends StatefulWidget {
+  final PageController pageController;
+
+  const Notes({Key key, this.pageController}) : super(key: key);
   @override
   _NotesState createState() => _NotesState();
 }
 
 class _NotesState extends State<Notes>
     with AutomaticKeepAliveClientMixin<Notes> {
+  ScrollController _scrollController = ScrollController();
   // Variables
   bool isLoading = false;
   List<String> selectedSubjects = [];
@@ -80,6 +90,22 @@ class _NotesState extends State<Notes>
     await loadNotes();
   }
 
+  // Clear Filter
+  clearFilter() {
+    setState(() {
+      selectedSubjects.clear();
+      searchTitle = null;
+      notes.clear();
+      loadNotes();
+    });
+  }
+
+  // Add
+  _add() async {
+    var result = await Get.to(AddNotes());
+    if (result ?? false) onRefresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -93,13 +119,22 @@ class _NotesState extends State<Notes>
             selectedSubjects: selectedSubjects,
             onSelected: onSelectedSubject,
           ),
-          if (resultLength == 0 && (isLoading ?? true)) ListSkeleton(size: 4),
+          if (resultLength == 0 && (isLoading ?? true))
+            DetailsSkeleton(
+              type: DetailsType.List,
+            )
+          else if (resultLength == 0)
+            EmptyList(
+              onClearFilter: clearFilter,
+            ),
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 if ((scrollInfo.metrics.pixels ==
                         scrollInfo.metrics.maxScrollExtent) &&
-                    !isLoading) {
+                    !isLoading &&
+                    _scrollController.position.userScrollDirection ==
+                        ScrollDirection.reverse) {
                   loadNotes();
                 }
                 return true;
@@ -107,15 +142,30 @@ class _NotesState extends State<Notes>
               child: RefreshIndicator(
                 onRefresh: onRefresh,
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
                   itemCount: resultLength,
                   itemBuilder: (context, position) {
-                    return NotesCard(note: notes[position]);
+                    return NotesCard(
+                      note: notes[position],
+                      onRefresh: onRefresh,
+                    );
                   },
                 ),
               ),
             ),
           ),
         ],
+      ),
+      drawer: HomeDrawer(),
+      floatingActionButton: FloatingActionButton(
+        heroTag: null,
+        onPressed: _add,
+        child: Icon(Icons.add),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      bottomNavigationBar: ApnaBottomNavigationBar(
+        pageController: widget.pageController,
       ),
     );
   }

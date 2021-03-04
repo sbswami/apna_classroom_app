@@ -1,3 +1,4 @@
+import 'package:apna_classroom_app/api/user_details.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:get/get.dart';
 
@@ -14,14 +15,23 @@ class ClassroomListController extends GetxController {
   // Add Message
   addMessage(String id, message, {bool setUnseen = false}) {
     int index = classrooms.indexWhere((element) => element[C.ID] == id);
-    classrooms[index][C.MESSAGE] = message;
-    if (setUnseen) ++classrooms[index][C.UNSEEN];
+    var classroom = classrooms[index];
+    classrooms.removeAt(index);
+    classroom[C.MESSAGE] = message;
+    classroom[C.UPDATED_AT] = DateTime.now().toString();
+    if (setUnseen) ++classroom[C.UNSEEN];
+    classrooms.insert(0, classroom);
   }
 
   // unseen set to zero
-  setUnseen(String id, int unseen) {
+  setUnseen(String id, {int unseen}) async {
+    // update UNSEEN on API
+    await unseenUserDetails({C.CLASSROOM: id});
+
     int index = classrooms.indexWhere((element) => element[C.ID] == id);
-    classrooms[index][C.UNSEEN] = unseen ?? 0;
+    var classroom = classrooms[index];
+    classroom[C.UNSEEN] = unseen ?? 0;
+    classrooms[index] = classroom;
   }
 
   // add Classrooms

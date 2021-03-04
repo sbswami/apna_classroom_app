@@ -6,8 +6,19 @@ class S {
   static const String APP_NAME = 'app_name';
   static const String APP_N = 'app_n';
 
+  // Sharing and etc things
+  static const String SHARING_NOTE = 'sharing_note';
+
   // Design Info
   static const String SOMETHING_WENT_WRONG = 'something_went_wrong';
+  static const String PROCESSING = 'processing';
+
+  // Empty State
+  static const String NOT_FOUND = 'not_found';
+  static const String NOT_FOUND_MSG = 'not_found_msg';
+  static const String CLEAR_FILTER = 'clear_filter';
+  static const String START_CHAT = 'start_chat';
+  static const String START_CHAT_MSG = 'start_chat_msg';
 
   // Login
   static const String LOGIN = 'login';
@@ -28,6 +39,8 @@ class S {
   static const String NAME_INVALID = 'name_invalid';
   static const String RESEND_OTP = 'resend_otp';
   static const String HIDE_MY_PHONE_NUMBER = 'hide_my_phone_number';
+  static const String PHONE_NUMBER = 'phone_number';
+  static const String SAVE = 'save';
 
   static const String CAMERA = 'camera';
   static const String GALLERY = 'gallery';
@@ -52,6 +65,11 @@ class S {
   static const String EDIT = 'edit';
   static const String ADD_AT_LEAST_ONE_EXAM = 'add_at_least_one_exam';
   static const String SUBJECT = 'subject';
+  static const String ARE_YOU_SURE_YOU_WANT_TO_DELETE =
+      'are_you_sure_you_want_to_delete';
+  static const String ARE_YOU_SURE_YOU_WANT_TO_EDIT =
+      'are_you_sure_you_want_to_edit';
+  static const String CAN_NOT_DELETE_NOW = 'can_not_delete_now';
 
   // Quiz + Notes
   static const String OPEN_EDITOR = 'open_editor';
@@ -71,6 +89,10 @@ class S {
   static const String MOVE_TO_BOTTOM = 'move_to_bottom';
   static const String PLEASE_ENTER_THE_NOTE_TITLE =
       'please_enter_the_note_title';
+  static const String NOTE_DELETE_NOTE = 'note_delete_note';
+  static const String NOTES_ARE_DELETED_BY_CREATOR =
+      'notes_are_deleted_by_creator';
+  static const String NOTE_EDIT_NOTE = 'note_edit_note';
 
   // Quiz + Exam
   static const String EXAM = 'exam';
@@ -95,6 +117,7 @@ class S {
       'please_add_at_least_1_question';
   static const String QUESTION_ADDED = 'question_added';
   static const String CREATE_EXAM = 'create_exam';
+  static const String EXAM_DELETE_NOTE = 'exam_delete_note';
 
   // Quiz + Question
   static const String QUESTION = 'question';
@@ -126,6 +149,8 @@ class S {
   static const String MARKS = 'marks';
   static const String OPTION = 'option';
   static const String ANSWER = 'answer';
+  static const String QUESTION_DELETE_NOTE = 'question_delete_note';
+  static const String QUESTION_EDIT_NOTE = 'question_edit_note';
 
   // Classroom
   static const String ADD_CLASSROOM = 'add_classroom';
@@ -151,6 +176,9 @@ class S {
   static const String SCHEDULE_EXAM = 'schedule_exam';
   static const String CLASSROOM_NOTES = 'classroom_notes';
   static const String PUBLIC_CLASSROOMS = 'public_classrooms';
+  static const String CLASSROOM_DELETE_NOTE = 'classroom_delete_note';
+  static const String CLASSROOM_DELETED_BY_CREATOR =
+      'classroom_deleted_by_creator';
 
   static const String RUNNING_EXAM = 'running_exam';
   static const String UPCOMING_EXAM = 'upcoming_exam';
@@ -164,6 +192,8 @@ class S {
   static const String SECONDS_AGO = 'seconds_ago';
   static const String MINUTES_AGO = 'minutes_ago';
   static const String HOURS_AGO = 'hours_ago';
+
+  static const String SEE_PUBLIC_CLASSROOMS = 'see_public_classrooms';
 
   // Exam Conducted
   static const String SELECT_EXAM = 'select_exam';
@@ -239,6 +269,24 @@ class S {
 
   // Chat
   static const String TYPE_HERE = 'type_here';
+  static const String MESSAGED_DELETED = 'messaged_deleted';
+
+  // Share
+  static const String SHARE = 'share';
+  static const String SHARE_TO_CLASSROOM = 'share_to_classroom';
+  static const String SHARE_OUTSIDE = 'share_outside';
+
+  // Drawer
+  static const String CHANGE_LANGUAGE = 'change_language';
+  static const String LOG_OUT = 'log_out';
+  static const String LIGHT_MODE = 'light_mode';
+  static const String DARK_MODE = 'dark_mode';
+  static const String INVITE = 'invite';
+
+  // Languages
+  static const String ENGLISH_USA = 'english_usa';
+  static const String ENGLISH_IN = 'english_in';
+  static const String HINDI_IN = 'hindi_in';
 
   // Buttons
   static const String CONTINUE = 'continue';
@@ -292,4 +340,9 @@ String getWhoCanShare(String key) {
       return S.ALL;
   }
   return '';
+}
+
+String getBooleanSt(bool value) {
+  if (value) return S.YES;
+  return S.NO;
 }

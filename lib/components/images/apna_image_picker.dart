@@ -15,27 +15,32 @@ class ApnaImagePicker extends StatelessWidget {
   const ApnaImagePicker({Key key, this.showDelete}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
       padding: const EdgeInsets.all(24.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          FlatIconTextButton(
-            iconData: Icons.camera_alt,
-            text: S.CAMERA.tr,
-            onPressed: () => Get.back(result: _CAMERA),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              FlatIconTextButton(
+                iconData: Icons.camera_alt,
+                text: S.CAMERA.tr,
+                onPressed: () => Get.back(result: _CAMERA),
+              ),
+              FlatIconTextButton(
+                iconData: Icons.photo_library,
+                text: S.GALLERY.tr,
+                onPressed: () => Get.back(result: _GALLERY),
+              ),
+              if (showDelete)
+                FlatIconTextButton(
+                  iconData: Icons.delete,
+                  text: S.DELETE.tr,
+                  onPressed: () => Get.back(result: _DELETE),
+                ),
+            ],
           ),
-          FlatIconTextButton(
-            iconData: Icons.photo_library,
-            text: S.GALLERY.tr,
-            onPressed: () => Get.back(result: _GALLERY),
-          ),
-          if (showDelete)
-            FlatIconTextButton(
-              iconData: Icons.delete,
-              text: S.DELETE.tr,
-              onPressed: () => Get.back(result: _DELETE),
-            ),
         ],
       ),
     );

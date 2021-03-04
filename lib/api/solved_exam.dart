@@ -18,7 +18,7 @@ Future getSolvedExam(Map<String, String> payload) async {
     payload: payload,
     url: SOLVED_EXAM_GET,
     isUser: true,
-    isLoading: false,
+    isLoading: true,
   );
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.SOLVED_EXAM];

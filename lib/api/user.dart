@@ -17,6 +17,7 @@ Future getUser() async {
   http.Response response = await apiGetCall(url: USER_GET, isUser: true);
   if (response.statusCode == 200) {
     UserController.to.updateUser(json.decode(response.body)[C.USER]);
+    return true;
   }
 }
 
@@ -41,5 +42,19 @@ Future searchPerson(Map<String, String> payload) async {
       await apiGetCall(url: USER_SEARCH_PERSON, payload: payload, isUser: true);
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.LIST];
+  }
+}
+
+Future getSubjectsUser() async {
+  http.Response response = await apiGetCall(url: USER_SUBJECTS, isUser: true);
+  if (response.statusCode == 200) {
+    return json.decode(response.body)[C.SUBJECT];
+  }
+}
+
+Future getExamsUser() async {
+  http.Response response = await apiGetCall(url: USER_EXAMS, isUser: true);
+  if (response.statusCode == 200) {
+    return json.decode(response.body)[C.EXAM];
   }
 }

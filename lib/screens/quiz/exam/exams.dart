@@ -1,11 +1,13 @@
 import 'package:apna_classroom_app/api/exam.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
+import 'package:apna_classroom_app/screens/empty/empty_list.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/detailed_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 const String PER_PAGE_EXAMS = '10';
@@ -13,14 +15,17 @@ const String PER_PAGE_EXAMS = '10';
 class Exams extends StatefulWidget {
   final String examTitle;
   final Function(Map exam) onSelect;
+  final bool updateExam;
 
-  const Exams({Key key, this.examTitle, this.onSelect}) : super(key: key);
+  const Exams({Key key, this.examTitle, this.onSelect, this.updateExam})
+      : super(key: key);
   @override
   _ExamsState createState() => _ExamsState();
 }
 
 class _ExamsState extends State<Exams>
     with AutomaticKeepAliveClientMixin<Exams> {
+  ScrollController _scrollController = ScrollController();
   bool isLoading = false;
   List<String> selectedSubjects = [];
   List<String> selectedExams = [];
@@ -35,10 +40,12 @@ class _ExamsState extends State<Exams>
 
   loadExams() async {
     if (isLoading == true) return;
+
     setState(() {
       isLoading = true;
     });
     int present = exams.length;
+
     Map<String, String> payload = {
       C.PRESENT: present.toString(),
       C.PER_PAGE: PER_PAGE_EXAMS,
@@ -83,6 +90,10 @@ class _ExamsState extends State<Exams>
     if (oldWidget.examTitle != widget.examTitle) {
       onSearch(widget.examTitle);
     }
+    // Update list on coming from add exam
+    if (widget.updateExam ?? false) {
+      onRefresh();
+    }
   }
 
   onSearch(String value) {
@@ -100,15 +111,27 @@ class _ExamsState extends State<Exams>
   Future<void> onRefresh() async {
     setState(() {
       exams.clear();
+      loadExams();
     });
-    await loadExams();
   }
 
-  onSelect(exam) {
+  onSelect(exam) async {
     if (widget.onSelect != null) return widget.onSelect(exam);
-    Get.to(DetailedExam(
+    var result = await Get.to(DetailedExam(
       exam: exam,
     ));
+    if (result ?? false) onRefresh();
+  }
+
+  // Clear Filter
+  clearFilter() {
+    setState(() {
+      selectedSubjects.clear();
+      selectedExams.clear();
+      searchTitle = null;
+      exams.clear();
+      loadExams();
+    });
   }
 
   @override
@@ -125,13 +148,20 @@ class _ExamsState extends State<Exams>
           selectedExams: selectedExams,
           onSelectedExam: onSelectedExam,
         ),
-        if (resultLength == 0 && (isLoading ?? true)) ListSkeleton(size: 4),
+        if (resultLength == 0 && (isLoading ?? true))
+          DetailsSkeleton(
+            type: DetailsType.List,
+          )
+        else if (resultLength == 0)
+          EmptyList(onClearFilter: clearFilter),
         Expanded(
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
               if ((scrollInfo.metrics.pixels ==
                       scrollInfo.metrics.maxScrollExtent) &&
-                  !isLoading) {
+                  !isLoading &&
+                  _scrollController.position.userScrollDirection ==
+                      ScrollDirection.reverse) {
                 loadExams();
               }
               return true;
@@ -139,6 +169,8 @@ class _ExamsState extends State<Exams>
             child: RefreshIndicator(
               onRefresh: onRefresh,
               child: ListView.builder(
+                physics: const AlwaysScrollableScrollPhysics(),
+                controller: _scrollController,
                 itemCount: resultLength,
                 itemBuilder: (context, position) {
                   return ExamCard(

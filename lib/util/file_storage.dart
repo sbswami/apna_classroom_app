@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
-import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/helper.dart';
 import 'package:http/http.dart' as http;
 import 'package:image/image.dart';
@@ -80,8 +79,7 @@ Future<File> getPdfCoverImage({@required String path}) async {
 Future<File> getFile(String fullPath) async {
   if (fullPath == null) return null;
   Directory appDocDirectory = await getApplicationDocumentsDirectory();
-  String localPath =
-      fullPath.replaceFirst(UserController.to.currentUser[C.ID], '');
+  String localPath = fullPath.replaceFirst(getUserId(), '');
   Directory directory =
       await Directory(appDocDirectory.path + removeFileName(localPath))
           .create(recursive: true);

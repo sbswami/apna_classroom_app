@@ -20,9 +20,10 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class AddExam extends StatefulWidget {
+  final exam;
   final List questions;
 
-  const AddExam({Key key, this.questions}) : super(key: key);
+  const AddExam({Key key, this.questions, this.exam}) : super(key: key);
   @override
   _AddExamState createState() => _AddExamState();
 }
@@ -30,7 +31,7 @@ class AddExam extends StatefulWidget {
 class _AddExamState extends State<AddExam> {
   // Constants
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final Map<String, dynamic> formData = {};
+  Map<String, dynamic> formData = {};
 
   // Init State
   @override
@@ -41,6 +42,28 @@ class _AddExamState extends State<AddExam> {
     if (widget.questions != null) {
       questions = widget.questions;
     }
+
+    if (widget.exam != null) {
+      formData = {
+        C.ID: widget.exam[C.ID],
+        C.TITLE: widget.exam[C.TITLE],
+        C.INSTRUCTION: widget.exam[C.INSTRUCTION],
+        C.MINUS_MARKING: widget.exam[C.MINUS_MARKING],
+        C.MINUS_MARKING_PER_QUESTION: widget.exam[C.MINUS_MARKING_PER_QUESTION],
+        C.SOLVING_TIME: widget.exam[C.SOLVING_TIME],
+        C.MARKS: widget.exam[C.MARKS],
+        C.PRIVACY: widget.exam[C.PRIVACY],
+        C.DIFFICULTY: widget.exam[C.DIFFICULTY],
+      };
+      subjects = widget.exam[C.SUBJECT].cast<String>().toSet();
+      exams = widget.exam[C.EXAM].cast<String>().toSet();
+      marksController.text = '${widget.exam[C.MARKS] ?? ''}';
+      solvingTimeController.text =
+          '${getMinute(widget.exam[C.SOLVING_TIME]) ?? ''}';
+      // TODO: map questions correctly
+      questions = widget.exam[C.QUESTION].toList();
+    }
+
     super.initState();
   }
 
@@ -76,20 +99,15 @@ class _AddExamState extends State<AddExam> {
       int questionsLength = questions.length;
 
       var questionList = questions.map((question) {
-        Map<String, dynamic> _question = {
-          C.QUESTION: question[C.ID],
-          C.SOLVING_TIME: question[C.SOLVING_TIME],
-          C.MARKS: question[C.MARKS],
-        };
         if (!isSolvingTimeCalculated) {
           int solvingTime = formData[C.SOLVING_TIME] ~/ questionsLength;
-          _question[C.SOLVING_TIME] = solvingTime;
+          question[C.SOLVING_TIME] = solvingTime;
         }
         if (!isMarksCalculated) {
           int marks = formData[C.MARKS] ~/ questionsLength;
-          _question[C.MARKS] = marks;
+          question[C.MARKS] = marks;
         }
-        return _question;
+        return question;
       }).toList();
 
       if (!isSolvingTimeCalculated) {
@@ -111,7 +129,7 @@ class _AddExamState extends State<AddExam> {
       var exam = await createExam(formData);
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
-      if (exam != null) Get.back();
+      if (exam != null) Get.back(result: true);
     }
   }
 
@@ -127,7 +145,9 @@ class _AddExamState extends State<AddExam> {
     );
     if (result == null) return;
     setState(() {
-      questions = result;
+      questions.removeWhere(
+          (element) => result.any((item) => item[C.ID] == element[C.ID]));
+      questions.insertAll(0, result);
       isSolvingTimeCalculated = true;
       isMarksCalculated = true;
       if (questions.length > 0) questionError = null;
@@ -309,11 +329,13 @@ class _AddExamState extends State<AddExam> {
                       decoration: InputDecoration(
                         labelText: S.EXAM_TITLE.tr,
                       ),
+                      initialValue: formData[C.TITLE],
                       validator: validTitle,
                       maxLength: 100,
                       onSaved: (value) => formData[C.TITLE] = value,
                     ),
                     TextFormField(
+                      initialValue: formData[C.INSTRUCTION],
                       decoration: InputDecoration(
                         labelText: S.EXAM_INSTRUCTION.tr,
                       ),
@@ -345,6 +367,7 @@ class _AddExamState extends State<AddExam> {
                 children: questions
                     .map(
                       (e) => QuestionCard(
+                        isFromExam: e[C.CREATED_BY] != null,
                         question: e,
                         onLongPress: ({BuildContext context}) =>
                             onLongPressQuestion(context, e),
@@ -364,6 +387,8 @@ class _AddExamState extends State<AddExam> {
                     if (formData[C.MINUS_MARKING])
                       TextFormField(
                         key: Key(C.MINUS_MARKING),
+                        initialValue:
+                            '${formData[C.MINUS_MARKING_PER_QUESTION] ?? ''}',
                         decoration: InputDecoration(
                             labelText: S.MINUS_MARKS_PER_QUESTION.tr),
                         keyboardType: TextInputType.number,

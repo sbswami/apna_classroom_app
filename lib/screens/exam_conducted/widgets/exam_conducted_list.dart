@@ -76,7 +76,7 @@ List<Map<String, dynamic>> getExamConductedButtons(String type, examConducted) {
           C.PRIMARY: true,
         });
       }
-      if (createdBy != UserController.to.currentUser[C.ID]) {
+      if (!isCreator(createdBy)) {
         buttons.add({
           C.NAME: S.JOIN.tr,
           C.ON_TAP: () {
@@ -85,7 +85,7 @@ List<Map<String, dynamic>> getExamConductedButtons(String type, examConducted) {
           },
         });
       }
-      if (createdBy == UserController.to.currentUser[C.ID]) {
+      if (isCreator(createdBy)) {
         buttons.addAll([
           {
             C.NAME: S.DELETE.tr,
@@ -107,7 +107,7 @@ List<Map<String, dynamic>> getExamConductedButtons(String type, examConducted) {
 
       break;
     case UPCOMING:
-      if (createdBy == UserController.to.currentUser[C.ID]) {
+      if (isCreator(createdBy)) {
         buttons.add({
           C.NAME: S.DELETE.tr,
           C.ON_TAP: () {
@@ -119,7 +119,7 @@ List<Map<String, dynamic>> getExamConductedButtons(String type, examConducted) {
       break;
     case COMPLETED:
       // Get is admin here to check thing
-      if (createdBy == UserController.to.currentUser[C.ID]) {
+      if (isCreator(createdBy)) {
         buttons.add({
           C.NAME: S.VIEW_RESULT.tr,
           C.ON_TAP: () {
@@ -128,7 +128,7 @@ List<Map<String, dynamic>> getExamConductedButtons(String type, examConducted) {
           C.PRIMARY: false,
         });
       }
-      if (createdBy != UserController.to.currentUser[C.ID]) {
+      if (!isCreator(createdBy)) {
         buttons.add({
           C.NAME: S.VIEW_RESULT.tr,
           C.ON_TAP: () {

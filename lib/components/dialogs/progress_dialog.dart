@@ -1,3 +1,4 @@
+import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -10,14 +11,13 @@ class ProgressDialog extends StatelessWidget {
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              CircularProgressIndicator(),
-              if (text != null) Text(text),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 32.0),
+            Text(text ?? S.PROCESSING.tr),
+          ],
         ),
       ),
     );

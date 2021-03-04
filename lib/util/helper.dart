@@ -22,6 +22,7 @@ String getUniqueId() {
 }
 
 int getMinute(int seconds) {
+  if (seconds == null) return null;
   return seconds ~/ 60;
 }
 
@@ -31,13 +32,12 @@ String getMinuteSt(int seconds) {
 }
 
 isAdmin(List members) {
-  return members.any((element) =>
-      (element[C.ID][C.ID] == UserController.to.currentUser[C.ID]) &&
-      (element[C.ROLE] == E.ADMIN));
+  return members?.any((element) =>
+      (element[C.ID][C.ID] == getUserId()) && (element[C.ROLE] == E.ADMIN));
 }
 
 isCreator(String createdBy) {
-  return createdBy == UserController.to.currentUser[C.ID];
+  return createdBy == getUserId();
 }
 
 Iterable<T> zip<T>(Iterable<T> a, Iterable<T> b) sync* {

@@ -5,6 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ApnaApp extends StatelessWidget {
+  final Locale locale;
+  final bool isDarkMode;
+
+  const ApnaApp({Key key, this.locale, this.isDarkMode}) : super(key: key);
   // This widget is the root of your application.
 
   @override
@@ -12,14 +16,11 @@ class ApnaApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Apna Classroom',
       translations: MyTranslation(),
-      locale: Get.deviceLocale,
+      locale: locale ?? Get.deviceLocale,
       fallbackLocale: Locale('en', 'US'),
-      theme: AppTheme.lightTheme,
-      // theme: ThemeData(
-      //     primaryColor: Color(0xFF3F6DF2),
-      //     primarySwatch: Colors.blue,
-      //     visualDensity: VisualDensity.adaptivePlatformDensity,
-      //     textTheme: TextTheme(button: TextStyle(color: Colors.white))),
+      theme: (isDarkMode ?? Get.isPlatformDarkMode)
+          ? AppTheme.darkTheme
+          : AppTheme.lightTheme,
       home: Initializer(),
     );
   }

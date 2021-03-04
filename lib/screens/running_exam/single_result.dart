@@ -1,6 +1,7 @@
 import 'package:apna_classroom_app/api/solved_exam.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/running_exam/answer_view.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -64,7 +65,8 @@ class _SingleResultState extends State<SingleResult> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            if (_solvedExam == null) LinearProgressIndicator(),
+            if (_solvedExam == null)
+              DetailsSkeleton(type: DetailsType.CardInfo),
             if (_solvedExam != null)
               Padding(
                 padding: const EdgeInsets.symmetric(

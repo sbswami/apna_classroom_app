@@ -11,6 +11,7 @@ class YesNoDialog extends StatelessWidget {
   final Function yes;
   final String noName;
   final Function no;
+  final bool destructive;
 
   const YesNoDialog(
       {Key key,
@@ -19,7 +20,8 @@ class YesNoDialog extends StatelessWidget {
       this.yes,
       this.no,
       this.yesName,
-      this.noName})
+      this.noName,
+      this.destructive})
       : super(key: key);
 
   @override
@@ -48,6 +50,7 @@ class YesNoDialog extends StatelessWidget {
           onPress: () {
             Get.back(result: (yes ?? () {})());
           },
+          destructive: destructive,
         ),
       ],
     );
@@ -72,6 +75,35 @@ yesOrNo(
       yesName: yesName,
       no: no,
       noName: noName,
+    ),
+  );
+}
+
+wantToDelete(Function onDelete, String msg) {
+  return showDialog(
+    context: Get.context,
+    barrierDismissible: true,
+    builder: (BuildContext context) => YesNoDialog(
+      title: S.ARE_YOU_SURE_YOU_WANT_TO_DELETE.tr,
+      msg: msg,
+      yes: onDelete,
+      yesName: S.DELETE.tr,
+      noName: S.CANCEL.tr,
+      destructive: true,
+    ),
+  );
+}
+
+wantToEdit(Function onYes, String msg) {
+  return showDialog(
+    context: Get.context,
+    barrierDismissible: true,
+    builder: (BuildContext context) => YesNoDialog(
+      title: S.ARE_YOU_SURE_YOU_WANT_TO_EDIT.tr,
+      msg: msg,
+      yes: onYes,
+      yesName: S.EDIT.tr,
+      noName: S.CANCEL.tr,
     ),
   );
 }

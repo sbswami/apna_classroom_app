@@ -35,9 +35,9 @@ Future listNote(Map<String, String> payload, List<String> subjects) async {
   }
 }
 
-Future getSubjectsNote() async {
-  http.Response response = await apiGetCall(url: NOTE_SUBJECTS, isUser: true);
-  if (response.statusCode == 200) {
-    return json.decode(response.body)[C.SUBJECT];
-  }
+Future<bool> deleteNote(Map<String, dynamic> payload) async {
+  http.Response response = await apiCall(
+      url: NOTE_DELETE, payload: payload, isUser: true, isLoading: true);
+
+  return response.statusCode == 200;
 }

@@ -1,8 +1,12 @@
 import 'package:apna_classroom_app/api/exam.dart';
+import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/chips/group_chips.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/quiz/exam/add_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/question_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/helper.dart';
@@ -20,18 +24,44 @@ class DetailedExam extends StatefulWidget {
 
 class _DetailedExamState extends State<DetailedExam> {
   bool isLoading = true;
-  Map<String, dynamic> exam = {};
+  Map<String, dynamic> exam;
 
   loadExam() async {
     Map<String, dynamic> _exam = await getExam({C.ID: widget.exam[C.ID]});
-    // print(_exam);
+
     setState(() {
       exam = _exam;
       isLoading = false;
     });
   }
 
-  onShare() {}
+  // Delete
+  _onDelete() async {
+    var result = await wantToDelete(() {
+      return true;
+    }, S.EXAM_DELETE_NOTE.tr);
+    if (!(result ?? false)) return;
+    bool isDeleted = await deleteExam({
+      C.ID: widget.exam[C.ID],
+    });
+    if (!isDeleted)
+      return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+    Get.back(result: true);
+  }
+
+  // Edit
+  bool isEdited = false;
+  _onEdit() async {
+    var result = await Get.to(() => AddExam(exam: exam));
+    if (result ?? false) {
+      setState(() {
+        isLoading = true;
+        exam = null;
+        isEdited = true;
+      });
+      loadExam();
+    }
+  }
 
   @override
   void initState() {
@@ -44,7 +74,6 @@ class _DetailedExamState extends State<DetailedExam> {
     return Scaffold(
       appBar: AppBar(
         title: Text(S.EXAM.tr),
-        actions: [IconButton(icon: Icon(Icons.share), onPressed: onShare)],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -55,19 +84,23 @@ class _DetailedExamState extends State<DetailedExam> {
                 children: [
                   SizedBox(height: 16.0),
                   SelectableText(
-                    widget.exam[C.TITLE],
+                    (exam ?? widget.exam)[C.TITLE],
                     style: Theme.of(context).textTheme.subtitle2,
                   ),
                   SizedBox(height: 8.0),
-                  if (isLoading) ListSkeleton(size: 4),
+                  if (isLoading)
+                    DetailsSkeleton(
+                      type: DetailsType.CardInfo,
+                    ),
                   if (!isLoading)
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         SizedBox(height: 8.0),
-                        if (exam[C.INSTRUCTION] != null)
-                          SelectableText(exam[C.INSTRUCTION]),
-                        SizedBox(height: 8.0),
+                        InfoCard(
+                          title: S.EXAM_INSTRUCTION.tr,
+                          data: exam[C.INSTRUCTION],
+                        ),
                         InfoCard(
                           title: S.MARKS.tr,
                           data: exam[C.MARKS],
@@ -86,7 +119,7 @@ class _DetailedExamState extends State<DetailedExam> {
                           data: getPrivacySt(exam[C.PRIVACY]).tr,
                         ),
                         InfoCard(
-                          title: S.SOLVING_TIME.tr,
+                          title: S.DIFFICULTY_LEVEL.tr,
                           data: getDifficulty(exam[C.DIFFICULTY]).tr,
                         ),
                         InfoCard(
@@ -108,17 +141,27 @@ class _DetailedExamState extends State<DetailedExam> {
               Column(
                 children: exam[C.QUESTION].map<Widget>(
                   (e) {
-                    var question = e[C.QUESTION];
-                    question[C.SOLVING_TIME] = e[C.SOLVING_TIME];
-                    question[C.MARKS] = e[C.MARKS];
-                    return QuestionCard(question: question);
+                    return QuestionCard(question: e, isFromExam: true);
                   },
                 ).toList(),
               ),
             SizedBox(height: 16.0),
+            if (isCreator((exam ?? widget.exam)[C.CREATED_BY]))
+              PrimaryButton(
+                destructive: true,
+                text: S.DELETE.tr,
+                onPress: _onDelete,
+              ),
+            SizedBox(height: 64),
           ],
         ),
       ),
+      floatingActionButton: isCreator((exam ?? {})[C.CREATED_BY])
+          ? FloatingActionButton(
+              onPressed: _onEdit,
+              child: Icon(Icons.edit),
+            )
+          : null,
     );
   }
 }

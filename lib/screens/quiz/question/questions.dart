@@ -1,13 +1,15 @@
 import 'package:apna_classroom_app/api/question.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/empty/empty_list.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/add_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/question_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 const String PER_PAGE_QUESTION = '10';
@@ -16,16 +18,27 @@ class Questions extends StatefulWidget {
   final String questionTitle;
   final Function(List list) onSelect;
   final List<String> selectedQuestion;
+  final bool updateQuestion;
 
   const Questions(
-      {Key key, this.questionTitle, this.onSelect, this.selectedQuestion})
+      {Key key,
+      this.questionTitle,
+      this.onSelect,
+      this.selectedQuestion,
+      this.updateQuestion})
       : super(key: key);
   @override
   _QuestionsState createState() => _QuestionsState();
+  @override
+  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
+    super.debugFillProperties(properties);
+    properties.add(DiagnosticsProperty<bool>('updateQuestion', updateQuestion));
+  }
 }
 
 class _QuestionsState extends State<Questions>
     with AutomaticKeepAliveClientMixin<Questions> {
+  ScrollController _scrollController = ScrollController();
   bool isLoading = false;
   List<String> selectedSubjects = [];
   List<String> selectedExams = [];
@@ -97,6 +110,11 @@ class _QuestionsState extends State<Questions>
     if (oldWidget.questionTitle != widget.questionTitle) {
       onSearch(widget.questionTitle);
     }
+
+    // Update list on coming from add question
+    if (widget.updateQuestion ?? false) {
+      onRefresh();
+    }
   }
 
   onSearch(String value) {
@@ -161,6 +179,17 @@ class _QuestionsState extends State<Questions>
     ));
   }
 
+  // Clear Filter
+  clearFilter() {
+    setState(() {
+      selectedSubjects.clear();
+      selectedExams.clear();
+      searchTitle = null;
+      questions.clear();
+      loadQuestion();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -184,13 +213,22 @@ class _QuestionsState extends State<Questions>
             selectedExams: selectedExams,
             onSelectedExam: onSelectedExam,
           ),
-          if (resultLength == 0 && (isLoading ?? true)) ListSkeleton(size: 4),
+          if (resultLength == 0 && (isLoading ?? true))
+            DetailsSkeleton(
+              type: DetailsType.List,
+            )
+          else if (resultLength == 0)
+            EmptyList(
+              onClearFilter: clearFilter,
+            ),
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 if ((scrollInfo.metrics.pixels ==
                         scrollInfo.metrics.maxScrollExtent) &&
-                    !isLoading) {
+                    !isLoading &&
+                    _scrollController.position.userScrollDirection ==
+                        ScrollDirection.reverse) {
                   loadQuestion();
                 }
                 return true;
@@ -198,6 +236,8 @@ class _QuestionsState extends State<Questions>
               child: RefreshIndicator(
                 onRefresh: onRefresh,
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
                   itemCount: resultLength,
                   itemBuilder: (context, position) {
                     bool isSelected;
@@ -208,10 +248,12 @@ class _QuestionsState extends State<Questions>
                     return QuestionCard(
                       question: questions[position],
                       isSelected: isSelected,
+                      isEditable: true,
                       onChanged: (value) =>
                           onSelectQuestion(questions[position][C.ID], value),
                       onLongPress: ({BuildContext context}) =>
                           onLongPress(context, questions[position][C.ID]),
+                      onRefresh: onRefresh,
                     );
                   },
                 ),

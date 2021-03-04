@@ -5,8 +5,20 @@ const EN_US = {
   S.APP_NAME: 'Apna Classroom',
   S.APP_N: 'Apna',
 
+  // Sharing and etc things
+  S.SHARING_NOTE:
+      'Hey There, I am using this amazing application and I loved it. This app is helpful for student and teachers.\nDownload it now!\n@link',
+
   // Design
   S.SOMETHING_WENT_WRONG: 'Something Went Wrong',
+  S.PROCESSING: 'Processing . . .',
+
+  // Empty State
+  S.NOT_FOUND: 'Not Found',
+  S.NOT_FOUND_MSG: 'We did not find anything.',
+  S.CLEAR_FILTER: 'Clear Filter',
+  S.START_CHAT: 'Start Chat',
+  S.START_CHAT_MSG: 'Share Notes, Photos, PDF, Exam and lot more.',
 
   // LOGIN
   S.LOGIN: 'Login',
@@ -26,6 +38,8 @@ const EN_US = {
   S.NAME_INVALID: 'Name is not valid',
   S.RESEND_OTP: 'Resend OTP?',
   S.HIDE_MY_PHONE_NUMBER: 'Hide my Phone Number',
+  S.PHONE_NUMBER: 'Phone Number',
+  S.SAVE: 'Save',
 
   S.CAMERA: 'Camera',
   S.GALLERY: 'Gallery',
@@ -50,6 +64,10 @@ const EN_US = {
   S.EDIT: 'Edit',
   S.ADD_AT_LEAST_ONE_EXAM: 'Add at lease one exam!',
   S.SUBJECT: 'Subject',
+  S.ARE_YOU_SURE_YOU_WANT_TO_DELETE: 'Are you sure you want to delete?',
+  S.CAN_NOT_DELETE_NOW:
+      'Can not delete now, Please try again later or send us feedback.',
+  S.ARE_YOU_SURE_YOU_WANT_TO_EDIT: 'Are you sure you want to edit?',
 
   // Notes + Quiz
   S.OPEN_EDITOR: 'Open Editor',
@@ -68,6 +86,10 @@ const EN_US = {
   S.MOVE_TO_TOP: 'Move to top',
   S.MOVE_TO_BOTTOM: 'Move to bottom',
   S.PLEASE_ENTER_THE_NOTE_TITLE: 'Please enter the note Title',
+  S.NOTE_DELETE_NOTE:
+      'No body can access this note after deletion, This note will be deleted from Classrooms as well.',
+  S.NOTES_ARE_DELETED_BY_CREATOR: 'Notes are deleted by the Creator',
+  S.NOTE_EDIT_NOTE: 'Notes will be updated in all Classroom as well.',
 
   // Quiz + Exam
   S.EXAM: 'Exam',
@@ -91,6 +113,8 @@ const EN_US = {
   S.PLEASE_ADD_AT_LEAST_1_QUESTION: 'Please add at least 1 Question',
   S.QUESTION_ADDED: 'Question Added',
   S.CREATE_EXAM: 'Create Exam',
+  S.EXAM_DELETE_NOTE:
+      'You will not able to restore this exam. Your scheduled exam will not effected by deletion of this exam.',
 
   // Quiz + Question
   S.QUESTION: 'Question',
@@ -120,6 +144,10 @@ const EN_US = {
   S.MARKS: 'Marks',
   S.OPTION: 'Option',
   S.ANSWER: 'Answer',
+  S.QUESTION_DELETE_NOTE:
+      'You can not restore question after delete. Your created exams are safe and this deletion does not effect them.',
+  S.QUESTION_EDIT_NOTE:
+      'Question editing here will not effect any of your created or scheduled exams.',
 
   // Classroom
   S.ADD_CLASSROOM: 'Add Classroom',
@@ -145,6 +173,9 @@ const EN_US = {
   S.SCHEDULE_EXAM: 'Schedule Exam',
   S.CLASSROOM_NOTES: 'Classroom Note',
   S.PUBLIC_CLASSROOMS: 'Public Classrooms',
+  S.CLASSROOM_DELETE_NOTE:
+      'It will delete all messages, Exams for this Classroom, and Notes sharing. You will not able to restore this.',
+  S.CLASSROOM_DELETED_BY_CREATOR: 'Classroom is deleted by Creator.',
 
   S.RUNNING_EXAM: 'Running Exam',
   S.UPCOMING_EXAM: 'Upcoming Exam',
@@ -158,6 +189,8 @@ const EN_US = {
   S.SECONDS_AGO: 'seconds ago',
   S.MINUTES_AGO: 'minutes ago',
   S.HOURS_AGO: 'hours ago',
+
+  S.SEE_PUBLIC_CLASSROOMS: 'See Public Classrooms',
 
   // Exam Conducted
   S.SELECT_EXAM: 'Select Exam',
@@ -228,6 +261,24 @@ const EN_US = {
 
   // Chat
   S.TYPE_HERE: 'Type here...',
+  S.MESSAGED_DELETED: 'This message is deleted',
+
+  // Share
+  S.SHARE: 'Share',
+  S.SHARE_TO_CLASSROOM: 'Share to Classroom',
+  S.SHARE_OUTSIDE: 'Share Outside',
+
+  // Drawer
+  S.CHANGE_LANGUAGE: 'Change language',
+  S.LOG_OUT: 'Log out',
+  S.LIGHT_MODE: 'Light mode',
+  S.DARK_MODE: 'Dark mode',
+  S.INVITE: 'Invite',
+
+  // Languages
+  S.ENGLISH_USA: 'English (USA)',
+  S.ENGLISH_IN: 'English (India)',
+  S.HINDI_IN: 'Hindi (India)',
 
   // Buttons
   S.CONTINUE: 'Continue',

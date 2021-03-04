@@ -13,7 +13,7 @@ class BottomNavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 70,
+      // width: 70,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,

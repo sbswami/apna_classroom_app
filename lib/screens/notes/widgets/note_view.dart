@@ -1,6 +1,7 @@
 import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/editor/text_field.dart';
 import 'package:apna_classroom_app/components/editor/text_viewer.dart';
+import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/media/image_viewer.dart';
@@ -40,19 +41,25 @@ class _NoteViewState extends State<NoteView> {
   @override
   void initState() {
     if (widget.note[C.TYPE] == E.TEXT) {
-      String firstLine = widget.note[C.TEXT].first[C.DATA];
-      int firstLineLength = firstLine.length;
-      String title = firstLine.substring(
-          0,
-          firstLineLength < MAX_NOTE_TITLE_LENGTH
-              ? firstLineLength
-              : MAX_NOTE_TITLE_LENGTH);
+      String title = getTitleOfTextNote();
       titleController.text = title;
       onChangeTitle(title);
     } else {
       titleController.text = widget.note[C.TITLE] ?? '';
     }
     super.initState();
+  }
+
+  // Get title of text data
+  String getTitleOfTextNote() {
+    String firstLine = widget.note[C.TEXT].first[C.DATA];
+    int firstLineLength = firstLine.length;
+    String title = firstLine.substring(
+        0,
+        firstLineLength < MAX_NOTE_TITLE_LENGTH
+            ? firstLineLength
+            : MAX_NOTE_TITLE_LENGTH);
+    return title;
   }
 
   onChangeTitle(String value) {
@@ -121,19 +128,30 @@ class _NoteViewState extends State<NoteView> {
         Get.to(TextViewer(text: widget.note));
         break;
       case E.IMAGE:
-        Get.to(ImageViewer(image: widget.note[C.FILE]));
+        Get.to(ImageViewer(
+          image: widget.note[C.FILE],
+          url: widget.note[C.URL],
+        ));
         break;
       case E.PDF:
-        Get.to(PdfViewer(pdf: widget.note[C.FILE]));
+        Get.to(PdfViewer(
+          pdf: widget.note[C.FILE],
+          url: widget.note[C.URL],
+        ));
         break;
     }
   }
 
   @override
   void didUpdateWidget(covariant NoteView oldWidget) {
-    if (oldWidget.note[C.TITLE] != widget.note[C.TITLE]) {
+    if (widget.note[C.TYPE] == E.TEXT) {
+      String title = getTitleOfTextNote();
+      titleController.text = title;
+      onChangeTitle(title);
+    } else if (oldWidget.note[C.TITLE] != widget.note[C.TITLE]) {
       titleController.text = widget.note[C.TITLE];
     }
+
     super.didUpdateWidget(oldWidget);
   }
 
@@ -208,7 +226,9 @@ class _NoteViewState extends State<NoteView> {
       case E.PDF:
       case E.IMAGE:
         return ClipRRect(
-          child: Image.file(widget.note[C.THUMBNAIL]),
+          child: widget.note[C.THUMBNAIL_URL] != null
+              ? UrlImage(url: widget.note[C.THUMBNAIL_URL])
+              : Image.file(widget.note[C.THUMBNAIL]),
           borderRadius: BorderRadius.circular(10),
         );
     }

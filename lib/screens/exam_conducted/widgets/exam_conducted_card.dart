@@ -13,109 +13,107 @@ class ExamConductedCard extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          border: Border.symmetric(
-            horizontal:
-                BorderSide(width: 0.5, color: Theme.of(context).dividerColor),
-          ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Theme.of(context).cardColor,
+        border: Border.symmetric(
+          horizontal:
+              BorderSide(width: 0.5, color: Theme.of(context).dividerColor),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              examConducted[C.EXAM][C.TITLE],
-              maxLines: 1,
-              style: Theme.of(context).textTheme.subtitle2,
-            ),
-            SizedBox(height: 4.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  getMinuteSt(examConducted[C.EXAM][C.SOLVING_TIME]),
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                Text(
-                  '${S.MARKS.tr} ${examConducted[C.EXAM][C.MARKS]}',
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                Text(
-                  getDifficulty(examConducted[C.EXAM][C.DIFFICULTY]).tr,
-                  style: Theme.of(context).textTheme.caption,
-                ),
-              ],
-            ),
-            // SizedBox(height: 6.0),
-            Divider(),
-            Row(
-              children: [
-                Text(
-                  S.START_TIME.tr,
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                SizedBox(width: 8.0),
-                Text(
-                  getFormattedDateTime(dateString: examConducted[C.START_TIME]),
-                  style: Theme.of(context).textTheme.caption.copyWith(
-                        color: Theme.of(context).textTheme.bodyText2.color,
-                      ),
-                ),
-              ],
-            ),
-            SizedBox(height: 4.0),
-            Row(
-              children: [
-                Text(
-                  S.EXPIRE_TIME.tr,
-                  style: Theme.of(context).textTheme.caption,
-                ),
-                SizedBox(width: 8.0),
-                Text(
-                  examConducted[C.EXPIRE_TIME] != null
-                      ? getFormattedDateTime(
-                          dateString: examConducted[C.EXPIRE_TIME])
-                      : S.NO_EXPIRE_TIME.tr,
-                  style: Theme.of(context).textTheme.caption.copyWith(
-                        color: Theme.of(context).errorColor,
-                      ),
-                ),
-              ],
-            ),
-            if (buttons != null)
-              Column(
-                children: buttons
-                    .map(
-                      (e) => Column(
-                        children: [
-                          Divider(),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              GestureDetector(
-                                onTap: e[C.ON_TAP],
-                                child: Text(
-                                  e[C.NAME],
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w500,
-                                    color: (e[C.PRIMARY] ?? true)
-                                        ? Theme.of(context).primaryColor
-                                        : Theme.of(context).errorColor,
-                                  ),
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            examConducted[C.EXAM][C.TITLE],
+            maxLines: 1,
+            style: Theme.of(context).textTheme.subtitle2,
+          ),
+          SizedBox(height: 4.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                getMinuteSt(examConducted[C.EXAM][C.SOLVING_TIME]),
+                style: Theme.of(context).textTheme.caption,
+              ),
+              Text(
+                '${S.MARKS.tr} ${examConducted[C.EXAM][C.MARKS]}',
+                style: Theme.of(context).textTheme.caption,
+              ),
+              Text(
+                getDifficulty(examConducted[C.EXAM][C.DIFFICULTY]).tr,
+                style: Theme.of(context).textTheme.caption,
+              ),
+            ],
+          ),
+          // SizedBox(height: 6.0),
+          Divider(),
+          Row(
+            children: [
+              Text(
+                S.START_TIME.tr,
+                style: Theme.of(context).textTheme.caption,
+              ),
+              SizedBox(width: 8.0),
+              Text(
+                getFormattedDateTime(dateString: examConducted[C.START_TIME]),
+                style: Theme.of(context).textTheme.caption.copyWith(
+                      color: Theme.of(context).textTheme.bodyText2.color,
+                    ),
+              ),
+            ],
+          ),
+          SizedBox(height: 4.0),
+          Row(
+            children: [
+              Text(
+                S.EXPIRE_TIME.tr,
+                style: Theme.of(context).textTheme.caption,
+              ),
+              SizedBox(width: 8.0),
+              Text(
+                examConducted[C.EXPIRE_TIME] != null
+                    ? getFormattedDateTime(
+                        dateString: examConducted[C.EXPIRE_TIME])
+                    : S.NO_EXPIRE_TIME.tr,
+                style: Theme.of(context).textTheme.caption.copyWith(
+                      color: Theme.of(context).errorColor,
+                    ),
+              ),
+            ],
+          ),
+          if (buttons != null)
+            Column(
+              children: buttons
+                  .map(
+                    (e) => Column(
+                      children: [
+                        Divider(),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            GestureDetector(
+                              onTap: e[C.ON_TAP],
+                              child: Text(
+                                e[C.NAME],
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w500,
+                                  color: (e[C.PRIMARY] ?? true)
+                                      ? Theme.of(context).primaryColor
+                                      : Theme.of(context).errorColor,
                                 ),
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    )
-                    .toList(),
-              )
-          ],
-        ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  )
+                  .toList(),
+            )
+        ],
       ),
     );
   }

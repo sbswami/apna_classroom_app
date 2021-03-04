@@ -1,6 +1,4 @@
-import 'package:apna_classroom_app/api/media.dart';
 import 'package:apna_classroom_app/api/solved_exam.dart';
-import 'package:apna_classroom_app/api/text.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
@@ -148,7 +146,7 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
     setState(() {
       selectedOptions = [];
       optionGroupValue = null;
-      answerController.text = '';
+      answerController.clear();
       answerSubmitted = false;
     });
   }
@@ -157,11 +155,9 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
   showSolution() async {
     print(_question[C.SOLUTION]);
     if (_question[C.SOLUTION][C.MEDIA] != null) {
-      var media = await getMedia({C.ID: _question[C.SOLUTION][C.MEDIA]});
-      showMedia(media);
+      showMedia(_question[C.SOLUTION][C.MEDIA]);
     } else if (_question[C.SOLUTION][C.TEXT] != null) {
-      var text = await getText({C.ID: _question[C.SOLUTION][C.TEXT]});
-      Get.to(TextViewer(text: text));
+      Get.to(TextViewer(text: _question[C.SOLUTION][C.TEXT]));
     }
   }
 

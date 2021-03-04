@@ -36,6 +36,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       setState(() {
         usernameError = null;
       });
+      showProgress();
       if (_formData[C.IMAGE] != null && _formData[C.THUMBNAIL] != null) {
         _formData[C.PHOTO_URL] = await uploadImage(_formData[C.IMAGE]);
         _formData[C.THUMBNAIL_URL] =
@@ -46,7 +47,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _formData.remove(C.THUMBNAIL_URL);
         _formData.remove(C.PHOTO_URL);
       }
-      showProgress();
       await updateUser(_formData);
       Get.back();
       Get.offAll(Home());
@@ -140,7 +140,3 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-
-const String _CAMERA = 'CAMERA';
-const String _GALLERY = 'GALLERY';
-const String _DELETE = 'DELETE';

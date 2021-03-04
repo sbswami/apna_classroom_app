@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +89,9 @@ class _PdfViewerState extends State<PdfViewer> {
         ],
       ),
       body: isLoading
-          ? ListSkeleton(size: 4)
+          ? DetailsSkeleton(
+              type: DetailsType.ImageInfo,
+            )
           : PdfView(
               documentLoader: Center(child: CircularProgressIndicator()),
               pageLoader: Center(child: CircularProgressIndicator()),

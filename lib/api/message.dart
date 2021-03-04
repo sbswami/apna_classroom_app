@@ -32,3 +32,15 @@ Future listMessage(Map<String, String> payload) async {
     return json.decode(response.body)[C.LIST];
   }
 }
+
+Future getNoteMessage(Map<String, String> payload) async {
+  http.Response response = await apiGetCall(
+    payload: payload,
+    url: MESSAGE_NOTE,
+    isUser: true,
+    isLoading: false,
+  );
+  if (response.statusCode == 200) {
+    return json.decode(response.body)[C.LIST];
+  }
+}

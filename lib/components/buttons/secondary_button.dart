@@ -23,9 +23,13 @@ class SecondaryButton extends StatelessWidget {
         children: [
           if (iconData != null) Icon(iconData, color: color),
           if (text != null)
-            Text(
-              text,
-              style: Theme.of(context).textTheme.button.copyWith(color: color),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                text,
+                style:
+                    Theme.of(context).textTheme.button.copyWith(color: color),
+              ),
             ),
         ],
       ),

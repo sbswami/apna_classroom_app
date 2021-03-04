@@ -5,6 +5,7 @@ import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/components/apna_file_picker.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/editor/text_editor.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
@@ -20,6 +21,9 @@ import 'package:get/get.dart';
 const int MAX_RECENTLY_SUBJECTS = 5;
 
 class AddNotes extends StatefulWidget {
+  final note;
+
+  const AddNotes({Key key, this.note}) : super(key: key);
   @override
   _AddNotesState createState() => _AddNotesState();
 }
@@ -42,6 +46,38 @@ class _AddNotesState extends State<AddNotes> {
     notesData = {
       C.PRIVACY: E.PUBLIC,
     };
+    if (widget.note != null) {
+      notesData = {
+        C.ID: widget.note[C.ID],
+        C.PRIVACY: widget.note[C.PRIVACY],
+        C.TITLE: widget.note[C.TITLE],
+      };
+      subjects = widget.note[C.SUBJECT].cast<String>().toSet();
+      notes = widget.note[C.LIST]
+          .map((element) {
+            if (element[C.MEDIA] != null) {
+              var media = element[C.MEDIA];
+              return {
+                C.ID: media[C.ID],
+                C.TYPE: media[C.TYPE],
+                C.TITLE: media[C.TITLE],
+                C.URL: media[C.URL],
+                C.THUMBNAIL_URL: media[C.THUMBNAIL_URL],
+              };
+            }
+            if (element[C.TEXT] != null) {
+              var text = element[C.TEXT];
+              return {
+                C.ID: text[C.ID],
+                C.TEXT: text[C.TEXT].cast<Map<String, dynamic>>(),
+                C.TYPE: E.TEXT,
+                C.TITLE: text[C.TITLE]
+              };
+            }
+          })
+          .toList()
+          .cast<Map<String, dynamic>>();
+    }
     super.initState();
   }
 
@@ -67,6 +103,10 @@ class _AddNotesState extends State<AddNotes> {
         });
         return;
       }
+      if (widget.note != null) {
+        var result = await wantToEdit(() => true, S.NOTE_EDIT_NOTE.tr);
+        if (!(result ?? false)) return;
+      }
       setState(() {
         subjectError = null;
         noteError = null;
@@ -75,12 +115,33 @@ class _AddNotesState extends State<AddNotes> {
       notesData[C.SUBJECT] = subjects.toList();
       form.save();
 
-      UploadController controller =
-          Get.put(UploadController(notes.length, 0), tag: NOTES_CONTROLLER_TAG);
-      showUploadDialog(NOTES_CONTROLLER_TAG);
+      UploadController.to.resetUpload(notes.length);
+      showUploadDialog();
       List notesUploaded = await Future.wait(notes.map((note) async {
         String url;
         String thumbnailUrl;
+
+        if (note[C.ID] != null) {
+          UploadController.to.increaseUpload();
+          if (note[C.TYPE] == E.TEXT) {
+            return {
+              C.TEXT: {
+                C.ID: note[C.ID],
+                C.TITLE: note[C.TITLE],
+                C.TEXT: note[C.TEXT],
+              }
+            };
+          }
+          return {
+            C.MEDIA: {
+              C.ID: note[C.ID],
+              C.TITLE: note[C.TITLE],
+              C.TYPE: note[C.TYPE],
+              C.URL: note[C.URL],
+              C.THUMBNAIL_URL: note[C.THUMBNAIL_URL],
+            }
+          };
+        }
         switch (note[C.TYPE]) {
           case E.IMAGE:
             url = await uploadImage(note[C.FILE]);
@@ -91,7 +152,7 @@ class _AddNotesState extends State<AddNotes> {
             thumbnailUrl = await uploadPdfThumbnail(note[C.THUMBNAIL]);
             break;
         }
-        controller.increaseUpload();
+        UploadController.to.increaseUpload();
         switch (note[C.TYPE]) {
           case E.IMAGE:
           case E.PDF:
@@ -117,7 +178,7 @@ class _AddNotesState extends State<AddNotes> {
       var note = await createNote(notesData);
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       Get.back();
-      if (note != null) Get.back();
+      if (note != null) Get.back(result: true);
     }
   }
 
@@ -152,6 +213,7 @@ class _AddNotesState extends State<AddNotes> {
 
   // Text Editor
   getNotesFromEditor({List<Map<String, dynamic>> list, int index}) async {
+    if (list != null) Get.back();
     var data = await Get.to(TextEditor(
       data: list,
     ));
@@ -229,6 +291,7 @@ class _AddNotesState extends State<AddNotes> {
                   children: [
                     // Title of the Notes
                     TextFormField(
+                      initialValue: notesData[C.TITLE],
                       decoration:
                           InputDecoration(labelText: S.ENTER_NOTES_TITLE.tr),
                       validator: validTitle,
@@ -250,7 +313,7 @@ class _AddNotesState extends State<AddNotes> {
                         E.PUBLIC: S.PUBLIC.tr,
                         E.PRIVATE: S.PRIVATE.tr,
                       },
-                      defaultValue: E.PUBLIC,
+                      defaultValue: notesData[C.PRIVACY],
                       onChange: onChangePrivacy,
                     ),
                     Divider(),

@@ -1,3 +1,7 @@
+class Constants {
+  static const String APP_LINK = 'https://play.google.com/';
+}
+
 class Hint {
   // Hints
   static const String COUNTRY_CODE = '+91';

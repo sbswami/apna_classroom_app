@@ -13,4 +13,14 @@ class AppTheme {
       button: buttonTextStyle,
     ),
   );
+
+  static final ThemeData darkTheme = ThemeData(
+    brightness: Brightness.dark,
+    // primaryColor: primaryColorDark,
+    accentColor: accentColorDark,
+    // cardColor: cardColorDark,
+    textTheme: TextTheme(
+      button: buttonTextStyleDark,
+    ),
+  );
 }

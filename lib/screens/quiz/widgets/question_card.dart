@@ -11,23 +11,33 @@ class QuestionCard extends StatelessWidget {
   final bool isSelected;
   final Function(bool selected) onChanged;
   final Function({BuildContext context}) onLongPress;
+  final Function onRefresh;
+  final bool isFromExam;
+  final bool isEditable;
 
   const QuestionCard(
       {Key key,
       this.question,
       this.isSelected,
       this.onChanged,
-      this.onLongPress})
+      this.onLongPress,
+      this.onRefresh,
+      this.isFromExam,
+      this.isEditable})
       : super(key: key);
 
-  onTapQuestion() {
-    Get.to(DetailedQuestion(
+  onTapQuestion() async {
+    var result = await Get.to(DetailedQuestion(
       question: question,
+      isEditable: isEditable,
+      isFromExam: isFromExam,
     ));
+    if ((result ?? false) && onRefresh != null) onRefresh();
   }
 
   @override
   Widget build(BuildContext context) {
+    print(question);
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,

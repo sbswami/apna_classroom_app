@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 
 class GroupChips extends StatelessWidget {
   final List<String> list;
+  final double width;
 
-  const GroupChips({Key key, this.list}) : super(key: key);
+  const GroupChips({Key key, this.list, this.width}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: MediaQuery.of(context).size.width * 0.7,
+      width: width ?? MediaQuery.of(context).size.width * 0.7,
       margin: const EdgeInsets.only(top: 8.0),
       child: Wrap(
         children: list

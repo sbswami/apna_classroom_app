@@ -1,9 +1,11 @@
 import 'package:apna_classroom_app/api/exam_conducted.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
+import 'package:apna_classroom_app/screens/empty/empty_list.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_card.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_list.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 class AllExamConducted extends StatefulWidget {
   final String classroomId;
@@ -17,6 +19,7 @@ class AllExamConducted extends StatefulWidget {
 }
 
 class _AllExamConductedState extends State<AllExamConducted> {
+  ScrollController _scrollController = ScrollController();
   // Variables
   String title = '';
   bool isLoading = false;
@@ -77,13 +80,20 @@ class _AllExamConductedState extends State<AllExamConducted> {
       ),
       body: Column(
         children: [
-          if (resultLength == 0 && (isLoading ?? true)) ListSkeleton(size: 4),
+          if (resultLength == 0 && (isLoading ?? true))
+            DetailsSkeleton(
+              type: DetailsType.Card,
+            )
+          else if (resultLength == 0)
+            EmptyList(),
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 if ((scrollInfo.metrics.pixels ==
                         scrollInfo.metrics.maxScrollExtent) &&
-                    !isLoading) {
+                    !isLoading &&
+                    _scrollController.position.userScrollDirection ==
+                        ScrollDirection.reverse) {
                   loadExamConducted();
                 }
                 return true;
@@ -91,6 +101,8 @@ class _AllExamConductedState extends State<AllExamConducted> {
               child: RefreshIndicator(
                 onRefresh: onRefresh,
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
                   itemCount: resultLength,
                   itemBuilder: (context, position) {
                     var examConducted = examConductedList[position];

@@ -44,7 +44,7 @@ class RecentlyUsedController extends GetxController {
     addRecentlyAddedExams(exams);
   }
 
-  void addAllExam(List<String> exams) async {
+  Future addAllExam(List<String> exams) async {
     this.exams.removeWhere((element) => exams.contains(element));
     this.exams.insertAll(0, exams);
     await addRecentlyAddedExams(this.exams);

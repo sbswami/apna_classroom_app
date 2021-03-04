@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:apna_classroom_app/api/api_constants.dart';
 import 'package:apna_classroom_app/api/helper.dart';
+import 'package:apna_classroom_app/screens/classroom/controllers/classroom_list_controller.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:http/http.dart' as http;
 
@@ -12,7 +13,11 @@ Future createExamConducted(Map<String, dynamic> payload) async {
       isUser: true,
       isLoading: true);
   if (response.statusCode == 200) {
-    return json.decode(response.body)[C.EXAM_CONDUCTED];
+    var data = json.decode(response.body);
+    data[C.MESSAGE].forEach((element) {
+      ClassroomListController.to.addMessage(element[C.CLASSROOM], element);
+    });
+    return data[C.EXAM_CONDUCTED];
   }
 }
 

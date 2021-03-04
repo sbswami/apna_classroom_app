@@ -1,13 +1,18 @@
 import 'package:apna_classroom_app/api/classroom.dart';
 import 'package:apna_classroom_app/components/buttons/arrow_secondary_button.dart';
+import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/chips/group_chips.dart';
+import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/classroom/person_card.dart';
+import 'package:apna_classroom_app/screens/chat/chat.dart';
 import 'package:apna_classroom_app/screens/classroom/search_person.dart';
+import 'package:apna_classroom_app/screens/classroom/widgets/person_card.dart';
+import 'package:apna_classroom_app/screens/classroom_notes/classroom_notes.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/schedule_exam.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_list.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -92,6 +97,20 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     });
   }
 
+  // Delete Classroom
+  _onDelete() async {
+    var result = await wantToDelete(() {
+      return true;
+    }, S.CLASSROOM_DELETE_NOTE.tr);
+    if (!(result ?? false)) return;
+    bool isDeleted = await deleteClassroom({
+      C.ID: widget.classroom[C.ID],
+    });
+    if (!isDeleted)
+      return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+    Get.back(result: true);
+  }
+
   // Import from excel via
   importViaExcel() {}
 
@@ -102,23 +121,41 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
         appBar: AppBar(
           title: Text(S.CLASSROOM.tr),
         ),
-        body: ListSkeleton(size: 3),
+        body: DetailsSkeleton(
+          type: DetailsType.ImageButtonCard,
+        ),
       );
     }
-    bool isItAdmin = isAdmin(classroom[C.MEMBERS]);
+
+    if (classroom == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(S.CLASSROOM.tr),
+        ),
+        body: Container(
+          margin: const EdgeInsets.all(16.0),
+          child: Text(
+            S.CLASSROOM_DELETED_BY_CREATOR.tr,
+            style: Theme.of(context).textTheme.headline6,
+          ),
+        ),
+      );
+    }
+
+    bool isItAdmin = isAdmin((classroom ?? {})[C.MEMBERS]);
     return Scaffold(
       appBar: AppBar(
         title: Text(S.CLASSROOM.tr),
       ),
       body: ListView(
+        physics: ClampingScrollPhysics(),
         children: [
           Container(
             decoration: BoxDecoration(
               boxShadow: [
                 BoxShadow(
-                  blurRadius: 5.0,
-                  spreadRadius: 1.0,
-                  offset: Offset(0, 1.0),
+                  spreadRadius: 0.3,
+                  blurRadius: 5,
                 ),
               ],
               color: Theme.of(context).cardColor,
@@ -144,7 +181,9 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                   SelectableText(classroom[C.DESCRIPTION]),
                 SizedBox(height: 8.0),
                 ArrowSecondaryButton(
-                  onPress: () {},
+                  onPress: () {
+                    Get.to(Chat(classroom: classroom));
+                  },
                   text: S.GO_TO_CHAT.tr,
                   preIcon: Icons.message,
                 ),
@@ -157,7 +196,9 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                   ),
                 SizedBox(height: 8.0),
                 ArrowSecondaryButton(
-                  onPress: () {},
+                  onPress: () {
+                    Get.to(ClassroomNotes(classroom: classroom));
+                  },
                   text: S.CLASSROOM_NOTES.tr,
                   preIcon: Icons.book,
                 ),
@@ -232,6 +273,19 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
               },
             ).toList(),
           ),
+          SizedBox(height: 16),
+          if (isCreator(classroom[C.CREATED_BY]))
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                PrimaryButton(
+                  destructive: true,
+                  text: S.DELETE.tr,
+                  onPress: _onDelete,
+                ),
+              ],
+            ),
+          SizedBox(height: 64),
         ],
       ),
     );

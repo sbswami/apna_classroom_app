@@ -5,6 +5,7 @@ import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/editor/text_editor.dart';
 import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
@@ -18,12 +19,16 @@ import 'package:apna_classroom_app/screens/quiz/widgets/option_check_box.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/question_image.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
+import 'package:apna_classroom_app/util/helper.dart';
 import 'package:apna_classroom_app/util/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
 class AddQuestion extends StatefulWidget {
+  final question;
+
+  const AddQuestion({Key key, this.question}) : super(key: key);
   @override
   _AddQuestionState createState() => _AddQuestionState();
 }
@@ -31,11 +36,54 @@ class AddQuestion extends StatefulWidget {
 class _AddQuestionState extends State<AddQuestion> {
   // Constants
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final Map<String, dynamic> formData = {};
+  Map<String, dynamic> formData = {};
 
   @override
   void initState() {
     formData[C.ANSWER_TYPE] = E.SINGLE_CHOICE;
+    if (widget.question != null) {
+      formData = {
+        C.ID: widget.question[C.ID],
+        C.TITLE: widget.question[C.TITLE],
+        C.ANSWER_TYPE: widget.question[C.ANSWER_TYPE],
+        C.ANSWER: widget.question[C.ANSWER],
+        C.ANSWER_FORMAT: widget.question[C.ANSWER_FORMAT],
+        C.ANSWER_HINT: widget.question[C.ANSWER_HINT],
+        C.SOLVING_TIME: widget.question[C.SOLVING_TIME],
+        C.MARKS: widget.question[C.MARKS],
+        C.DIFFICULTY: widget.question[C.DIFFICULTY],
+      };
+
+      subjects = widget.question[C.SUBJECT].cast<String>().toSet();
+      exams = widget.question[C.EXAM].cast<String>().toSet();
+      images = widget.question[C.MEDIA].cast<Map<String, dynamic>>() ?? [];
+      options = widget.question[C.OPTION].cast<Map<String, dynamic>>();
+      optionGroupValue =
+          options.indexWhere((element) => element[C.CORRECT] == true);
+      if (widget.question[C.SOLUTION] != null) {
+        showAddSolution = true;
+        var _solution = widget.question[C.SOLUTION];
+        if (_solution[C.MEDIA] != null) {
+          var media = _solution[C.MEDIA];
+          solution = {
+            C.ID: media[C.ID],
+            C.TYPE: media[C.TYPE],
+            C.TITLE: media[C.TITLE],
+            C.URL: media[C.URL],
+            C.THUMBNAIL_URL: media[C.THUMBNAIL_URL],
+          };
+        }
+        if (_solution[C.TEXT] != null) {
+          var text = _solution[C.TEXT];
+          solution = {
+            C.ID: text[C.ID],
+            C.TEXT: text[C.TEXT].cast<Map<String, dynamic>>(),
+            C.TYPE: E.TEXT,
+            C.TITLE: text[C.TITLE]
+          };
+        }
+      }
+    }
     super.initState();
   }
 
@@ -76,8 +124,14 @@ class _AddQuestionState extends State<AddQuestion> {
         subjectError = null;
       });
 
+      if (widget.question != null) {
+        var result = await wantToEdit(() => true, S.QUESTION_EDIT_NOTE.tr);
+        if (!(result ?? false)) return;
+      }
+
       formData[C.EXAM] = exams.toList();
       formData[C.SUBJECT] = subjects.toList();
+
       form.save();
 
       int totalUploads = images.length +
@@ -86,13 +140,23 @@ class _AddQuestionState extends State<AddQuestion> {
         totalUploads++;
       }
 
-      UploadController controller = Get.put(UploadController(totalUploads, 0),
-          tag: QUESTION_CONTROLLER_TAG);
-      showUploadDialog(QUESTION_CONTROLLER_TAG);
+      UploadController.to.resetUpload(totalUploads);
+      showUploadDialog();
       List media = await Future.wait(images.map((image) async {
+        if (image[C.ID] != null) {
+          UploadController.to.increaseUpload();
+          return {
+            C.ID: image[C.ID],
+            C.TYPE: image[C.TYPE],
+            C.TITLE: image[C.TITLE],
+            C.URL: image[C.URL],
+            C.THUMBNAIL_URL: image[C.THUMBNAIL_URL],
+          };
+        }
+
         String url = await uploadImage(image[C.FILE]);
         String thumbnailUrl = await uploadImageThumbnail(image[C.THUMBNAIL]);
-        controller.increaseUpload();
+        UploadController.to.increaseUpload();
         return {
           C.TYPE: image[C.TYPE],
           C.TITLE: image[C.TITLE],
@@ -103,10 +167,23 @@ class _AddQuestionState extends State<AddQuestion> {
       formData[C.MEDIA] = media;
       List optionList = await Future.wait(options.map((option) async {
         if (option[C.TEXT] != null) return option;
+        if (option[C.ID] != null) {
+          UploadController.to.increaseUpload();
+          return {
+            C.MEDIA: {
+              C.ID: option[C.MEDIA][C.ID],
+              C.TYPE: option[C.MEDIA][C.TYPE],
+              C.TITLE: option[C.MEDIA][C.TITLE],
+              C.URL: option[C.MEDIA][C.URL],
+              C.THUMBNAIL_URL: option[C.MEDIA][C.THUMBNAIL_URL],
+            },
+            C.CORRECT: option[C.CORRECT],
+          };
+        }
         String url = await uploadImage(option[C.MEDIA][C.FILE]);
         String thumbnailUrl =
             await uploadImageThumbnail(option[C.MEDIA][C.THUMBNAIL]);
-        controller.increaseUpload();
+        UploadController.to.increaseUpload();
         return {
           C.MEDIA: {
             C.TYPE: option[C.MEDIA][C.TYPE],
@@ -120,41 +197,63 @@ class _AddQuestionState extends State<AddQuestion> {
       formData[C.OPTION] = optionList;
 
       if (solution != null) {
-        if (solution[C.TYPE] == E.TEXT) {
-          formData[C.SOLUTION] = {
-            C.TEXT: {C.TEXT: solution[C.TEXT], C.TITLE: solution[C.TITLE]},
-          };
-        } else {
-          String url;
-          String thumbnailUrl;
-          switch (solution[C.TYPE]) {
-            case E.IMAGE:
-              url = await uploadImage(solution[C.FILE]);
-              thumbnailUrl = await uploadImageThumbnail(solution[C.THUMBNAIL]);
-              break;
-            case E.PDF:
-              url = await uploadPdf(solution[C.FILE]);
-              thumbnailUrl = await uploadPdfThumbnail(solution[C.THUMBNAIL]);
-              break;
+        if (solution[C.ID] != null) {
+          if (solution[C.TYPE] == E.TEXT) {
+            formData[C.SOLUTION] = {
+              C.TEXT: {
+                C.ID: solution[C.ID],
+                C.TITLE: solution[C.TITLE],
+                C.TEXT: solution[C.TEXT],
+              }
+            };
           }
-          controller.increaseUpload();
+          UploadController.to.increaseUpload();
           formData[C.SOLUTION] = {
             C.MEDIA: {
+              C.ID: solution[C.ID],
               C.TITLE: solution[C.TITLE],
               C.TYPE: solution[C.TYPE],
-              C.URL: url,
-              C.THUMBNAIL_URL: thumbnailUrl,
+              C.URL: solution[C.URL],
+              C.THUMBNAIL_URL: solution[C.THUMBNAIL_URL],
             }
           };
+        } else {
+          if (solution[C.TYPE] == E.TEXT) {
+            formData[C.SOLUTION] = {
+              C.TEXT: {C.TEXT: solution[C.TEXT], C.TITLE: solution[C.TITLE]},
+            };
+          } else {
+            String url;
+            String thumbnailUrl;
+            switch (solution[C.TYPE]) {
+              case E.IMAGE:
+                url = await uploadImage(solution[C.FILE]);
+                thumbnailUrl =
+                    await uploadImageThumbnail(solution[C.THUMBNAIL]);
+                break;
+              case E.PDF:
+                url = await uploadPdf(solution[C.FILE]);
+                thumbnailUrl = await uploadPdfThumbnail(solution[C.THUMBNAIL]);
+                break;
+            }
+            UploadController.to.increaseUpload();
+            formData[C.SOLUTION] = {
+              C.MEDIA: {
+                C.TITLE: solution[C.TITLE],
+                C.TYPE: solution[C.TYPE],
+                C.URL: url,
+                C.THUMBNAIL_URL: thumbnailUrl,
+              }
+            };
+          }
         }
       }
 
-      // print(formData);
       var question = await createQuestion(formData);
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
       Get.back();
-      if (question != null) Get.back();
+      if (question != null) Get.back(result: true);
     }
   }
 
@@ -361,6 +460,7 @@ class _AddQuestionState extends State<AddQuestion> {
               children: [
                 TextFormField(
                   key: Key('Hi'),
+                  initialValue: formData[C.TITLE],
                   decoration: InputDecoration(labelText: S.QUESTION.tr),
                   validator: validQuestion,
                   keyboardType: TextInputType.multiline,
@@ -442,10 +542,10 @@ class _AddQuestionState extends State<AddQuestion> {
                             ],
                           ),
                         SizedBox(height: 16.0),
-                      ]..addAll(options
-                          .asMap()
-                          .map(
-                            (key, value) => MapEntry(
+                      ]..addAll(options.asMap().map(
+                          (key, value) {
+                            var media = value[C.MEDIA] ?? {};
+                            return MapEntry(
                               key,
                               OptionCheckBox(
                                 checked: value[C.CORRECT],
@@ -456,17 +556,18 @@ class _AddQuestionState extends State<AddQuestion> {
                                 onChangeRadio: (int value) =>
                                     onChangeRadioOption(value),
                                 text: value[C.TEXT],
-                                image: (value[C.MEDIA] ?? {})[C.FILE],
-                                thumbnailImage:
-                                    (value[C.MEDIA] ?? {})[C.THUMBNAIL],
+                                url: media[C.URL],
+                                thumbnailUrl: media[C.THUMBNAIL_URL],
+                                image: media[C.FILE],
+                                thumbnailImage: media[C.THUMBNAIL],
                                 onDelete: () => onDelete(key),
                                 isCheckBox:
                                     formData[C.ANSWER_TYPE] == E.MULTI_CHOICE,
                                 isEditable: true,
                               ),
-                            ),
-                          )
-                          .values),
+                            );
+                          },
+                        ).values),
                     ),
                   ),
                 if (formData[C.ANSWER_TYPE] == E.DIRECT_ANSWER)
@@ -482,6 +583,7 @@ class _AddQuestionState extends State<AddQuestion> {
                       children: [
                         TextFormField(
                           onSaved: (String value) => formData[C.ANSWER] = value,
+                          initialValue: formData[C.ANSWER],
                           validator: validAnswer,
                           decoration: InputDecoration(
                             labelText: S.ENTER_ANSWER.tr,
@@ -490,6 +592,7 @@ class _AddQuestionState extends State<AddQuestion> {
                         ),
                         TextFormField(
                           onSaved: (value) => onSaved(C.ANSWER_FORMAT, value),
+                          initialValue: formData[C.ANSWER_FORMAT],
                           decoration: InputDecoration(
                             labelText: S.ANSWER_FORMAT.tr,
                             hintText: S.ANSWER_FORMAT_HINT.tr,
@@ -521,12 +624,14 @@ class _AddQuestionState extends State<AddQuestion> {
                 ),
                 TextFormField(
                   onSaved: (String value) => onSaved(C.ANSWER_HINT, value),
+                  initialValue: formData[C.ANSWER_HINT],
                   decoration: InputDecoration(
                     labelText: S.ANSWER_HINT.tr,
                   ),
                   maxLength: 100,
                 ),
                 TextFormField(
+                  initialValue: '${getMinute(formData[C.SOLVING_TIME]) ?? ''}',
                   decoration: InputDecoration(
                       labelText: S.SOLVING_TIME.tr, hintText: S.MINUTE.tr),
                   keyboardType: TextInputType.number,
@@ -538,6 +643,7 @@ class _AddQuestionState extends State<AddQuestion> {
                   onSaved: saveSolvingTime,
                 ),
                 TextFormField(
+                  initialValue: '${formData[C.MARKS] ?? ''}',
                   decoration: InputDecoration(labelText: S.ENTER_MARKS.tr),
                   keyboardType: TextInputType.number,
                   inputFormatters: <TextInputFormatter>[

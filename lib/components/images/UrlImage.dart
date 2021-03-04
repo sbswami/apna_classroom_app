@@ -20,14 +20,19 @@ class UrlImage extends StatelessWidget {
           );
         }
         if (snapshot.hasData) {
-          return Image.file(
-            snapshot.data,
-            fit: fit,
+          return ClipRRect(
+            borderRadius: BorderRadius.circular(4.0),
+            child: Image.file(
+              snapshot.data,
+              fit: fit,
+            ),
           );
         }
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: CircularProgressIndicator(),
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: CircularProgressIndicator(),
+          ),
         );
       },
       future: getFile(url),

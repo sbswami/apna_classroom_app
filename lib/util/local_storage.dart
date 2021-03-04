@@ -1,9 +1,12 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 const String RECENTLY_ADDED_SUBJECTS = 'RECENTLY_ADDED_SUBJECTS';
 const String GET_LAST_ADDED_SUBJECTS = 'GET_LAST_ADDED_SUBJECTS';
 const String RECENTLY_ADDED_EXAMS = 'RECENTLY_ADDED_EXAMS';
 const String GET_LAST_ADDED_EXAMS = 'GET_LAST_ADDED_EXAMS';
+const String LOCALE = 'LOCALE';
+const String IS_DARK_MODE = 'IS_DARK_MODE';
 
 Future<SharedPreferences> getStorage() {
   return SharedPreferences.getInstance();
@@ -42,6 +45,24 @@ Future<List<String>> getLastAddedExams() async {
 
 Future<void> setLastAddedExams(List<String> list) async {
   (await getStorage()).setStringList(GET_LAST_ADDED_EXAMS, list);
+}
+
+Future<void> setLocale({String localeString, Locale locale}) async {
+  if (locale != null)
+    localeString = '${locale.languageCode}_${locale.countryCode}';
+  (await getStorage()).setString(LOCALE, localeString);
+}
+
+Future<String> getLocale() async {
+  return (await getStorage()).getString(LOCALE);
+}
+
+Future<void> setDarkMode(bool isDarkMode) async {
+  (await getStorage()).setBool(IS_DARK_MODE, isDarkMode);
+}
+
+Future<bool> isDarkMode() async {
+  return (await getStorage()).getBool(IS_DARK_MODE);
 }
 
 // Clear all Data

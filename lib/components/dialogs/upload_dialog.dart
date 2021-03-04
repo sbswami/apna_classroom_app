@@ -1,23 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-const String NOTES_CONTROLLER_TAG = 'NOTES_UPLOAD_TAG';
-const String QUESTION_CONTROLLER_TAG = 'QUESTION_UPLOAD_TAG';
-
 class UploadDialog extends StatefulWidget {
-  final String tag;
-
-  UploadDialog({Key key, this.tag}) : super(key: key);
-
+  UploadDialog({Key key}) : super(key: key);
   @override
   _UploadDialogState createState() => _UploadDialogState();
 }
 
 class _UploadDialogState extends State<UploadDialog> {
-  UploadController controller;
   @override
   void initState() {
-    controller = Get.find(tag: widget.tag);
     super.initState();
   }
 
@@ -34,8 +26,10 @@ class _UploadDialogState extends State<UploadDialog> {
               children: [
                 CircularProgressIndicator(),
                 Obx(
-                  () => Text(
-                      'Uploading ${controller.uploaded}/${controller.maxUpload}'),
+                  () {
+                    return Text(
+                        'Uploaded ${UploadController.to.uploaded}/${UploadController.to.maxUpload}');
+                  },
                 ),
               ],
             ),
@@ -46,22 +40,23 @@ class _UploadDialogState extends State<UploadDialog> {
   }
 }
 
-showUploadDialog(String tag) {
+showUploadDialog() {
   return showDialog(
     context: Get.context,
     barrierDismissible: true,
-    builder: (BuildContext context) => UploadDialog(
-      tag: tag,
-    ),
+    builder: (BuildContext context) => UploadDialog(),
   );
 }
 
 class UploadController extends GetxController {
-  int maxUpload;
+  var maxUpload = 0.obs;
   var uploaded = 0.obs;
 
-  UploadController(int maxUpload, uploaded) {
-    this.maxUpload = maxUpload;
+  static UploadController get to => Get.find<UploadController>();
+
+  resetUpload(int maxUpload) {
+    this.maxUpload = maxUpload.obs;
+    uploaded = 0.obs;
   }
 
   increaseUpload() {

@@ -1,0 +1,149 @@
+
+Known pending things
+
+_____Done // 1. Drawer View
+    a. Profile Image -> Go to profile // Done
+        1. edit profile option // Done
+    b. User ID // Done
+    c. Change Language // Done
+    d. Dark mode // Done
+    e. Invite // Done
+    f. Sign Out // Done
+_____Done // 2. Remove Notification icon
+_____Done // 3. Pull all possible subjects + exams tags from backend at the time of login
+_____Done // 4. Empty States for all listing screens
+    a. Classrooms
+        1. Main Classrooms // Done
+        2. select classrooms // Done
+        3. public classrooms // Done
+    b. Quiz -> Exam // Done
+    c. Quiz -> Questions // Done
+    d. Notes // Done
+    e. Chat // Done
+    f. Classroom notes // Done
+_____Done // 5. Loading state differ from screens to screens
+    1. List with profile circle // Done
+    2. List without circles // Done
+    3. Image loading -> Logo Icon // Done
+    4. And a lot more 😛 // Done
+_____Done // 6. Image loading circle fix
+XXX--++-- BLOCKED // 7. Schedule exam button from exam details screen
+_____Done // 8. Delete Option
+    a. Notes // Done
+        1. If notes deleted after Classroom share -> Show Notes deleted by creator // Done
+    b. Exam // Done
+    c. Question // DONE
+        1. Deleted questions will no longer available in question but will be there in exams // DONE
+    d. Classroom // Done
+        1. Only can be deleted by the creator of classroom -> Handled by API end // Done
+9. Edit option
+    a. Notes // updated on all classrooms as well note // Done
+    b. Exam // Edit this exam will not effect classroom created exams // DONE
+    c. Question // Edit question will not effect any exam // Done
+    d. Classroom
+        1. Add members
+        2. Delete Members
+10. Image Picker improvement
+    a. add option for user to pick image from exiting image
+11. File Picker Improvement
+    a. add option for user to pick file from existing files
+12. Multi-Select Notes and actions ->
+    a. Share
+    b. Delete
+12.a Share notes to other apps should add
+13. Multi-Select Question
+    a. Delete
+    b. Create Exam
+14. Multi-Select Exam
+    a. Delete exam
+15. Fix Classroom Details
+    a. Title text
+    b. description text
+    c. Image Shadow
+16. Schedule Exam
+    a. Create New Exam -> Make it working
+    b. Random question exam -> make it working
+    c. Exam Expire = ExamExpireTime ?? StartTime + AllowedDelayed + SolvingTime // Set Expire time in DB it self
+    d. remove
+        1. Can ask doubt
+17. Running Exam
+    a. Delete Exam
+        1. Delete exam instantly -> "Will Stop running exam from all devices"
+        2. Send push notification to stop and close exam window
+    b. Review the "Start" exam process button click
+    c. The close, Back should fallback before "Start" exam screen -> Join Button
+    d. Create a "Job Scheduler" on each exam start -> mark all "Solved Exam" as finished at exam expire time
+18. Fix UI issue of View Result -> Answers screen
+20. Completed Exam
+    a. Add "View Result" Functionality
+    b. List of completed exam in reverse time order
+21. Fix Public + Private Exam issue same as classroom
+22. Fix Notes Public + Private issue same as classroom
+23. Upcoming Exam
+    a. add "Delete" option // Remove other option
+24. Import member from excel // Remove the option
+25. Add option to create a Public link to join classroom
+26. Add Firebase deep-link into application
+    1. classroom
+        a. Join
+        b. Details
+        c. Notes
+        d. Conducted exams
+    2. Notes
+    3. Exam
+    4. Conducted Exam
+        a. Join link
+        b. result link
+27. Share classroom -> Icon on top right corner
+28. Leave classroom option // Creator can't leave
+29. Report classroom option
+30. Chat Message long press -> Open bottom option menus
+    a. Delete // If user is message sender
+    b. Copy // If message is text
+    c. Share -> Share message deep-link -> Open in case of member of classroom else open join request
+    d. Report -> Sent to report DB
+31. Remove share option from exam and question
+32. Find all string and add to localization
+33. Check for dark theme
+34. Add MP4 file support in application
+    a. Pick MP4 and upload
+    b. Load MP4 and Play in different quality
+    c. Compress Video post upload
+    d. use Firebase functions to compress video and split
+35. Compress images, pdf, mp4 this too big sizes of files
+36. Add image in notes Text Type
+37. Add content provider to accept data sharing from other apps
+38. Login to single device -> Detect active device and logout if the current device is not match with active device with DB
+_______Done // 39. Fix loading dialog
+40. Write script of thing to delete unused files from Firebase storage
+41. Add, Yes / no, Discard options on each critical clicks
+42. Make Native Splash screens // Not from Flutter
+43. Remote Config for App update pop - up
+44. Firebase Analytics - Add on all Major events
+45. Remote config for some A/B testing
+46. Error on Home app bar text filed on tab switch while open search bar
+47. Compress local assets
+48. After add new thing need to reload again should be fixed by auto load after coming back from create screen with successful create
+    a. Classroom
+    b. Exam
+    c. Question
+    d. Note
+    e. Schedule Exam
+    f. On all Edit as well
+49. Progress bar shouldn't be dismiss ,
+    a. Progress
+    b. upload dialog
+50. First open Guide
+51. Create Dev switch in application // Different Dev API
+52. User Support center
+    a. Chat with Us // Using Firestore
+    b. Write to us on social media
+53. Pop notification on running app if user is not that screen
+54. Fix Share outside app flow
+55. Notes security thing // only creator + access list can share private notes
+56.
+
+
+
+
+TODO::::::::: argent fix all on select things checkout with question picker in add exams and do like that on all location start with schedule exam classroom picker + Exam edit option only if coming from exams screen

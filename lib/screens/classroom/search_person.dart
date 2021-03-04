@@ -1,9 +1,11 @@
 import 'package:apna_classroom_app/api/user.dart';
-import 'package:apna_classroom_app/components/skeletons/list_skeleton.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/classroom/person_card.dart';
+import 'package:apna_classroom_app/screens/classroom/widgets/person_card.dart';
+import 'package:apna_classroom_app/screens/empty/empty_list.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 
 class SearchPerson extends StatefulWidget {
@@ -12,6 +14,7 @@ class SearchPerson extends StatefulWidget {
 }
 
 class _SearchPersonState extends State<SearchPerson> {
+  ScrollController _scrollController = ScrollController();
   final TextEditingController searchController = TextEditingController();
 
   // Variables
@@ -94,6 +97,12 @@ class _SearchPersonState extends State<SearchPerson> {
     await loadPerson();
   }
 
+  // Clear Filter
+  clearFilter() {
+    searchController.clear();
+    loadPerson();
+  }
+
   @override
   Widget build(BuildContext context) {
     int resultLength = users.length;
@@ -120,16 +129,21 @@ class _SearchPersonState extends State<SearchPerson> {
           ),
           SizedBox(height: 8.0),
           if (resultLength == 0 && (isLoading ?? true))
-            ListSkeleton(
-              size: 4,
-              person: true,
+            DetailsSkeleton(
+              type: DetailsType.PersonList,
+            )
+          else if (resultLength == 0)
+            EmptyList(
+              onClearFilter: clearFilter,
             ),
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (ScrollNotification scrollInfo) {
                 if ((scrollInfo.metrics.pixels ==
                         scrollInfo.metrics.maxScrollExtent) &&
-                    !isLoading) {
+                    !isLoading &&
+                    _scrollController.position.userScrollDirection ==
+                        ScrollDirection.reverse) {
                   loadPerson();
                 }
                 return true;
@@ -137,6 +151,8 @@ class _SearchPersonState extends State<SearchPerson> {
               child: RefreshIndicator(
                 onRefresh: onRefresh,
                 child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
                   itemCount: resultLength,
                   itemBuilder: (context, position) {
                     var _person = users[position];

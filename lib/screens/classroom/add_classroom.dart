@@ -13,8 +13,8 @@ import 'package:apna_classroom_app/components/tags/exam_tag_input.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
-import 'package:apna_classroom_app/screens/classroom/person_card.dart';
 import 'package:apna_classroom_app/screens/classroom/search_person.dart';
+import 'package:apna_classroom_app/screens/classroom/widgets/person_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
 import 'package:apna_classroom_app/util/validators.dart';
@@ -85,7 +85,7 @@ class _AddClassroomState extends State<AddClassroom> {
         return member;
       }).toList();
       formData[C.MEMBERS].insert(0, {
-        C.ID: UserController.to.currentUser[C.ID],
+        C.ID: getUserId(),
         C.ROLE: E.ADMIN,
       });
       showProgress();
@@ -104,7 +104,7 @@ class _AddClassroomState extends State<AddClassroom> {
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
       var classroom = await createClassroom(formData);
       Get.back();
-      if (classroom != null) Get.back();
+      if (classroom != null) Get.back(result: true);
     }
   }
 
