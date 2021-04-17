@@ -4,8 +4,10 @@ import 'package:skeleton_loader/skeleton_loader.dart';
 
 class DetailsSkeleton extends StatelessWidget {
   final DetailsType type;
+  final double imageHeight;
 
-  const DetailsSkeleton({Key key, this.type}) : super(key: key);
+  const DetailsSkeleton({Key key, this.type, this.imageHeight})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +20,8 @@ class DetailsSkeleton extends StatelessWidget {
         ),
         items: 1,
         period: Duration(seconds: 2),
-        highlightColor: Colors.black12,
+        highlightColor: Theme.of(context).backgroundColor,
+        baseColor: Theme.of(context).dividerColor,
         direction: SkeletonDirection.ltr,
       ),
     );
@@ -51,7 +54,7 @@ class DetailsSkeleton extends StatelessWidget {
         return [_Chat()];
 
       case DetailsType.Image:
-        return [_Image()];
+        return [_Image(height: imageHeight)];
 
       case DetailsType.Info:
         return [
@@ -74,8 +77,6 @@ class DetailsSkeleton extends StatelessWidget {
           _ListItem(),
           _ListItem(),
           _ListItem(),
-          _ListItem(),
-          _ListItem(),
         ];
       case DetailsType.PersonList:
         return [
@@ -93,9 +94,12 @@ class DetailsSkeleton extends StatelessWidget {
 }
 
 class _Image extends StatelessWidget {
+  final double height;
+
+  const _Image({Key key, this.height}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Container(height: 250, child: Image.asset(A.APP_ICON));
+    return Container(height: height ?? 250, child: Image.asset(A.APP_ICON));
   }
 }
 

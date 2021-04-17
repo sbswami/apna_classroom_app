@@ -15,8 +15,15 @@ class SecondaryButton extends StatelessWidget {
     Color color = (destructive ?? false)
         ? Theme.of(context).errorColor
         : Theme.of(context).primaryColor;
-    return RaisedButton(
-      color: Theme.of(context).cardColor,
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Theme.of(context).cardColor),
+        shape: MaterialStateProperty.all<OutlinedBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+      ),
       onPressed: onPress,
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -33,8 +40,6 @@ class SecondaryButton extends StatelessWidget {
             ),
         ],
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 4.0,
     );
   }
 }

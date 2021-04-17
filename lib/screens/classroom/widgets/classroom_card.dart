@@ -43,7 +43,7 @@ class ClassroomCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool unseen = classroom[C.UNSEEN] > 0;
+    bool unseen = (classroom[C.UNSEEN] ?? 0) > 0;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
@@ -57,7 +57,11 @@ class ClassroomCard extends StatelessWidget {
       child: Row(
         children: [
           if (isSelected != null)
-            Checkbox(value: isSelected, onChanged: onChanged),
+            Checkbox(
+              value: isSelected,
+              onChanged: onChanged,
+              checkColor: Theme.of(context).cardColor,
+            ),
           GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onIconTap,
@@ -66,7 +70,7 @@ class ClassroomCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: PersonImage(
-                thumbnailUrl: classroom[C.THUMBNAIL_URL],
+                thumbnailUrl: (classroom[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
                 size: 50,
               ),
             ),
@@ -153,10 +157,10 @@ class ClassroomCard extends StatelessWidget {
 }
 
 String getSubtitleText(Map message) {
-  if (message == null) return '--';
+  if (message == null) return '—';
   switch (message[C.TYPE]) {
     case E.MESSAGE:
-      String messageText = message[C.MESSAGE].toString();
+      String messageText = (message[C.MESSAGE] ?? '—').toString();
       int msgLength = messageText.length;
       if (msgLength > 25) return messageText.substring(0, 25) + '...';
       return messageText;
@@ -166,8 +170,10 @@ String getSubtitleText(Map message) {
       return '🏞 Media';
     case E.EXAM_CONDUCTED:
       return '🔔 Exam scheduled';
+    case E.CLASSROOM:
+      return '👩‍🏫 Classroom';
   }
-  return '--';
+  return '—';
 }
 
 getMessageTextStyle(bool unseen, BuildContext context) {
@@ -175,7 +181,7 @@ getMessageTextStyle(bool unseen, BuildContext context) {
     return TextStyle(
       fontSize: 12,
       fontWeight: FontWeight.w600,
-      color: Theme.of(context).primaryColor,
+      color: Theme.of(context).accentColor,
     );
   }
   return Theme.of(context).textTheme.caption;

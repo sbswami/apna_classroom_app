@@ -1,7 +1,6 @@
 import 'package:apna_classroom_app/api/message.dart';
 import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
-import 'package:apna_classroom_app/components/apna_file_picker.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -9,8 +8,10 @@ import 'package:apna_classroom_app/screens/chat/controllers/chat_messages_contro
 import 'package:apna_classroom_app/screens/chat/widgets/message.dart';
 import 'package:apna_classroom_app/screens/classroom/controllers/classroom_list_controller.dart';
 import 'package:apna_classroom_app/screens/empty/empty_list.dart';
+import 'package:apna_classroom_app/screens/media/media_picker/media_picker.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
+import 'package:apna_classroom_app/util/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -29,9 +30,6 @@ class _ChatState extends State<Chat> {
 
   // Variables
   bool isLoading = false;
-
-  // Fetch message on start
-  // Add message here if receive message via FCM
 
   // Load message
   loadMessage() async {
@@ -93,74 +91,9 @@ class _ChatState extends State<Chat> {
   // Media things
 
   _selectMedia() async {
-    List mediaList = await showApnaFilePicker(true);
-    if (mediaList == null) return;
-    await _sendMedia(mediaList);
-  }
-
-  _sendMedia(List mediaList) async {
-    UploadController.to.resetUpload(mediaList.length);
-    showUploadDialog();
-
-    await Future.wait(mediaList.map((media) async {
-      String url;
-      String thumbnailUrl;
-
-      switch (media[C.TYPE]) {
-        case E.IMAGE:
-          url = await uploadImage(media[C.FILE]);
-          thumbnailUrl = await uploadImageThumbnail(media[C.THUMBNAIL]);
-          break;
-
-        case E.PDF:
-          url = await uploadPdf(media[C.FILE]);
-          thumbnailUrl = await uploadPdfThumbnail(media[C.THUMBNAIL]);
-          break;
-      }
-      UploadController.to.increaseUpload();
-
-      // Send message
-      // Create a temporary ID to check later and update the Message object
-      String randomString = DateTime.now().millisecondsSinceEpoch.toString();
-
-      // Message Object
-      var messageObj = {
-        C.TYPE: E.MEDIA,
-        C.MEDIA: {
-          C.TITLE: media[C.TITLE],
-          C.TYPE: media[C.TYPE],
-          C.URL: url,
-          C.THUMBNAIL_URL: thumbnailUrl,
-          C.CREATED_AT: DateTime.now().toString(),
-        },
-        C.CLASSROOM: widget.classroom[C.ID],
-        C.CREATED_BY: getUserId(),
-      };
-
-      // Insert new message
-      ChatMessagesController.to.insertMessages([
-        {...messageObj, C.ID: randomString}
-      ]);
-
-      // Clean text box
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(0.0,
-            duration: Duration(seconds: 1), curve: Curves.ease);
-      }
-
-      var message = await createMessage(messageObj);
-
-      // if message sent
-      if (message != null) {
-        ChatMessagesController.to.updateMessageObj(randomString, message);
-        ClassroomListController.to.addMessage(widget.classroom[C.ID], message);
-      }
-      // message failed to sent
-      else {
-        // TODO: handle failed message
-      }
-    }));
-    Get.back();
+    var result = await showApnaMediaPicker(false);
+    if (result == null) return;
+    await sendMediaToChat(result, widget.classroom[C.ID]);
   }
 
   @override
@@ -211,67 +144,155 @@ class _ChatState extends State<Chat> {
                     controller: _scrollController,
                     itemBuilder: (BuildContext context, int index) {
                       final message = messages[index];
-                      final bool isMe = isCreator(message[C.CREATED_BY]);
+                      String creatorId =
+                          messageCreatedById(message[C.CREATED_BY]);
+
+                      final bool isMe = isCreator(creatorId);
+
                       return Message(
-                          key: Key(message[C.ID]),
-                          isMe: isMe,
-                          message: message);
+                        key: Key(message[C.ID]),
+                        isMe: isMe,
+                        message: message,
+                      );
                     },
                   ),
                 );
               },
             ),
           ),
-          Container(
-            padding: const EdgeInsets.only(
-              bottom: 16.0,
-              left: 4.0,
-              right: 4.0,
-              // top: 8.0,
-            ),
-            decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 2,
-                  blurRadius: 5,
-                )
-              ],
-            ),
-            child: Container(
-              constraints: BoxConstraints(
-                maxHeight: 180,
+          if (canSendMessage(widget.classroom[C.WHO_CAN_SEND_MESSAGES],
+              widget.classroom[C.IS_ADMIN]))
+            Container(
+              padding: const EdgeInsets.only(
+                bottom: 16.0,
+                left: 4.0,
+                right: 4.0,
+                // top: 8.0,
               ),
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(Icons.file_copy_rounded),
-                    onPressed: _selectMedia,
-                    color: Theme.of(context).primaryColor,
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: messageInputController,
-                      decoration: InputDecoration(
-                        hintText: S.TYPE_HERE.tr,
-                        border: InputBorder.none,
-                      ),
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                    ),
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: _send,
-                    color: Theme.of(context).primaryColor,
-                  ),
+              decoration: BoxDecoration(
+                color: Theme.of(context).cardColor,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                  )
                 ],
               ),
-            ),
-          )
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: 180,
+                ),
+                child: Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.file_copy_rounded),
+                      onPressed: _selectMedia,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: messageInputController,
+                        decoration: InputDecoration(
+                          hintText: S.TYPE_HERE.tr,
+                          border: InputBorder.none,
+                        ),
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      onPressed: _send,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ],
+                ),
+              ),
+            )
         ],
       ),
     );
   }
+}
+
+bool canSendMessage(String whoCanShare, bool _isAdmin) {
+  switch (whoCanShare) {
+    case E.ADMIN_ONLY:
+      return _isAdmin;
+      break;
+    case E.ALL:
+      return true;
+      break;
+  }
+  return false;
+}
+
+sendMediaToChat(List mediaList, String classroomId) async {
+  List messages = [];
+  UploadController.to.resetUpload(mediaList.length);
+
+  showUploadDialog();
+
+  await Future.wait(mediaList.map((media) async {
+    String url;
+    String thumbnailUrl;
+    if (media[C.URL] != null && media[C.THUMBNAIL_URL] != null) {
+      url = media[C.URL];
+      thumbnailUrl = media[C.THUMBNAIL_URL];
+    } else {
+      switch (media[C.TYPE]) {
+        case E.IMAGE:
+          url = await uploadImage(media[C.FILE]);
+          thumbnailUrl = await uploadImageThumbnail(media[C.THUMBNAIL]);
+          break;
+
+        case E.PDF:
+          url = await uploadPdf(media[C.FILE]);
+          thumbnailUrl = await uploadPdfThumbnail(media[C.THUMBNAIL]);
+          break;
+      }
+    }
+    UploadController.to.increaseUpload();
+
+    // Send message
+    // Create a temporary ID to check later and update the Message object
+    String randomString = DateTime.now().millisecondsSinceEpoch.toString();
+
+    // Message Object
+    var messageObj = {
+      C.TYPE: E.MEDIA,
+      C.MEDIA: {
+        C.ID: media[C.ID],
+        C.TITLE: media[C.TITLE],
+        C.TYPE: media[C.TYPE],
+        C.URL: url,
+        C.THUMBNAIL_URL: thumbnailUrl,
+        C.CREATED_AT: DateTime.now().toString(),
+      },
+      C.CLASSROOM: classroomId,
+      C.CREATED_BY: getUserId(),
+    };
+
+    // Insert new message
+    ChatMessagesController.to.insertMessages([
+      {...messageObj, C.ID: randomString}
+    ]);
+
+    var message = await createMessage(messageObj);
+
+    messages.add(message);
+
+    // if message sent
+    if (message != null) {
+      ChatMessagesController.to.updateMessageObj(randomString, message);
+      ClassroomListController.to.addMessage(classroomId, message);
+    }
+    // message failed to sent
+    else {
+      // TODO: handle failed message
+    }
+  }));
+  Get.back();
+  return messages.map((e) => e[C.MEDIA]).toList();
 }

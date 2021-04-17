@@ -1,5 +1,7 @@
 class Constants {
-  static const String APP_LINK = 'https://play.google.com/';
+  static const String PLAY_STORE_LINK = 'https://play.google.com/';
+  static const String APP_STORE_LINK = 'https://www.apple.com/app-store/';
+  static const int APP_VERSION = 1;
 }
 
 class Hint {
@@ -46,4 +48,11 @@ class E {
   static const String EXAM_CONDUCTED = 'EXAM_CONDUCTED';
   static const String NOTE = 'NOTE';
   static const String MEDIA = 'MEDIA';
+  static const String CLASSROOM = 'CLASSROOM';
+  static const String MESSAGE_DELETED = 'MESSAGE_DELETED';
+  static const String LOGGED_OUT = 'LOGGED_OUT';
+
+  // Report
+  static const String OPEN = 'OPEN';
+  static const String CLOSED = 'CLOSED';
 }

@@ -38,7 +38,13 @@ class _HomeAppBarState extends State<HomeAppBar> {
       return [
         IconButton(
           icon: Icon(Icons.search),
-          onPressed: () => widget.onSearch(searchController.text),
+          onPressed: () {
+            FocusScopeNode currentFocus = FocusScope.of(context);
+            if (!currentFocus.hasPrimaryFocus) {
+              currentFocus.unfocus();
+            }
+            widget.onSearch(searchController.text);
+          },
         )
       ];
     return [
@@ -55,7 +61,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
     if (searchActive) {
       return TextFormField(
         controller: searchController,
-        autofocus: true,
+        // autofocus: true,
         decoration: InputDecoration(
           hintText: S.SEARCH.tr,
           hintStyle: TextStyle(
@@ -108,6 +114,7 @@ class _HomeAppBarState extends State<HomeAppBar> {
       title: getTitle(),
       actions: getActions(context),
       bottom: widget.bottom,
+      brightness: Brightness.dark,
     );
   }
 }

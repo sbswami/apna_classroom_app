@@ -34,7 +34,7 @@ dependencies:
   firebase_analytics: ^6.2.0
 
   # Firebase Core
-  firebase_core: "^0.5.3"
+  firebase_core: ^0.5.3
 
   # Firebase Authentication for Phone
   firebase_auth: "^0.18.4"
@@ -44,6 +44,12 @@ dependencies:
 
   # Firebase Messaging
   firebase_messaging: ^7.0.3
+
+  # Deep link
+  firebase_dynamic_links: ^0.6.0+1
+
+  # Remote config
+  firebase_remote_config: ^0.4.0
 
   # Grab the device info
   device_info: ^1.0.0
@@ -76,13 +82,29 @@ dependencies:
   skeleton_loader: ^1.0.2+2
 
   # Permission Handler
-  permission_handler: ^5.0.1+1
+#  permission_handler: ^6.0.1
 
   # Date time format
   intl: ^0.16.1
 
   # Sharing Lib
   share: '>=0.6.5+4 <2.0.0'
+
+  # Show links in text
+  flutter_linkify: ^5.0.0
+
+  # Url Launcher
+  url_launcher: ^6.0.2
+
+  # Receive content from another apps
+  receive_sharing_intent: ^1.4.4
+
+  # Video Player
+  video_player:
+    git:
+      url: https://github.com/sanekyy/plugins.git
+      ref: caching
+      path: packages/video_player/video_player
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

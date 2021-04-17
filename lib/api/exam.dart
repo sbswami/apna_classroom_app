@@ -6,8 +6,8 @@ import 'package:apna_classroom_app/util/c.dart';
 import 'package:http/http.dart' as http;
 
 Future createExam(Map<String, dynamic> payload) async {
-  http.Response response = await apiCall(
-      url: EXAM_CREATE, payload: payload, isUser: true, isLoading: true);
+  http.Response response =
+      await apiCall(url: EXAM_CREATE, payload: payload, isUser: true);
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.EXAM];
   }
@@ -37,8 +37,15 @@ Future listExam(Map<String, String> payload, List<String> subjects,
 }
 
 Future<bool> deleteExam(Map<String, dynamic> payload) async {
+  http.Response response =
+      await apiCall(url: EXAM_DELETE, payload: payload, isUser: true);
+
+  return response.statusCode == 200;
+}
+
+Future<bool> addToAccessListExam(Map<String, dynamic> payload) async {
   http.Response response = await apiCall(
-      url: EXAM_DELETE, payload: payload, isUser: true, isLoading: true);
+      url: EXAM_ADD_TO_ACCESS_LIST, payload: payload, isUser: true);
 
   return response.statusCode == 200;
 }

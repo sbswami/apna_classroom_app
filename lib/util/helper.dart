@@ -14,6 +14,7 @@ getDeviceID() async {
     var data = await deviceInfoPlugin.iosInfo;
     return data.identifierForVendor; //UUID for iOS
   }
+  // TODO: unique ID for WEB
   return DateTime.now().microsecondsSinceEpoch;
 }
 
@@ -32,8 +33,10 @@ String getMinuteSt(int seconds) {
 }
 
 isAdmin(List members) {
-  return members?.any((element) =>
-      (element[C.ID][C.ID] == getUserId()) && (element[C.ROLE] == E.ADMIN));
+  var member =
+      members?.firstWhere((element) => element[C.ID][C.ID] == getUserId()) ??
+          {};
+  return member[C.ROLE] == E.ADMIN;
 }
 
 isCreator(String createdBy) {

@@ -50,6 +50,8 @@ class _AnswerViewState extends State<AnswerView> {
                   onNext: () => onNext(index),
                   onPrev: () => onPrev(index),
                   showOnly: true,
+                  showSolutionAndAnswer: widget.solvedExam[C.EXAM_CONDUCTED]
+                      [C.SHOW_SOLUTION_AND_ANSWER],
                 ),
               ),
             )

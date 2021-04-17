@@ -15,19 +15,19 @@ TextStyle buttonTextStyle = TextStyle(
   // fontWeight: FontWeight.w400,
 );
 
-const primaryColorDark = Color(0xFF181515);
-const accentColorDark = Color(0xFFA7D9FF);
+const primaryColorDark = Color(0xFFDCDCDC);
+const accentColorDark = Color(0xFF287FC9);
 
 const navBarColorDark = Color(0xFFEFEFEF);
 const textColorDark = Color(0xFF070707);
 
-const buttonTextColorDark = Color(0xFFEFEFEF);
+const buttonTextColorDark = Color(0xFF000000);
 const fadeTextColorDark = Color(0xFF909090);
 
-const cardColorDark = Color(0xFF000000);
+const cardColorDark = Color(0xFF1F1F1F);
 
 TextStyle buttonTextStyleDark = TextStyle(
-  color: buttonTextColor,
+  color: buttonTextColorDark,
   // fontSize: buttonTextSize,
   // fontWeight: FontWeight.w400,
 );

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:apna_classroom_app/api/api_constants.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
+import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
@@ -25,14 +26,14 @@ Future<http.Response> apiCall({
     headers[C.UID] = FirebaseAuth.instance.currentUser.uid;
   }
 
-  isLoading ? showProgress() : 0;
+  if (isLoading) showProgress();
 
   http.Response response = await http
       .post(API_ROOT + url,
           body: json.encoder.convert(payload), headers: headers)
       .catchError(handleAPIError);
-  isLoading ? Get.back() : 0;
-  return response ?? {};
+  if (isLoading) Get.back();
+  return response;
 }
 
 Future<http.Response> apiGetCall({
@@ -49,7 +50,7 @@ Future<http.Response> apiGetCall({
     headers[C.UID] = FirebaseAuth.instance.currentUser.uid;
   }
 
-  isLoading ? showProgress() : 0;
+  if (isLoading) showProgress();
 
   Uri uri = Uri.http(API_ROOT_GET, url, payload);
   String urlNew = uri.toString();
@@ -72,7 +73,7 @@ Future<http.Response> apiGetCall({
   }
   http.Response response = await http.get(urlNew, headers: headers);
 
-  isLoading ? Get.back() : 0;
+  if (isLoading) Get.back();
   return response;
 }
 
@@ -84,5 +85,5 @@ parseUrl(String url) {
 }
 
 handleAPIError(error) {
-  ok(title: 'Bad Request', msg: 'Bad request, Please give us feedback!');
+  ok(title: S.BAD_REQUEST.tr, msg: S.BAD_REQUEST_PLEASE_GIVE_US_FEEDBACK.tr);
 }

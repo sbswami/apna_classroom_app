@@ -1,7 +1,7 @@
 import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
-import 'package:apna_classroom_app/components/menu_item.dart';
+import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/profile/change_language.dart';
 import 'package:apna_classroom_app/screens/profile/profile_details.dart';
@@ -39,7 +39,7 @@ class HomeDrawer extends StatelessWidget {
   _invite() {
     Share.share(
       S.SHARING_NOTE.trParams({
-        'link': Constants.APP_LINK,
+        'link': Constants.PLAY_STORE_LINK, // TODO: add deeplink for invite
       }),
       subject: S.APP_NAME.tr,
     );
@@ -61,7 +61,7 @@ class HomeDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     PersonImage(
-                      thumbnailUrl: user[C.THUMBNAIL_URL],
+                      thumbnailUrl: (user[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
                       size: 70,
                     ),
                     SizedBox(width: 16.0),
@@ -71,16 +71,12 @@ class HomeDrawer extends StatelessWidget {
                       children: [
                         Text(
                           user[C.NAME],
-                          style: TextStyle(
-                              color: Theme.of(context).cardColor, fontSize: 18),
+                          style: TextStyle(fontSize: 18, color: Colors.white),
                         ),
                         SizedBox(height: 8.0),
                         Text(
                           user[C.USERNAME],
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: Theme.of(context).cardColor,
-                          ),
+                          style: TextStyle(fontSize: 12, color: Colors.white),
                         ),
                       ],
                     )
@@ -93,7 +89,7 @@ class HomeDrawer extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left: 24.0, top: 8.0),
+            padding: const EdgeInsets.only(left: 24.0, top: 16.0),
             child: Column(
               children: [
                 MenuItem(
@@ -103,7 +99,9 @@ class HomeDrawer extends StatelessWidget {
                   },
                   iconData: Icons.public_rounded,
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: 12.0),
+                Divider(),
+                SizedBox(height: 12.0),
                 MenuItem(
                   text: Get.isDarkMode ? S.LIGHT_MODE.tr : S.DARK_MODE.tr,
                   iconData: Get.isDarkMode
@@ -111,13 +109,17 @@ class HomeDrawer extends StatelessWidget {
                       : Icons.brightness_2_rounded,
                   onTap: switchTheme,
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: 12.0),
+                Divider(),
+                SizedBox(height: 12.0),
                 MenuItem(
                   text: S.INVITE.tr,
                   onTap: _invite,
                   iconData: Icons.group_add_rounded,
                 ),
-                SizedBox(height: 16.0),
+                SizedBox(height: 12.0),
+                Divider(),
+                SizedBox(height: 12.0),
                 MenuItem(
                   text: S.LOG_OUT.tr,
                   onTap: _signOut,

@@ -11,7 +11,17 @@ class S {
 
   // Design Info
   static const String SOMETHING_WENT_WRONG = 'something_went_wrong';
+  static const String THIS_SHOULD_NOT_HAPPEN = 'this_should_not_happen';
   static const String PROCESSING = 'processing';
+  static const String NUMBER_HINT = 'number_hint';
+  static const String BAD_REQUEST = 'bad_request';
+  static const String BAD_REQUEST_PLEASE_GIVE_US_FEEDBACK =
+      'bad_request_please_give_us_feedback';
+
+  // Update
+  static const String NEW_UPDATE = 'new_update';
+  static const String SKIP_THIS_VERSION = 'skip_this_version';
+  static const String UPDATE = 'update';
 
   // Empty State
   static const String NOT_FOUND = 'not_found';
@@ -19,6 +29,7 @@ class S {
   static const String CLEAR_FILTER = 'clear_filter';
   static const String START_CHAT = 'start_chat';
   static const String START_CHAT_MSG = 'start_chat_msg';
+  static const String NO_MEDIA_MSG = 'no_media_msg';
 
   // Login
   static const String LOGIN = 'login';
@@ -29,6 +40,9 @@ class S {
   static const String WRONG_PHONE_NUMBER_LIMIT_EXCEED =
       'wrong_phone_number_limit_exceed';
   static const String CODE_SENT = 'code_sent';
+  static const String LOGGED_IN_WITH_NEW_DEVICE = 'logged_in_with_new_device';
+  static const String LOGGED_OUT_FROM_THIS_DEVICE =
+      'logged_out_from_this_device';
 
   // Profile
   static const String PROFILE = 'profile';
@@ -67,13 +81,26 @@ class S {
   static const String SUBJECT = 'subject';
   static const String ARE_YOU_SURE_YOU_WANT_TO_DELETE =
       'are_you_sure_you_want_to_delete';
+  static const String ARE_YOU_SURE_YOU_WANT_TO_LEAVE =
+      'are_you_sure_you_want_to_leave';
   static const String ARE_YOU_SURE_YOU_WANT_TO_EDIT =
       'are_you_sure_you_want_to_edit';
   static const String CAN_NOT_DELETE_NOW = 'can_not_delete_now';
+  static const String IMAGE = 'image';
+  static const String PDF = 'pdf';
+  static const String VIDEO = 'video';
+  static const String LEAVE = 'leave';
+  static const String REPORT = 'report';
+  static const String ENTER_YOUR_COMPLAIN = 'enter_your_complain';
+  static const String REPORT_SUBMITTED_MESSAGE = 'report_submitted_message';
+  static const String ARE_YOU_SURE_YOU_WANT_TO_DISCARD =
+      'are_you_sure_you_want_to_discard';
+  static const String DISCARD = 'discard';
 
   // Quiz + Notes
   static const String OPEN_EDITOR = 'open_editor';
   static const String UPLOAD_FILE = 'upload_file';
+  static const String UPLOAD = 'upload';
   static const String ACCEPTED_FORMATS = 'accepted_formats';
   static const String EDITOR = 'editor';
 
@@ -90,9 +117,14 @@ class S {
   static const String PLEASE_ENTER_THE_NOTE_TITLE =
       'please_enter_the_note_title';
   static const String NOTE_DELETE_NOTE = 'note_delete_note';
+  static const String NOTE_LIST_DELETE_NOTE = 'note_list_delete_note';
   static const String NOTES_ARE_DELETED_BY_CREATOR =
       'notes_are_deleted_by_creator';
   static const String NOTE_EDIT_NOTE = 'note_edit_note';
+  static const String YOU_DO_NOT_HAVE_ACCESS_NOTE =
+      'you_do_not_have_access_note';
+  static const String NOTE_DISCARD = 'note_discard';
+  static const String TEXT_EDITOR_DISCARD = 'text_editor_discard';
 
   // Quiz + Exam
   static const String EXAM = 'exam';
@@ -118,6 +150,7 @@ class S {
   static const String QUESTION_ADDED = 'question_added';
   static const String CREATE_EXAM = 'create_exam';
   static const String EXAM_DELETE_NOTE = 'exam_delete_note';
+  static const String EXAM_DISCARD = 'exam_discard';
 
   // Quiz + Question
   static const String QUESTION = 'question';
@@ -151,6 +184,7 @@ class S {
   static const String ANSWER = 'answer';
   static const String QUESTION_DELETE_NOTE = 'question_delete_note';
   static const String QUESTION_EDIT_NOTE = 'question_edit_note';
+  static const String QUESTION_DISCARD = 'question_discard';
 
   // Classroom
   static const String ADD_CLASSROOM = 'add_classroom';
@@ -160,14 +194,13 @@ class S {
   static const String WHO_CAN_JOIN = 'who_can_join';
   static const String ANYONE_CAN_JOIN = 'anyone_can_join';
   static const String ACCEPT_JOIN_REQUESTS = 'accept_join_requests';
-  static const String WHO_CAN_SHARE_NOTES = 'who_can_share_notes';
-  static const String WHO_CAN_SHARE_MESSAGES = 'WHO_CAN_SHARE_MESSAGES';
+  static const String WHO_CAN_SHARE_MESSAGES = 'who_can_share_messages';
   static const String ADMIN_ONLY = 'admin_only';
   static const String ALL = 'all';
   static const String ADD_MEMBER = 'add_member';
   static const String IMPORT_VIA_EXCEL = 'import_via_excel';
   static const String ADMIN = 'admin';
-  static const String SEARCH_PERSON = 'SEARCH_PERSON';
+  static const String SEARCH_PERSON = 'search_person';
   static const String REMOVE = 'remove';
   static const String MAKE_ADMIN = 'make_admin';
   static const String NOT_ADMIN = 'not_admin';
@@ -179,6 +212,13 @@ class S {
   static const String CLASSROOM_DELETE_NOTE = 'classroom_delete_note';
   static const String CLASSROOM_DELETED_BY_CREATOR =
       'classroom_deleted_by_creator';
+  static const String DO_YOU_WANT_SEND_JOIN_REQUEST =
+      'do_you_want_send_join_request';
+  static const String YOU_DO_NOT_HAVE_ACCESS_CLASSROOM =
+      'you_do_not_have_access';
+  static const String WANT_TO_JOIN = 'want_to_join';
+  static const String LEAVE_CLASSROOM_MESSAGE = 'leave_classroom_message';
+  static const String CLASSROOM_DISCARD = 'classroom_discard';
 
   static const String RUNNING_EXAM = 'running_exam';
   static const String UPCOMING_EXAM = 'upcoming_exam';
@@ -222,6 +262,16 @@ class S {
   static const String EXPIRE_TIME = 'expire_time';
   static const String NO_EXPIRE_TIME = 'no_expire_time';
   static const String SEND_REQUEST = 'send_request';
+  static const String NUMBER_OF_QUESTIONS = 'number_of_questions';
+  static const String NUMBER_OF_QUESTIONS_HELPER_TEXT =
+      'number_of_questions_helper_text';
+  static const String DELETE_RUNNING_EXAM_NOTE = 'delete_running_exam_note';
+  static const String DELETE_UPCOMING_EXAM_NOTE = 'delete_upcoming_exam_note';
+  static const String DELETE_COMPLETED_EXAM_NOTE = 'delete_completed_exam_note';
+  static const String REASON_OF_DELETION = 'reason_of_deletion';
+  static const String ENTER_REASON = 'enter_reason';
+  static const String PLEASE_SELECT_EXAM_TO_SCHEDULE =
+      'please_select_exam_to_schedule';
 
   // Running Exam
   static const String START = 'start';
@@ -266,10 +316,18 @@ class S {
   static const String YOU_CAN_NOT_RESUME_EXAM_BECAUSE_YOU_ARE_OUT_OF_TIME =
       'you_can_not_resume_exam_because_you_are_out_of_time';
   static const String YOU_CAN_NOT_RESUME_EXAM = 'you_can_not_resume_exam';
+  static const String THIS_EXAM_IS_DELETED = 'this_exam_is_deleted';
+  static const String EXAM_DELETED_NOTE = 'exam_deleted_note';
+  static const String SWITCH_QUESTIONS = 'switch_questions';
+  static const String DISCARD_RUNNING_EXAM = 'discard_running_exam';
+  static const String SUBMIT_EXAM = 'submit_exam';
+  static const String SUBMIT_EXAM_MESSAGE = 'submit_exam_message';
 
   // Chat
   static const String TYPE_HERE = 'type_here';
   static const String MESSAGED_DELETED = 'messaged_deleted';
+  static const String COPY = 'copy';
+  static const String MESSAGE_COPIED = 'message_copied';
 
   // Share
   static const String SHARE = 'share';
@@ -288,11 +346,21 @@ class S {
   static const String ENGLISH_IN = 'english_in';
   static const String HINDI_IN = 'hindi_in';
 
+  // Sharing Texts
+  static const String CLASSROOM_DETAILS_SHARING_TEXT =
+      'classroom_details_sharing_text';
+  static const String NOTE_DETAILS_SHARING_TEXT = 'note_details_sharing_text';
+  static const String EXAM_DETAILS_SHARING_TEXT = 'exam_details_sharing_text';
+
   // Buttons
   static const String CONTINUE = 'continue';
   static const String OKAY = 'okay';
   static const String PLUS_ADD = 'plus_add';
   static const String CANCEL = 'cancel';
+
+  // Video
+  static const String QUALITY = 'quality';
+  static const String SPEED = 'speed';
 }
 
 String getDifficulty(String key) {

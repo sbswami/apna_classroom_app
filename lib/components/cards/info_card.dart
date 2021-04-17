@@ -5,7 +5,7 @@ class InfoCard extends StatelessWidget {
   final String title;
   final Widget child;
 
-  const InfoCard({Key key, this.data, this.title, this.child})
+  const InfoCard({Key key, this.data, @required this.title, this.child})
       : super(key: key);
 
   @override
@@ -33,7 +33,7 @@ class InfoCard extends StatelessWidget {
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-              child: Text('$data'),
+              child: SelectableText('$data'),
             ),
           if (child != null)
             Padding(

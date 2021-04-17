@@ -50,7 +50,7 @@ class _ClassroomSelectorState extends State<ClassroomSelector> {
 
     Map<String, String> payload = {
       C.PRESENT: classrooms.length.toString(),
-      C.PER_PAGE: '2',
+      C.PER_PAGE: '10',
     };
     if (searchTitle != null) payload[C.TITLE] = searchTitle;
     var _classroom =
@@ -110,8 +110,8 @@ class _ClassroomSelectorState extends State<ClassroomSelector> {
     });
   }
 
-  onSelect() {
-    widget.onSelect(
+  onSelect() async {
+    await widget.onSelect(
       classrooms
           .where(
             (element) => selectedClassroom.contains(element[C.ID]),

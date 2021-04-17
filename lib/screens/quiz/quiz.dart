@@ -5,10 +5,12 @@ import 'package:apna_classroom_app/screens/quiz/exam/add_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/exams.dart';
 import 'package:apna_classroom_app/screens/quiz/question/add_question.dart';
 import 'package:apna_classroom_app/screens/quiz/question/questions.dart';
+import 'package:apna_classroom_app/screens/quiz/quiz_provider.dart';
 import 'package:apna_classroom_app/screens/quiz/quiz_tab_controller.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/quiz_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 class Quiz extends StatefulWidget {
   final PageController pageController;
@@ -49,22 +51,17 @@ class _QuizState extends State<Quiz> with SingleTickerProviderStateMixin {
   }
 
   // Add
-  bool _updateExam = false;
-  bool _updateQuestion = false;
   _add() async {
+    final update = Provider.of<QuizProvider>(context, listen: false);
     switch (QuizTabController.to.activeTab) {
       case 0:
         var result = await Get.to(AddExam());
-        setState(() {
-          _updateExam = (result ?? false);
-        });
+        update.updateExam = (result != null);
+
         break;
       case 1:
         var result = await Get.to(AddQuestion());
-
-        setState(() {
-          _updateQuestion = (result ?? false);
-        });
+        update.updateQuestion = (result ?? false);
         break;
     }
   }
@@ -85,11 +82,13 @@ class _QuizState extends State<Quiz> with SingleTickerProviderStateMixin {
             children: [
               Exams(
                 examTitle: examSearchTitle,
-                updateExam: _updateExam,
+                // updateExam: _updateExam,
+                // setUpdateExam: _setUpdateExam,
               ),
               Questions(
                 questionTitle: questionSearchTitle,
-                updateQuestion: _updateQuestion,
+                // updateQuestion: _updateQuestion,
+                // setUpdateQuestion: _setUpdateQuestion,
               ),
             ],
           ),

@@ -1,5 +1,4 @@
 import 'package:apna_classroom_app/api/classroom.dart';
-import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
@@ -102,7 +101,9 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
     if (classroom[C.WHO_CAN_JOIN] == E.ANYONE) {
       return yesOrNo(
         title: S.JOIN.tr,
-        msg: '"${classroom[C.TITLE]}", want to join',
+        msg: S.WANT_TO_JOIN.trParams({
+          'title': classroom[C.TITLE],
+        }),
         yesName: S.JOIN.tr,
         yes: () => join(classroom, index),
         noName: S.CANCEL.tr,
@@ -111,7 +112,8 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
     if (classroom[C.WHO_CAN_JOIN] == E.REQUEST_BEFORE_JOIN) {
       return yesOrNo(
         title: S.JOIN.tr,
-        msg: '"${classroom[C.TITLE]}", do you want send join request?',
+        msg: S.DO_YOU_WANT_SEND_JOIN_REQUEST
+            .trParams({C.TITLE: classroom[C.TITLE]}),
         yesName: S.SEND_REQUEST.tr,
         yes: () => sendRequest(classroom, index),
         noName: S.CANCEL.tr,
@@ -120,21 +122,15 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
   }
 
   join(Map classroom, int index) async {
-    await addMembers({
-      C.ID: classroom[C.ID],
-      C.MEMBERS: [
-        {
-          C.ID: getUserId(),
-          C.ROLE: E.MEMBER,
-        }
-      ]
-    });
+    await joinClassroom(classroom);
     setState(() {
       classrooms.removeAt(index);
     });
   }
 
-  sendRequest(Map classroom, int index) {}
+  sendRequest(Map classroom, int index) {
+    // TODO: send join request
+  }
 
   // On refresh
   Future<void> onRefresh() async {

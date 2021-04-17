@@ -4,21 +4,21 @@ import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/screens/empty/empty_list.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/detailed_exam.dart';
+import 'package:apna_classroom_app/screens/quiz/quiz_provider.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 const String PER_PAGE_EXAMS = '10';
 
 class Exams extends StatefulWidget {
   final String examTitle;
   final Function(Map exam) onSelect;
-  final bool updateExam;
 
-  const Exams({Key key, this.examTitle, this.onSelect, this.updateExam})
-      : super(key: key);
+  const Exams({Key key, this.examTitle, this.onSelect}) : super(key: key);
   @override
   _ExamsState createState() => _ExamsState();
 }
@@ -51,10 +51,10 @@ class _ExamsState extends State<Exams>
       C.PER_PAGE: PER_PAGE_EXAMS,
     };
     if (searchTitle != null) payload[C.TITLE] = searchTitle;
-    var questionList = await listExam(payload, selectedSubjects, selectedExams);
+    var examsList = await listExam(payload, selectedSubjects, selectedExams);
     setState(() {
       isLoading = false;
-      exams.addAll(questionList);
+      exams.addAll(examsList);
     });
   }
 
@@ -87,13 +87,15 @@ class _ExamsState extends State<Exams>
   @override
   void didUpdateWidget(Exams oldWidget) {
     super.didUpdateWidget(oldWidget);
+
     if (oldWidget.examTitle != widget.examTitle) {
       onSearch(widget.examTitle);
     }
     // Update list on coming from add exam
-    if (widget.updateExam ?? false) {
-      onRefresh();
-    }
+    // if (widget.updateExam ?? false) {
+    //   onRefresh();
+    //   widget.setUpdateExam();
+    // }
   }
 
   onSearch(String value) {
@@ -117,9 +119,10 @@ class _ExamsState extends State<Exams>
 
   onSelect(exam) async {
     if (widget.onSelect != null) return widget.onSelect(exam);
-    var result = await Get.to(DetailedExam(
-      exam: exam,
-    ));
+    var result = await Get.to(() => DetailedExam(
+          exam: exam,
+          isEditable: true,
+        ));
     if (result ?? false) onRefresh();
   }
 
@@ -134,10 +137,28 @@ class _ExamsState extends State<Exams>
     });
   }
 
+  _update(QuizProvider update) async {
+    await Future.delayed(Duration(microseconds: 500));
+    update.updateExam = false;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.onSelect == null) {
+      final update = Provider.of<QuizProvider>(context);
+      if (update.updateExam) {
+        onRefresh();
+        _update(update);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     int resultLength = exams.length;
+
     return Column(
       children: [
         SubjectFilter(
@@ -153,35 +174,36 @@ class _ExamsState extends State<Exams>
             type: DetailsType.List,
           )
         else if (resultLength == 0)
-          EmptyList(onClearFilter: clearFilter),
-        Expanded(
-          child: NotificationListener<ScrollNotification>(
-            onNotification: (ScrollNotification scrollInfo) {
-              if ((scrollInfo.metrics.pixels ==
-                      scrollInfo.metrics.maxScrollExtent) &&
-                  !isLoading &&
-                  _scrollController.position.userScrollDirection ==
-                      ScrollDirection.reverse) {
-                loadExams();
-              }
-              return true;
-            },
-            child: RefreshIndicator(
-              onRefresh: onRefresh,
-              child: ListView.builder(
-                physics: const AlwaysScrollableScrollPhysics(),
-                controller: _scrollController,
-                itemCount: resultLength,
-                itemBuilder: (context, position) {
-                  return ExamCard(
-                    exam: exams[position],
-                    onTap: () => onSelect(exams[position]),
-                  );
-                },
+          EmptyList(onClearFilter: clearFilter)
+        else
+          Expanded(
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (ScrollNotification scrollInfo) {
+                if ((scrollInfo.metrics.pixels ==
+                        scrollInfo.metrics.maxScrollExtent) &&
+                    !isLoading &&
+                    _scrollController.position.userScrollDirection ==
+                        ScrollDirection.reverse) {
+                  loadExams();
+                }
+                return true;
+              },
+              child: RefreshIndicator(
+                onRefresh: onRefresh,
+                child: ListView.builder(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  controller: _scrollController,
+                  itemCount: resultLength,
+                  itemBuilder: (context, position) {
+                    return ExamCard(
+                      exam: exams[position],
+                      onTap: () => onSelect(exams[position]),
+                    );
+                  },
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }

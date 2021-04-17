@@ -1,18 +1,17 @@
 import 'package:apna_classroom_app/api/question.dart';
 import 'package:apna_classroom_app/api/storage.dart';
-import 'package:apna_classroom_app/components/apna_file_picker.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/editor/text_editor.dart';
-import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
 import 'package:apna_classroom_app/components/tags/exam_tag_input.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/media/media_picker/media_picker.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/note_view.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/enter_option_bar.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/option_check_box.dart';
@@ -167,7 +166,7 @@ class _AddQuestionState extends State<AddQuestion> {
       formData[C.MEDIA] = media;
       List optionList = await Future.wait(options.map((option) async {
         if (option[C.TEXT] != null) return option;
-        if (option[C.ID] != null) {
+        if (option[C.ID] != null || option[C.MEDIA][C.ID] != null) {
           UploadController.to.increaseUpload();
           return {
             C.MEDIA: {
@@ -260,15 +259,10 @@ class _AddQuestionState extends State<AddQuestion> {
   // Add Image to question
   List<Map<String, dynamic>> images = [];
   addImageToQuestion() async {
-    List result = await showApnaImagePicker(context);
+    var result = await showApnaMediaPicker(true);
     if (result == null) return;
     setState(() {
-      images.add({
-        C.TITLE: S.APP_N.tr + '${images.length}',
-        C.THUMBNAIL: result[1],
-        C.FILE: result[2],
-        C.TYPE: E.IMAGE,
-      });
+      images.add(result);
     });
   }
 
@@ -313,16 +307,11 @@ class _AddQuestionState extends State<AddQuestion> {
   }
 
   addOptionImage() async {
-    List result = await showApnaImagePicker(context);
+    var result = await showApnaMediaPicker(true);
     if (result == null) return;
-    addNewOption(
-      media: {
-        C.TITLE: getFileName(file: result[2]),
-        C.THUMBNAIL: result[1],
-        C.FILE: result[2],
-        C.TYPE: E.IMAGE,
-      },
-    );
+    setState(() {
+      addNewOption(media: result);
+    });
   }
 
   addTextOption() {
@@ -437,268 +426,280 @@ class _AddQuestionState extends State<AddQuestion> {
   }
 
   getSolutionFromFile() async {
-    List solutions = await showApnaFilePicker(false);
-    if (solutions == null) return;
+    var result = await showApnaMediaPicker(false);
+    if (result == null) return;
     setState(() {
-      solution = solutions.first;
+      solution = result.first;
     });
+  }
+
+  // On Back
+  Future<bool> _onBack() async {
+    var result = await wantToDiscard(() => true, S.QUESTION_DISCARD.tr);
+    return (result ?? false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(S.ADD_QUESTION.tr),
-        actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  key: Key('Hi'),
-                  initialValue: formData[C.TITLE],
-                  decoration: InputDecoration(labelText: S.QUESTION.tr),
-                  validator: validQuestion,
-                  keyboardType: TextInputType.multiline,
-                  maxLines: null,
-                  onSaved: (String value) => formData[C.TITLE] = value,
-                  maxLength: 500,
-                ),
-                Row(
-                  children: [
-                    SecondaryButton(
+    return WillPopScope(
+      onWillPop: _onBack,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(S.ADD_QUESTION.tr),
+          actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
+        ),
+        body: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextFormField(
+                    key: Key('Hi'),
+                    initialValue: formData[C.TITLE],
+                    decoration: InputDecoration(labelText: S.QUESTION.tr),
+                    validator: validQuestion,
+                    keyboardType: TextInputType.multiline,
+                    maxLines: null,
+                    onSaved: (String value) => formData[C.TITLE] = value,
+                    maxLength: 500,
+                  ),
+                  Container(
+                    alignment: Alignment.centerLeft,
+                    child: SecondaryButton(
                       text: S.ADD_IMAGE.tr,
                       onPress: addImageToQuestion,
                     ),
-                  ],
-                ),
-                SizedBox(height: 8.0),
-                Wrap(
-                  children: images
-                      .asMap()
-                      .map(
-                        (index, value) => MapEntry(
-                          index,
-                          QuestionImage(
-                            questionImage: value,
-                            onChangeName: (title) =>
-                                onImageTitleChange(index, title),
-                            onDelete: () => onRemoveImage(index),
-                            isEditable: true,
-                          ),
-                        ),
-                      )
-                      .values
-                      .toList(),
-                ),
-                SizedBox(height: 8.0),
-                InputCard(
-                  title: S.ANSWER_TYPE.tr,
-                  child: RadioGroup(
-                    list: {
-                      E.MULTI_CHOICE: S.MULTI_CHOICE.tr,
-                      E.SINGLE_CHOICE: S.SINGLE_CHOICE.tr,
-                      E.DIRECT_ANSWER: S.DIRECT_ANSWER.tr,
-                    },
-                    isVertical: true,
-                    defaultValue: formData[C.ANSWER_TYPE],
-                    onChange: onChooseAnswerType,
                   ),
-                ),
-                if (formData[C.ANSWER_TYPE] == E.MULTI_CHOICE ||
-                    formData[C.ANSWER_TYPE] == E.SINGLE_CHOICE)
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 1, color: Theme.of(context).dividerColor),
-                      borderRadius: BorderRadius.circular(5),
+                  SizedBox(height: 8.0),
+                  Wrap(
+                    children: images
+                        .asMap()
+                        .map(
+                          (index, value) => MapEntry(
+                            index,
+                            QuestionImage(
+                              questionImage: value,
+                              onChangeName: (title) =>
+                                  onImageTitleChange(index, title),
+                              onDelete: () => onRemoveImage(index),
+                              isEditable: true,
+                            ),
+                          ),
+                        )
+                        .values
+                        .toList(),
+                  ),
+                  SizedBox(height: 8.0),
+                  InputCard(
+                    title: S.ANSWER_TYPE.tr,
+                    child: RadioGroup(
+                      list: {
+                        E.MULTI_CHOICE: S.MULTI_CHOICE.tr,
+                        E.SINGLE_CHOICE: S.SINGLE_CHOICE.tr,
+                        E.DIRECT_ANSWER: S.DIRECT_ANSWER.tr,
+                      },
+                      isVertical: true,
+                      defaultValue: formData[C.ANSWER_TYPE],
+                      onChange: onChooseAnswerType,
                     ),
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      children: [
-                        EnterOptionBar(
-                          addOptionImage: addOptionImage,
-                          optionTextController: optionTextController,
-                          addTextOption: addTextOption,
-                          focusNode: optionFocusNode,
-                        ),
-                        if (optionError != null)
-                          Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  optionError,
-                                  style: TextStyle(
-                                    color: Theme.of(context).errorColor,
+                  ),
+                  if (formData[C.ANSWER_TYPE] == E.MULTI_CHOICE ||
+                      formData[C.ANSWER_TYPE] == E.SINGLE_CHOICE)
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 1, color: Theme.of(context).dividerColor),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          EnterOptionBar(
+                            addOptionImage: addOptionImage,
+                            optionTextController: optionTextController,
+                            addTextOption: addTextOption,
+                            focusNode: optionFocusNode,
+                          ),
+                          if (optionError != null)
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(
+                                    optionError,
+                                    style: TextStyle(
+                                      color: Theme.of(context).errorColor,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        SizedBox(height: 16.0),
-                      ]..addAll(options.asMap().map(
-                          (key, value) {
-                            var media = value[C.MEDIA] ?? {};
-                            return MapEntry(
-                              key,
-                              OptionCheckBox(
-                                checked: value[C.CORRECT],
-                                onChanged: (checked) =>
-                                    onCheckOption(key, checked),
-                                groupValue: optionGroupValue,
-                                valueRadio: key,
-                                onChangeRadio: (int value) =>
-                                    onChangeRadioOption(value),
-                                text: value[C.TEXT],
-                                url: media[C.URL],
-                                thumbnailUrl: media[C.THUMBNAIL_URL],
-                                image: media[C.FILE],
-                                thumbnailImage: media[C.THUMBNAIL],
-                                onDelete: () => onDelete(key),
-                                isCheckBox:
-                                    formData[C.ANSWER_TYPE] == E.MULTI_CHOICE,
-                                isEditable: true,
-                              ),
-                            );
-                          },
-                        ).values),
+                              ],
+                            ),
+                          SizedBox(height: 16.0),
+                        ]..addAll(options.asMap().map(
+                            (key, value) {
+                              var media = value[C.MEDIA] ?? {};
+                              return MapEntry(
+                                key,
+                                OptionCheckBox(
+                                  checked: value[C.CORRECT],
+                                  onChanged: (checked) =>
+                                      onCheckOption(key, checked),
+                                  groupValue: optionGroupValue,
+                                  valueRadio: key,
+                                  onChangeRadio: (int value) =>
+                                      onChangeRadioOption(value),
+                                  text: value[C.TEXT],
+                                  url: media[C.URL],
+                                  thumbnailUrl: media[C.THUMBNAIL_URL],
+                                  image: media[C.FILE],
+                                  thumbnailImage: media[C.THUMBNAIL],
+                                  onDelete: () => onDelete(key),
+                                  isCheckBox:
+                                      formData[C.ANSWER_TYPE] == E.MULTI_CHOICE,
+                                  isEditable: true,
+                                ),
+                              );
+                            },
+                          ).values),
+                      ),
                     ),
+                  if (formData[C.ANSWER_TYPE] == E.DIRECT_ANSWER)
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 1, color: Theme.of(context).dividerColor),
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            onSaved: (String value) =>
+                                formData[C.ANSWER] = value,
+                            initialValue: formData[C.ANSWER],
+                            validator: validAnswer,
+                            decoration: InputDecoration(
+                              labelText: S.ENTER_ANSWER.tr,
+                            ),
+                            maxLength: 500,
+                          ),
+                          TextFormField(
+                            onSaved: (value) => onSaved(C.ANSWER_FORMAT, value),
+                            initialValue: formData[C.ANSWER_FORMAT],
+                            decoration: InputDecoration(
+                              labelText: S.ANSWER_FORMAT.tr,
+                              hintText: S.ANSWER_FORMAT_HINT.tr,
+                            ),
+                            maxLength: 30,
+                          ),
+                        ],
+                      ),
+                    ),
+                  // Exam Tag
+                  ExamTagInput(
+                    exams: exams,
+                    examError: examError,
+                    examController: examController,
+                    addExam: addExam,
+                    removeExam: removeExam,
+                    addAllLastUsedExam: addAllLastUsedExam,
+                    focusNode: examFocusNode,
                   ),
-                if (formData[C.ANSWER_TYPE] == E.DIRECT_ANSWER)
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          width: 1, color: Theme.of(context).dividerColor),
-                      borderRadius: BorderRadius.circular(5),
+                  // Subject Tag
+                  SubjectTagInput(
+                    subjects: subjects,
+                    subjectError: subjectError,
+                    subjectController: subjectController,
+                    addSubject: addSubject,
+                    removeSubject: removeSubject,
+                    addAllLastUsed: addAllLastUsed,
+                    focusNode: subjectFocusNode,
+                  ),
+                  TextFormField(
+                    onSaved: (String value) => onSaved(C.ANSWER_HINT, value),
+                    initialValue: formData[C.ANSWER_HINT],
+                    decoration: InputDecoration(
+                      labelText: S.ANSWER_HINT.tr,
                     ),
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
+                    maxLength: 100,
+                  ),
+                  TextFormField(
+                    initialValue:
+                        '${getMinute(formData[C.SOLVING_TIME]) ?? ''}',
+                    decoration: InputDecoration(
+                        labelText: S.SOLVING_TIME.tr, hintText: S.MINUTE.tr),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter(new RegExp('[0-9]'),
+                          allow: true)
+                    ],
+                    maxLength: 3,
+                    onSaved: saveSolvingTime,
+                  ),
+                  TextFormField(
+                    initialValue: '${formData[C.MARKS] ?? ''}',
+                    decoration: InputDecoration(labelText: S.ENTER_MARKS.tr),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter(new RegExp('[0-9]'),
+                          allow: true)
+                    ],
+                    onSaved: saveMarks,
+                  ),
+                  SizedBox(height: 16.0),
+                  if (!showAddSolution)
+                    Row(
                       children: [
-                        TextFormField(
-                          onSaved: (String value) => formData[C.ANSWER] = value,
-                          initialValue: formData[C.ANSWER],
-                          validator: validAnswer,
-                          decoration: InputDecoration(
-                            labelText: S.ENTER_ANSWER.tr,
-                          ),
-                          maxLength: 500,
-                        ),
-                        TextFormField(
-                          onSaved: (value) => onSaved(C.ANSWER_FORMAT, value),
-                          initialValue: formData[C.ANSWER_FORMAT],
-                          decoration: InputDecoration(
-                            labelText: S.ANSWER_FORMAT.tr,
-                            hintText: S.ANSWER_FORMAT_HINT.tr,
-                          ),
-                          maxLength: 30,
+                        SecondaryButton(
+                          text: S.ADD_SOLUTION.tr,
+                          onPress: () {
+                            setState(() {
+                              showAddSolution = true;
+                            });
+                          },
                         ),
                       ],
                     ),
+                  if (showAddSolution && solution == null)
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        FlatIconTextButton(
+                          onPressed: getSolutionFromEditor,
+                          iconData: Icons.edit,
+                          text: S.OPEN_EDITOR.tr,
+                        ),
+                        FlatIconTextButton(
+                          onPressed: getSolutionFromFile,
+                          iconData: Icons.attach_file,
+                          text: S.UPLOAD_FILE.tr,
+                          note: S.ACCEPTED_FORMATS.tr,
+                        )
+                      ],
+                    ),
+                  SizedBox(height: 16),
+                  Visibility(
+                    child: NoteView(
+                      note: solution,
+                      onDelete: () {
+                        setState(() {
+                          solution = null;
+                        });
+                      },
+                      onChangeTitle: (value) => solution[C.TITLE] = value,
+                      onEdit: () =>
+                          getSolutionFromEditor(list: solution[C.TEXT]),
+                      isQuestion: true,
+                    ),
+                    visible: solution != null,
                   ),
-                // Exam Tag
-                ExamTagInput(
-                  exams: exams,
-                  examError: examError,
-                  examController: examController,
-                  addExam: addExam,
-                  removeExam: removeExam,
-                  addAllLastUsedExam: addAllLastUsedExam,
-                  focusNode: examFocusNode,
-                ),
-                // Subject Tag
-                SubjectTagInput(
-                  subjects: subjects,
-                  subjectError: subjectError,
-                  subjectController: subjectController,
-                  addSubject: addSubject,
-                  removeSubject: removeSubject,
-                  addAllLastUsed: addAllLastUsed,
-                  focusNode: subjectFocusNode,
-                ),
-                TextFormField(
-                  onSaved: (String value) => onSaved(C.ANSWER_HINT, value),
-                  initialValue: formData[C.ANSWER_HINT],
-                  decoration: InputDecoration(
-                    labelText: S.ANSWER_HINT.tr,
-                  ),
-                  maxLength: 100,
-                ),
-                TextFormField(
-                  initialValue: '${getMinute(formData[C.SOLVING_TIME]) ?? ''}',
-                  decoration: InputDecoration(
-                      labelText: S.SOLVING_TIME.tr, hintText: S.MINUTE.tr),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter(new RegExp('[0-9]'),
-                        allow: true)
-                  ],
-                  maxLength: 3,
-                  onSaved: saveSolvingTime,
-                ),
-                TextFormField(
-                  initialValue: '${formData[C.MARKS] ?? ''}',
-                  decoration: InputDecoration(labelText: S.ENTER_MARKS.tr),
-                  keyboardType: TextInputType.number,
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter(new RegExp('[0-9]'),
-                        allow: true)
-                  ],
-                  onSaved: saveMarks,
-                ),
-                SizedBox(height: 16.0),
-                if (!showAddSolution)
-                  Row(
-                    children: [
-                      SecondaryButton(
-                        text: S.ADD_SOLUTION.tr,
-                        onPress: () {
-                          setState(() {
-                            showAddSolution = true;
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                if (showAddSolution && solution == null)
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      FlatIconTextButton(
-                        onPressed: getSolutionFromEditor,
-                        iconData: Icons.edit,
-                        text: S.OPEN_EDITOR.tr,
-                      ),
-                      FlatIconTextButton(
-                        onPressed: getSolutionFromFile,
-                        iconData: Icons.attach_file,
-                        text: S.UPLOAD_FILE.tr,
-                        note: S.ACCEPTED_FORMATS.tr,
-                      )
-                    ],
-                  ),
-                SizedBox(height: 16),
-                Visibility(
-                  child: NoteView(
-                    note: solution,
-                    onDelete: () {
-                      setState(() {
-                        solution = null;
-                      });
-                    },
-                    onChangeTitle: (value) => solution[C.TITLE] = value,
-                    onEdit: () => getSolutionFromEditor(list: solution[C.TEXT]),
-                    isQuestion: true,
-                  ),
-                  visible: solution != null,
-                ),
-              ],
+                  SizedBox(height: 64),
+                ],
+              ),
             ),
           ),
         ),

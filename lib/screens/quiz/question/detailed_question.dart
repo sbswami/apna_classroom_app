@@ -56,7 +56,7 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
     }, S.QUESTION_DELETE_NOTE.tr);
     if (!(result ?? false)) return;
     bool isDeleted = await deleteQuestion({
-      C.ID: widget.question[C.ID],
+      C.ID: [widget.question[C.ID]], // list of ids
     });
     if (!isDeleted)
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
@@ -91,6 +91,8 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
 
   @override
   Widget build(BuildContext context) {
+    bool updatable = isCreator((question ?? {})[C.CREATED_BY]) &&
+        (widget.isEditable ?? false);
     return WillPopScope(
       onWillPop: _onBack,
       child: Scaffold(
@@ -166,7 +168,7 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
                     ],
                   ),
                 SizedBox(height: 16),
-                if (!(widget.isFromExam ?? false))
+                if (updatable)
                   PrimaryButton(
                     destructive: true,
                     text: S.DELETE.tr,
@@ -177,8 +179,7 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
             ),
           ),
         ),
-        floatingActionButton: isCreator((question ?? {})[C.CREATED_BY]) &&
-                (widget.isEditable ?? false)
+        floatingActionButton: updatable
             ? FloatingActionButton(
                 onPressed: _onEdit,
                 child: Icon(Icons.edit),

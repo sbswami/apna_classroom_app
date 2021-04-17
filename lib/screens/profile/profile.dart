@@ -2,10 +2,10 @@ import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
-import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/home/home.dart';
+import 'package:apna_classroom_app/screens/media/media_picker/media_picker.dart';
 import 'package:apna_classroom_app/screens/profile/service.dart';
 import 'package:apna_classroom_app/util/assets.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -37,15 +37,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         usernameError = null;
       });
       showProgress();
-      if (_formData[C.IMAGE] != null && _formData[C.THUMBNAIL] != null) {
-        _formData[C.PHOTO_URL] = await uploadImage(_formData[C.IMAGE]);
-        _formData[C.THUMBNAIL_URL] =
-            await uploadImageThumbnail(_formData[C.THUMBNAIL]);
-        _formData.remove(C.IMAGE);
-        _formData.remove(C.THUMBNAIL);
-      } else {
-        _formData.remove(C.THUMBNAIL_URL);
-        _formData.remove(C.PHOTO_URL);
+      if (_formData[C.MEDIA] != null) {
+        _formData[C.MEDIA][C.URL] =
+            await uploadImage(_formData[C.MEDIA][C.FILE]);
+        _formData[C.MEDIA][C.THUMBNAIL_URL] =
+            await uploadImageThumbnail(_formData[C.MEDIA][C.THUMBNAIL]);
+        _formData[C.MEDIA].remove(C.FILE);
+        _formData[C.MEDIA].remove(C.THUMBNAIL);
       }
       await updateUser(_formData);
       Get.back();
@@ -54,19 +52,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   pickProfilePick() async {
-    var result = await showApnaImagePicker(context, showDelete: true);
+    var result = await showApnaMediaPicker(true, deleteOption: true);
+    print(result);
     if (result == null) return;
-
-    if (result[3]) {
+    if (result[C.DELETE] ?? false) {
       return setState(() {
-        _formData[C.IMAGE] = null;
-        _formData[C.THUMBNAIL] = null;
+        _formData.remove(C.MEDIA);
       });
     }
-
     setState(() {
-      _formData[C.THUMBNAIL] = result[1];
-      _formData[C.IMAGE] = result[2];
+      _formData[C.MEDIA] = result;
     });
   }
 
@@ -90,8 +85,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   PersonImage(
                     editMode: true,
-                    thumbnailImage: _formData[C.THUMBNAIL],
-                    image: _formData[C.IMAGE],
+                    thumbnailImage: (_formData[C.MEDIA] ?? {})[C.THUMBNAIL],
+                    image: (_formData[C.MEDIA] ?? {})[C.IMAGE],
                     onPhotoSelect: pickProfilePick,
                   ),
                   SizedBox(height: 16),

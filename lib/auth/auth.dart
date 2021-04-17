@@ -12,12 +12,10 @@ import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/helper.dart';
 import 'package:apna_classroom_app/util/local_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:get/get.dart';
 
 Future<int> checkUser() async {
   int userLevel = 0;
-  await Firebase.initializeApp();
   // await Future.delayed(Duration(seconds: 2));
   if (FirebaseAuth.instance.currentUser != null) {
     bool isUser = await getUser();
@@ -74,8 +72,19 @@ verifyPhoneNumber(
       codeAutoRetrievalTimeout: codeAutoRetrievalTimeout);
 }
 
+ConfirmationResult confirmationResult;
+
 sendOtp(String phoneNumber, {Function onCodeSent}) async {
   showProgress();
+  if (GetPlatform.isWeb) {
+    ConfirmationResult _result =
+        await FirebaseAuth.instance.signInWithPhoneNumber(phoneNumber);
+    confirmationResult = _result;
+    onCodeSent();
+    Get.back();
+    return confirmationResult;
+  }
+
   await verifyPhoneNumber(phoneNumber, (UserCredential authResult) async {
     await handleAuthResult(authResult);
     Get.back();
@@ -93,16 +102,21 @@ sendOtp(String phoneNumber, {Function onCodeSent}) async {
 }
 
 Future<UserCredential> signInWithPhoneNumber(String smsCode) async {
-  final AuthCredential credential = PhoneAuthProvider.credential(
-    verificationId: verificationId,
-    smsCode: smsCode,
-  );
+  UserCredential userCredential;
+  if (GetPlatform.isWeb) {
+    userCredential = await confirmationResult.confirm(smsCode);
+  } else {
+    final AuthCredential credential = PhoneAuthProvider.credential(
+      verificationId: verificationId,
+      smsCode: smsCode,
+    );
+    userCredential = await auth.signInWithCredential(credential);
+  }
 
-  final UserCredential result = await auth.signInWithCredential(credential);
-  final User user = result.user;
+  final User user = userCredential.user;
   final User currentUser = auth.currentUser;
   assert(user.uid == currentUser.uid);
-  return result;
+  return userCredential;
 }
 
 handleAuthResult(UserCredential authResult) async {

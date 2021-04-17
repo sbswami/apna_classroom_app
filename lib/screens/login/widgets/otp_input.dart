@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class OtpInput extends StatelessWidget {
-  FocusNode focusNode1 = FocusNode();
-  FocusNode focusNode2 = FocusNode();
-  FocusNode focusNode3 = FocusNode();
-  FocusNode focusNode4 = FocusNode();
-  FocusNode focusNode5 = FocusNode();
-  FocusNode focusNode6 = FocusNode();
+  final FocusNode focusNode1 = FocusNode();
+  final FocusNode focusNode2 = FocusNode();
+  final FocusNode focusNode3 = FocusNode();
+  final FocusNode focusNode4 = FocusNode();
+  final FocusNode focusNode5 = FocusNode();
+  final FocusNode focusNode6 = FocusNode();
 
   final otp;
 

@@ -43,7 +43,7 @@ class _UploadDialogState extends State<UploadDialog> {
 showUploadDialog() {
   return showDialog(
     context: Get.context,
-    barrierDismissible: true,
+    barrierDismissible: false,
     builder: (BuildContext context) => UploadDialog(),
   );
 }

@@ -21,6 +21,7 @@ class RunningSingleQuestion extends StatefulWidget {
   final Function onPrev;
   final answerObj;
   final int index;
+  final bool showSolutionAndAnswer;
 
   const RunningSingleQuestion({
     Key key,
@@ -30,6 +31,7 @@ class RunningSingleQuestion extends StatefulWidget {
     this.answerObj,
     this.index,
     this.showOnly,
+    this.showSolutionAndAnswer,
   }) : super(key: key);
 
   // On Submit update the question in controller in answer list
@@ -49,7 +51,7 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
 
   @override
   void initState() {
-    _question = widget.answerObj[C.QUESTION][C.QUESTION];
+    _question = widget.answerObj[C.QUESTION];
     correctOptionRadioValue =
         _question[C.OPTION].indexWhere((element) => element[C.CORRECT] == true);
     _question[C.OPTION].asMap().forEach((key, value) {
@@ -62,7 +64,6 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
       isCorrectAnswer = widget.answerObj[C.CORRECT];
       switch (_question[C.ANSWER_TYPE]) {
         case E.SINGLE_CHOICE:
-          print(widget.answerObj[C.ANSWER]);
           if (widget.answerObj[C.ANSWER].take(1).isNotEmpty) {
             optionGroupValue = _question[C.OPTION].indexWhere(
                 (element) => element[C.ID] == widget.answerObj[C.ANSWER].first);
@@ -153,7 +154,6 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
 
   // Show solution
   showSolution() async {
-    print(_question[C.SOLUTION]);
     if (_question[C.SOLUTION][C.MEDIA] != null) {
       showMedia(_question[C.SOLUTION][C.MEDIA]);
     } else if (_question[C.SOLUTION][C.TEXT] != null) {
@@ -197,7 +197,9 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
                       enabled: !answerSubmitted,
                     ),
                   getCorrectAnswer(),
-                  if (answerSubmitted && (_question[C.SOLUTION] != null))
+                  if (answerSubmitted &&
+                      (_question[C.SOLUTION] != null) &&
+                      widget.showSolutionAndAnswer)
                     SecondaryButton(
                       text: S.SHOW_SOLUTION.tr,
                       onPress: showSolution,
@@ -250,13 +252,17 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
                     onPressed: widget.onPrev,
                     iconSize: 32.0,
                     color: Theme.of(context).primaryColor,
-                  ),
+                  )
+                else
+                  SizedBox(width: 48),
                 if (!(widget.showOnly ?? false))
                   SecondaryButton(
                     destructive: true,
                     text: S.CLEAR.tr,
                     onPress: clear,
-                  ),
+                  )
+                else if (widget.questionsLength > 1)
+                  Text(S.SWITCH_QUESTIONS.tr),
                 if (!(widget.showOnly ?? false))
                   PrimaryButton(
                     text: S.SUBMIT.tr,
@@ -268,7 +274,9 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
                     onPressed: widget.onNext,
                     iconSize: 32.0,
                     color: Theme.of(context).primaryColor,
-                  ),
+                  )
+                else
+                  SizedBox(width: 48),
               ],
             ),
             SizedBox(height: 8.0),
@@ -308,7 +316,8 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
               int groupValue = optionGroupValue;
               Color color;
               bool checked = selectedOptions.contains(key);
-              if (answerSubmitted) {
+
+              if (answerSubmitted && widget.showSolutionAndAnswer) {
                 if (_question[C.ANSWER_TYPE] == E.SINGLE_CHOICE) {
                   if (key == correctOptionRadioValue) {
                     color = Colors.green;
@@ -357,7 +366,9 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
   }
 
   Widget getCorrectAnswer() {
-    if (_question[C.ANSWER_TYPE] == E.DIRECT_ANSWER && answerSubmitted) {
+    if (_question[C.ANSWER_TYPE] == E.DIRECT_ANSWER &&
+        answerSubmitted &&
+        widget.showSolutionAndAnswer) {
       return Padding(
         padding: const EdgeInsets.only(top: 8.0),
         child: Row(
@@ -400,8 +411,8 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
               Text(getMinuteSt(widget.answerObj[C.QUESTION][C.SOLVING_TIME]))
             ],
           ),
-          if (answerSubmitted) Divider(),
-          if (answerSubmitted)
+          if (answerSubmitted && widget.showSolutionAndAnswer) Divider(),
+          if (answerSubmitted && widget.showSolutionAndAnswer)
             Text(
               isCorrectAnswer
                   ? S.YOU_SUBMITTED_CORRECT_ANSWER.tr

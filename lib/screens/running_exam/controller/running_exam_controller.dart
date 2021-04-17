@@ -19,12 +19,10 @@ class RunningExamController extends GetxController {
         .map((index, value) => MapEntry(index, value));
     int processLength = answers.keys.length;
     questions = questions
-        .where((question) => !answers.values.any((element) =>
-            element[C.QUESTION][C.QUESTION][C.ID] ==
-            question[C.QUESTION][C.ID]))
+        .where((question) => !answers.values
+            .any((element) => element[C.QUESTION][C.ID] == question[C.ID]))
         .toList();
 
-    print(questions.length);
     answers.addAll(questions.asMap().map((index, value) =>
         MapEntry(index + processLength, {C.QUESTION: value})));
     solvedExam = _solvedExam;

@@ -134,7 +134,6 @@ const HI_IN = {
   S.WHO_CAN_JOIN: 'कौन शामिल हो सकता है?',
   S.ANYONE_CAN_JOIN: 'कोई भी शामिल हो सकता है!',
   S.ACCEPT_JOIN_REQUESTS: 'जुड़ने के अनुरोध स्वीकार करें!',
-  S.WHO_CAN_SHARE_NOTES: 'कौन नोट साझा कर सकता है?',
   S.WHO_CAN_SHARE_MESSAGES: 'संदेश कौन साझा कर सकता है?',
   S.ADMIN_ONLY: 'केवल व्यवस्थापक',
   S.ALL: 'सब',

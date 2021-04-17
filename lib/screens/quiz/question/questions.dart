@@ -1,16 +1,20 @@
 import 'package:apna_classroom_app/api/question.dart';
-import 'package:apna_classroom_app/components/buttons/primary_button.dart';
+import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/empty/empty_list.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/subject_filter.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/add_exam.dart';
+import 'package:apna_classroom_app/screens/quiz/quiz_provider.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/question_card.dart';
+import 'package:apna_classroom_app/screens/quiz/widgets/questions_speed_dial.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 
 const String PER_PAGE_QUESTION = '10';
 
@@ -18,22 +22,15 @@ class Questions extends StatefulWidget {
   final String questionTitle;
   final Function(List list) onSelect;
   final List<String> selectedQuestion;
-  final bool updateQuestion;
 
-  const Questions(
-      {Key key,
-      this.questionTitle,
-      this.onSelect,
-      this.selectedQuestion,
-      this.updateQuestion})
-      : super(key: key);
+  const Questions({
+    Key key,
+    this.questionTitle,
+    this.onSelect,
+    this.selectedQuestion,
+  }) : super(key: key);
   @override
   _QuestionsState createState() => _QuestionsState();
-  @override
-  void debugFillProperties(DiagnosticPropertiesBuilder properties) {
-    super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty<bool>('updateQuestion', updateQuestion));
-  }
 }
 
 class _QuestionsState extends State<Questions>
@@ -112,9 +109,10 @@ class _QuestionsState extends State<Questions>
     }
 
     // Update list on coming from add question
-    if (widget.updateQuestion ?? false) {
-      onRefresh();
-    }
+    // if (widget.updateQuestion ?? false) {
+    //   onRefresh();
+    //   widget.setUpdateQuestion();
+    // }
   }
 
   onSearch(String value) {
@@ -132,6 +130,7 @@ class _QuestionsState extends State<Questions>
   Future<void> onRefresh() async {
     setState(() {
       questions.clear();
+      selectedQuestions.clear();
     });
     await loadQuestion();
   }
@@ -169,14 +168,17 @@ class _QuestionsState extends State<Questions>
   }
 
   // Create Exam
-  createExam() {
-    Get.to(AddExam(
-      questions: questions
-          .where(
-            (element) => selectedQuestions.contains(element[C.ID]),
-          )
-          .toList(),
+  createExam() async {
+    var questionList = questions
+        .where(
+          (element) => selectedQuestions.contains(element[C.ID]),
+        )
+        .toList();
+    var result = await Get.to(AddExam(
+      questions: questionList,
     ));
+    final update = Provider.of<QuizProvider>(context, listen: false);
+    update.updateExam = (result != null);
   }
 
   // Clear Filter
@@ -190,19 +192,73 @@ class _QuestionsState extends State<Questions>
     });
   }
 
+  _update(QuizProvider update) async {
+    await Future.delayed(Duration(microseconds: 500));
+    update.updateQuestion = false;
+  }
+
+  // Delete multiple questions
+  _delete() async {
+    var result = await wantToDelete(() {
+      return true;
+    }, S.QUESTION_DELETE_NOTE.tr);
+    if (!(result ?? false)) return;
+    bool isDeleted = await deleteQuestion({
+      C.ID: selectedQuestions,
+    });
+    if (!isDeleted)
+      return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+    onRefresh();
+  }
+
+  // Floating action button
+  _actionButton() {
+    if (widget.onSelect != null)
+      return FloatingActionButton(
+        onPressed: onSelect,
+        child: Icon(Icons.check),
+      );
+
+    if (isSelectable && selectedQuestions.length > 0)
+      return ApnaSpeedDial(
+        list: [
+          ActionButtonType(
+            title: S.DELETE.tr,
+            iconData: Icons.delete,
+            onPressed: _delete,
+          ),
+          ActionButtonType(
+            title: S.CREATE_EXAM.tr,
+            iconData: Icons.add,
+            onPressed: createExam,
+          ),
+        ],
+      );
+  }
+
+  _actionPosition() {
+    if (widget.onSelect != null) return;
+    return FloatingActionButtonLocation.startFloat;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.onSelect == null) {
+      final update = Provider.of<QuizProvider>(context);
+      if (update.updateQuestion) {
+        onRefresh();
+        _update(update);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     int resultLength = questions.length;
-    bool showCreateExam =
-        isSelectable && widget.onSelect == null && selectedQuestions.length > 0;
+
     return Scaffold(
-      floatingActionButton: widget.onSelect != null
-          ? FloatingActionButton(
-              onPressed: onSelect,
-              child: Icon(Icons.check),
-            )
-          : null,
       body: Column(
         children: [
           SubjectFilter(
@@ -220,59 +276,52 @@ class _QuestionsState extends State<Questions>
           else if (resultLength == 0)
             EmptyList(
               onClearFilter: clearFilter,
-            ),
-          Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (ScrollNotification scrollInfo) {
-                if ((scrollInfo.metrics.pixels ==
-                        scrollInfo.metrics.maxScrollExtent) &&
-                    !isLoading &&
-                    _scrollController.position.userScrollDirection ==
-                        ScrollDirection.reverse) {
-                  loadQuestion();
-                }
-                return true;
-              },
-              child: RefreshIndicator(
-                onRefresh: onRefresh,
-                child: ListView.builder(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  controller: _scrollController,
-                  itemCount: resultLength,
-                  itemBuilder: (context, position) {
-                    bool isSelected;
-                    if (isSelectable) {
-                      isSelected = selectedQuestions.any(
-                          (element) => element == questions[position][C.ID]);
-                    }
-                    return QuestionCard(
-                      question: questions[position],
-                      isSelected: isSelected,
-                      isEditable: true,
-                      onChanged: (value) =>
-                          onSelectQuestion(questions[position][C.ID], value),
-                      onLongPress: ({BuildContext context}) =>
-                          onLongPress(context, questions[position][C.ID]),
-                      onRefresh: onRefresh,
-                    );
-                  },
+            )
+          else
+            Expanded(
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (ScrollNotification scrollInfo) {
+                  if ((scrollInfo.metrics.pixels ==
+                          scrollInfo.metrics.maxScrollExtent) &&
+                      !isLoading &&
+                      _scrollController.position.userScrollDirection ==
+                          ScrollDirection.reverse) {
+                    loadQuestion();
+                  }
+                  return true;
+                },
+                child: RefreshIndicator(
+                  onRefresh: onRefresh,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    controller: _scrollController,
+                    itemCount: resultLength,
+                    itemBuilder: (context, position) {
+                      bool isSelected;
+                      final question = questions[position];
+                      if (isSelectable) {
+                        isSelected = selectedQuestions
+                            .any((element) => element == question[C.ID]);
+                      }
+                      return QuestionCard(
+                        question: question,
+                        isSelected: isSelected,
+                        isEditable: true,
+                        onChanged: (value) =>
+                            onSelectQuestion(question[C.ID], value),
+                        onLongPress: ({BuildContext context}) =>
+                            onLongPress(context, question[C.ID]),
+                        onRefresh: onRefresh,
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
-          ),
         ],
       ),
-      bottomSheet: showCreateExam
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                PrimaryButton(
-                  text: S.CREATE_EXAM.tr,
-                  onPress: createExam,
-                ),
-              ],
-            )
-          : null,
+      floatingActionButton: _actionButton(),
+      floatingActionButtonLocation: _actionPosition(),
     );
   }
 

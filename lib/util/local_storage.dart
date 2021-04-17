@@ -7,6 +7,7 @@ const String RECENTLY_ADDED_EXAMS = 'RECENTLY_ADDED_EXAMS';
 const String GET_LAST_ADDED_EXAMS = 'GET_LAST_ADDED_EXAMS';
 const String LOCALE = 'LOCALE';
 const String IS_DARK_MODE = 'IS_DARK_MODE';
+const String SKIP_VERSION = 'SKIP_VERSION';
 
 Future<SharedPreferences> getStorage() {
   return SharedPreferences.getInstance();
@@ -63,6 +64,15 @@ Future<void> setDarkMode(bool isDarkMode) async {
 
 Future<bool> isDarkMode() async {
   return (await getStorage()).getBool(IS_DARK_MODE);
+}
+
+// Skip Version
+Future<int> getSkipVersion() async {
+  return (await getStorage()).getInt(SKIP_VERSION);
+}
+
+Future<void> setSkipVersion(int versionCode) async {
+  (await getStorage()).setInt(SKIP_VERSION, versionCode);
 }
 
 // Clear all Data

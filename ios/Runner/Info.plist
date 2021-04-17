@@ -67,6 +67,12 @@
     <key>NSAppleMusicUsageDescription</key>
     <string>To upload music files</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>Want to upload notes, solution photos</string>
+    <string>To upload photos, please allow permission to access your photo library.</string>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
+    </dict>
 </dict>
 </plist>

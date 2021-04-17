@@ -48,7 +48,6 @@ class _ClassroomState extends State<Classroom>
     setState(() {
       isLoading = true;
     });
-    print(ClassroomListController.to.classrooms.length.toString());
     Map<String, String> payload = {
       C.PRESENT: ClassroomListController.to.classrooms.length.toString(),
       C.PER_PAGE: LIMIT,

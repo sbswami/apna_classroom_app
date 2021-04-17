@@ -11,7 +11,11 @@ class LabeledCheckBox extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Checkbox(value: checked, onChanged: onChanged),
+        Checkbox(
+          value: checked,
+          onChanged: onChanged,
+          checkColor: Theme.of(context).cardColor,
+        ),
         GestureDetector(child: Text(text), onTap: () => onChanged(!checked)),
       ],
     );

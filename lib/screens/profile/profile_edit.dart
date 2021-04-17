@@ -3,9 +3,9 @@ import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
-import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/media/media_picker/media_picker.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/validators.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +18,7 @@ class ProfileEdit extends StatefulWidget {
 
 class _ProfileEditState extends State<ProfileEdit> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final Map<String, dynamic> _formData = {};
+  Map<String, dynamic> _formData = {};
 
   //
 
@@ -28,12 +28,13 @@ class _ProfileEditState extends State<ProfileEdit> {
     if (form.validate()) {
       form.save();
       showProgress();
-      if (_formData[C.IMAGE] != null && _formData[C.THUMBNAIL] != null) {
-        _formData[C.PHOTO_URL] = await uploadImage(_formData[C.IMAGE]);
-        _formData[C.THUMBNAIL_URL] =
-            await uploadImageThumbnail(_formData[C.THUMBNAIL]);
-        _formData.remove(C.IMAGE);
-        _formData.remove(C.THUMBNAIL);
+      if (_formData[C.MEDIA] != null && _formData[C.MEDIA][C.ID] == null) {
+        _formData[C.MEDIA][C.URL] =
+            await uploadImage(_formData[C.MEDIA][C.FILE]);
+        _formData[C.MEDIA][C.THUMBNAIL_URL] =
+            await uploadImageThumbnail(_formData[C.MEDIA][C.THUMBNAIL]);
+        _formData[C.MEDIA].remove(C.FILE);
+        _formData[C.MEDIA].remove(C.THUMBNAIL);
       }
       await updateUser(_formData);
       Get.back();
@@ -43,33 +44,34 @@ class _ProfileEditState extends State<ProfileEdit> {
 
   // Pick profile pick
   pickProfilePick() async {
-    var result = await showApnaImagePicker(context, showDelete: true);
+    var result = await showApnaMediaPicker(true, deleteOption: true);
+    print(result);
     if (result == null) return;
-
-    if (result[3]) {
+    if (result[C.DELETE] ?? false) {
       return setState(() {
-        _formData[C.IMAGE] = null;
-        _formData[C.THUMBNAIL] = null;
+        _formData[C.MEDIA] = null;
       });
     }
-
     setState(() {
-      _formData[C.THUMBNAIL] = result[1];
-      _formData[C.IMAGE] = result[2];
+      _formData[C.MEDIA] = result;
     });
   }
 
   // Init State
   @override
   void initState() {
-    _formData[C.HIDE_MY_NUMBER] =
-        UserController.to.currentUser[C.HIDE_MY_NUMBER];
+    _formData = {
+      C.HIDE_MY_NUMBER: UserController.to.currentUser[C.HIDE_MY_NUMBER],
+      C.MEDIA: UserController.to.currentUser[C.MEDIA],
+    };
+
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     var _user = UserController.to.currentUser;
+    var media = _formData[C.MEDIA] ?? {};
     return Scaffold(
       appBar: AppBar(
         title: Text(S.PROFILE.tr),
@@ -85,10 +87,10 @@ class _ProfileEditState extends State<ProfileEdit> {
                   SizedBox(height: 16),
                   PersonImage(
                     editMode: true,
-                    thumbnailImage: _formData[C.THUMBNAIL],
-                    image: _formData[C.IMAGE],
-                    thumbnailUrl: _user[C.THUMBNAIL_URL],
-                    url: _user[C.PHOTO_URL],
+                    thumbnailImage: media[C.THUMBNAIL],
+                    image: media[C.FILE],
+                    thumbnailUrl: media[C.THUMBNAIL_URL],
+                    url: media[C.URL],
                     onPhotoSelect: pickProfilePick,
                   ),
                   SizedBox(height: 16),

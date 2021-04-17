@@ -7,8 +7,10 @@ import 'package:flutter/material.dart';
 class UrlImage extends StatelessWidget {
   final String url;
   final BoxFit fit;
+  final double borderRadius;
 
-  const UrlImage({Key key, this.url, this.fit}) : super(key: key);
+  const UrlImage({Key key, this.url, this.fit, this.borderRadius})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -21,7 +23,7 @@ class UrlImage extends StatelessWidget {
         }
         if (snapshot.hasData) {
           return ClipRRect(
-            borderRadius: BorderRadius.circular(4.0),
+            borderRadius: BorderRadius.circular(borderRadius ?? 4.0),
             child: Image.file(
               snapshot.data,
               fit: fit,

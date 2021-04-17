@@ -9,7 +9,7 @@ import 'package:flutter/rendering.dart';
 
 class AllExamConducted extends StatefulWidget {
   final String classroomId;
-  final String type;
+  final ExamConductedState type;
 
   const AllExamConducted({Key key, this.classroomId, this.type})
       : super(key: key);
@@ -46,13 +46,13 @@ class _AllExamConductedState extends State<AllExamConducted> {
       C.CLASSROOM: widget.classroomId,
     };
     switch (widget.type) {
-      case RUNNING:
+      case ExamConductedState.RUNNING:
         payload[C.RUNNING_EXAM] = "true";
         break;
-      case UPCOMING:
+      case ExamConductedState.UPCOMING:
         payload[C.UPCOMING_EXAM] = "true";
         break;
-      case COMPLETED:
+      case ExamConductedState.COMPLETED:
         payload[C.COMPLETED_EXAM] = "true";
         break;
     }

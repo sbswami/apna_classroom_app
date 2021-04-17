@@ -10,9 +10,7 @@ import 'package:image/image.dart' as ImageLib;
 import 'package:image_picker/image_picker.dart';
 
 class ApnaImagePicker extends StatelessWidget {
-  final bool showDelete;
-
-  const ApnaImagePicker({Key key, this.showDelete}) : super(key: key);
+  const ApnaImagePicker({Key key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -33,12 +31,6 @@ class ApnaImagePicker extends StatelessWidget {
                 text: S.GALLERY.tr,
                 onPressed: () => Get.back(result: _GALLERY),
               ),
-              if (showDelete)
-                FlatIconTextButton(
-                  iconData: Icons.delete,
-                  text: S.DELETE.tr,
-                  onPressed: () => Get.back(result: _DELETE),
-                ),
             ],
           ),
         ],
@@ -47,12 +39,11 @@ class ApnaImagePicker extends StatelessWidget {
   }
 }
 
-showApnaImagePicker(BuildContext context,
-    {bool showDelete = false, double maxSize}) async {
+showApnaImagePicker(BuildContext context, {double maxSize}) async {
   var result = await showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return ApnaImagePicker(showDelete: showDelete);
+        return ApnaImagePicker();
       });
   final picker = ImagePicker();
   PickedFile pickedFile;
@@ -64,10 +55,6 @@ showApnaImagePicker(BuildContext context,
     case _GALLERY:
       pickedFile = await picker.getImage(
           source: ImageSource.gallery, maxWidth: maxSize, maxHeight: maxSize);
-      break;
-    case _DELETE:
-      // index 3 = true // only to delete the image
-      return ['', '', '', true];
       break;
     default:
       return;
@@ -85,9 +72,8 @@ showApnaImagePicker(BuildContext context,
       path: IMAGE_PATH,
       file: File(filePath),
       extension: getExtension(filePath));
-  return [filePath, thumbnailImage, image, false];
+  return [filePath, thumbnailImage, image];
 }
 
 const String _CAMERA = 'CAMERA';
 const String _GALLERY = 'GALLERY';
-const String _DELETE = 'DELETE';

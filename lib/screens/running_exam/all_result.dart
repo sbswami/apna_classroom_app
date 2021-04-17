@@ -1,6 +1,7 @@
 import 'package:apna_classroom_app/api/solved_exam.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/quiz/exam/detailed_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
 import 'package:apna_classroom_app/screens/running_exam/single_result.dart';
 import 'package:apna_classroom_app/screens/running_exam/widgets/person_marks_card.dart';
@@ -45,6 +46,13 @@ class _AllResultState extends State<AllResult> {
     loadResult();
   }
 
+  // On exam tap
+  _onExamTap() {
+    Get.to(
+      () => DetailedExam(examConducted: _examConducted),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,7 +62,11 @@ class _AllResultState extends State<AllResult> {
       body: Column(
         children: [
           if (_result == null) DetailsSkeleton(type: DetailsType.CardInfo),
-          if (_result != null) ExamCard(exam: _examConducted[C.EXAM]),
+          if (_result != null)
+            ExamCard(
+              exam: _examConducted[C.EXAM],
+              onTap: _onExamTap,
+            ),
           if (_result != null)
             Column(
               children: _result

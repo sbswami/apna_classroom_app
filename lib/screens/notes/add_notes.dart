@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/api/storage.dart';
-import 'package:apna_classroom_app/components/apna_file_picker.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
@@ -11,6 +10,7 @@ import 'package:apna_classroom_app/components/radio/radio_group.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/media/media_picker/media_picker.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/note_view.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
@@ -35,7 +35,6 @@ class _AddNotesState extends State<AddNotes> {
 
   // Variables
   Map<String, dynamic> notesData;
-  bool _loading = false;
   List<Map<String, dynamic>> notes = [];
   String subjectError;
   String noteError;
@@ -231,14 +230,10 @@ class _AddNotesState extends State<AddNotes> {
 
   // File Picker
   pickFile() async {
+    var result = await showApnaMediaPicker(false);
+    if (result == null) return;
     setState(() {
-      _loading = true;
-    });
-    var newNotes = await showApnaFilePicker(true);
-    setState(() {
-      _loading = false;
-      if (newNotes == null) return;
-      notes.addAll(newNotes);
+      notes.addAll(result);
     });
   }
 
@@ -272,94 +267,98 @@ class _AddNotesState extends State<AddNotes> {
     notes[index][C.TITLE] = title;
   }
 
+  // On Back
+  Future<bool> _onBack() async {
+    var result = await wantToDiscard(() => true, S.NOTE_DISCARD.tr);
+    return (result ?? false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(S.ADD_NOTES.tr),
-        actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
-      ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: formKey,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Stack(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title of the Notes
-                    TextFormField(
-                      initialValue: notesData[C.TITLE],
-                      decoration:
-                          InputDecoration(labelText: S.ENTER_NOTES_TITLE.tr),
-                      validator: validTitle,
-                      onSaved: (value) => notesData[C.TITLE] = value,
-                      maxLength: 30,
-                    ),
-                    SizedBox(height: 8),
-                    // Add Subjects list
-                    SubjectTagInput(
-                      subjects: subjects,
-                      subjectError: subjectError,
-                      subjectController: subjectController,
-                      addSubject: addSubject,
-                      removeSubject: removeSubject,
-                      addAllLastUsed: addAllLastUsed,
-                    ),
-                    RadioGroup(
-                      list: {
-                        E.PUBLIC: S.PUBLIC.tr,
-                        E.PRIVATE: S.PRIVATE.tr,
-                      },
-                      defaultValue: notesData[C.PRIVACY],
-                      onChange: onChangePrivacy,
-                    ),
-                    Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        FlatIconTextButton(
-                          onPressed: getNotesFromEditor,
-                          iconData: Icons.edit,
-                          text: S.OPEN_EDITOR.tr,
-                        ),
-                        FlatIconTextButton(
-                          onPressed: pickFile,
-                          iconData: Icons.attach_file,
-                          text: S.UPLOAD_FILE.tr,
-                          note: S.ACCEPTED_FORMATS.tr,
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 12),
-                    if (noteError != null)
-                      Text(
-                        noteError,
-                        style: TextStyle(color: Theme.of(context).errorColor),
+    return WillPopScope(
+      onWillPop: _onBack,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(S.ADD_NOTES.tr),
+          actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title of the Notes
+                  TextFormField(
+                    initialValue: notesData[C.TITLE],
+                    decoration:
+                        InputDecoration(labelText: S.ENTER_NOTES_TITLE.tr),
+                    validator: validTitle,
+                    onSaved: (value) => notesData[C.TITLE] = value,
+                    maxLength: 30,
+                  ),
+                  SizedBox(height: 8),
+                  // Add Subjects list
+                  SubjectTagInput(
+                    subjects: subjects,
+                    subjectError: subjectError,
+                    subjectController: subjectController,
+                    addSubject: addSubject,
+                    removeSubject: removeSubject,
+                    addAllLastUsed: addAllLastUsed,
+                  ),
+                  RadioGroup(
+                    list: {
+                      E.PUBLIC: S.PUBLIC.tr,
+                      E.PRIVATE: S.PRIVATE.tr,
+                    },
+                    defaultValue: notesData[C.PRIVACY],
+                    onChange: onChangePrivacy,
+                  ),
+                  Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      FlatIconTextButton(
+                        onPressed: getNotesFromEditor,
+                        iconData: Icons.edit,
+                        text: S.OPEN_EDITOR.tr,
                       ),
-                    SizedBox(height: 12),
-                  ]..addAll(notes
-                      .asMap()
-                      .map(
-                        (i, e) => MapEntry(
-                          i,
-                          NoteView(
-                            note: e,
-                            onChangeTitle: (title) => onChangeTitle(i, title),
-                            onDelete: () => onNoteDelete(i),
-                            onNoteMove: (AxisDirection direction, bool end) =>
-                                onNoteMove(i, direction, end),
-                            onEdit: () =>
-                                getNotesFromEditor(list: e[C.TEXT], index: i),
-                          ),
-                        ),
+                      FlatIconTextButton(
+                        onPressed: pickFile,
+                        iconData: Icons.attach_file,
+                        text: S.UPLOAD_FILE.tr,
+                        note: S.ACCEPTED_FORMATS.tr,
                       )
-                      .values),
-                ),
-                if (_loading) LinearProgressIndicator(),
-              ],
+                    ],
+                  ),
+                  SizedBox(height: 12),
+                  if (noteError != null)
+                    Text(
+                      noteError,
+                      style: TextStyle(color: Theme.of(context).errorColor),
+                    ),
+                  SizedBox(height: 12),
+                ]..addAll(notes
+                    .asMap()
+                    .map(
+                      (i, e) => MapEntry(
+                        i,
+                        NoteView(
+                          note: e,
+                          onChangeTitle: (title) => onChangeTitle(i, title),
+                          onDelete: () => onNoteDelete(i),
+                          onNoteMove: (AxisDirection direction, bool end) =>
+                              onNoteMove(i, direction, end),
+                          onEdit: () =>
+                              getNotesFromEditor(list: e[C.TEXT], index: i),
+                        ),
+                      ),
+                    )
+                    .values),
+              ),
             ),
           ),
         ),

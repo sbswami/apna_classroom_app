@@ -1,6 +1,10 @@
 import 'package:apna_classroom_app/api/fcm.dart';
+import 'package:apna_classroom_app/api/remote_config/remote_config.dart';
+import 'package:apna_classroom_app/api/remote_config/remote_config_constants.dart';
+import 'package:apna_classroom_app/api/remote_config/remote_config_defaults.dart';
 import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
+import 'package:apna_classroom_app/components/dialogs/update_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/screens/chat/controllers/chat_messages_controller.dart';
@@ -11,6 +15,8 @@ import 'package:apna_classroom_app/screens/login/login.dart';
 import 'package:apna_classroom_app/screens/profile/profile.dart';
 import 'package:apna_classroom_app/screens/quiz/quiz_tab_controller.dart';
 import 'package:apna_classroom_app/screens/splash/splash.dart';
+import 'package:apna_classroom_app/util/constants.dart';
+import 'package:apna_classroom_app/util/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -38,6 +44,8 @@ class _InitializerState extends State<Initializer> {
   }
 
   _checkUser() async {
+    await initRemoteConfig();
+    _checkForUpdate();
     int _useLevel = await checkUser();
     setState(() {
       userLevel = _useLevel;
@@ -45,8 +53,25 @@ class _InitializerState extends State<Initializer> {
     });
   }
 
+  _checkForUpdate() async {
+    // Check for minimum version
+    if (remoteConfig[RCC.MINIMUM_VERSION_CODE].asInt() >
+        Constants.APP_VERSION) {
+      await showUpdateDialog(mustUpdate: true);
+    }
+    // Latest version is greater then current version
+    // And Latest version is not skipped
+    else if (remoteConfig[RCC.LATEST_VERSION_CODE].asInt() >
+            Constants.APP_VERSION &&
+        (await getSkipVersion()) !=
+            remoteConfig[RCC.LATEST_VERSION_CODE].asInt()) {
+      await showUpdateDialog();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    // return ApnaVideoPlayer();
     if (loading) return Splash();
     return getScreenForUser(userLevel);
   }

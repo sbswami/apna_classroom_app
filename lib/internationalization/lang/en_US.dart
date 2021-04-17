@@ -1,4 +1,5 @@
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/util/c.dart';
 
 const EN_US = {
   // Basic
@@ -11,14 +12,25 @@ const EN_US = {
 
   // Design
   S.SOMETHING_WENT_WRONG: 'Something Went Wrong',
+  S.THIS_SHOULD_NOT_HAPPEN: 'This should not happen, Please provide feedback',
   S.PROCESSING: 'Processing . . .',
+  S.NUMBER_HINT: 'eg. 10',
+  S.BAD_REQUEST: 'Bad Request',
+  S.BAD_REQUEST_PLEASE_GIVE_US_FEEDBACK:
+      'Bad request, Please give us feedback!',
+
+  // Design
+  S.NEW_UPDATE: 'New Upload',
+  S.SKIP_THIS_VERSION: 'Skip this version',
+  S.UPDATE: 'Update',
 
   // Empty State
   S.NOT_FOUND: 'Not Found',
-  S.NOT_FOUND_MSG: 'We did not find anything.',
+  S.NOT_FOUND_MSG: 'We did not find anything',
   S.CLEAR_FILTER: 'Clear Filter',
   S.START_CHAT: 'Start Chat',
   S.START_CHAT_MSG: 'Share Notes, Photos, PDF, Exam and lot more.',
+  S.NO_MEDIA_MSG: 'We did not find any media uploaded.  ',
 
   // LOGIN
   S.LOGIN: 'Login',
@@ -28,6 +40,9 @@ const EN_US = {
   S.WRONG_PHONE_NUMBER_LIMIT_EXCEED:
       'Either wrong phone number or you exceed the limit of verification in 4 Hours. Try with the correct phone number or Try after 4 Hours',
   S.CODE_SENT: 'Code Sent',
+  S.LOGGED_IN_WITH_NEW_DEVICE: 'You have logged in with new device',
+  S.LOGGED_OUT_FROM_THIS_DEVICE:
+      'You are logged out from this device, only one device can logged in at a time',
 
   // Profile
   S.PROFILE: 'Profile',
@@ -65,15 +80,28 @@ const EN_US = {
   S.ADD_AT_LEAST_ONE_EXAM: 'Add at lease one exam!',
   S.SUBJECT: 'Subject',
   S.ARE_YOU_SURE_YOU_WANT_TO_DELETE: 'Are you sure you want to delete?',
+  S.ARE_YOU_SURE_YOU_WANT_TO_LEAVE:
+      'Are you sure you want to leave @${C.TITLE}?',
   S.CAN_NOT_DELETE_NOW:
       'Can not delete now, Please try again later or send us feedback.',
   S.ARE_YOU_SURE_YOU_WANT_TO_EDIT: 'Are you sure you want to edit?',
+  S.IMAGE: 'Image',
+  S.PDF: 'PDF',
+  S.VIDEO: 'Video',
+  S.LEAVE: 'Leave',
+  S.REPORT: 'Report',
+  S.ENTER_YOUR_COMPLAIN: 'Enter your complain',
+  S.REPORT_SUBMITTED_MESSAGE:
+      'We got your report, we will check and resolve as soon as possible.',
+  S.ARE_YOU_SURE_YOU_WANT_TO_DISCARD: 'Are you sure you want to discard?',
+  S.DISCARD: 'Discard',
 
   // Notes + Quiz
   S.OPEN_EDITOR: 'Open Editor',
   S.UPLOAD_FILE: 'Upload File',
   S.ACCEPTED_FORMATS: 'PDF, JPEG, MP4',
   S.EDITOR: 'Editor',
+  S.UPLOAD: 'Upload',
 
   // Notes
   S.ADD_NOTES: 'Add Notes',
@@ -88,8 +116,14 @@ const EN_US = {
   S.PLEASE_ENTER_THE_NOTE_TITLE: 'Please enter the note Title',
   S.NOTE_DELETE_NOTE:
       'No body can access this note after deletion, This note will be deleted from Classrooms as well.',
+  S.NOTE_LIST_DELETE_NOTE:
+      'Notes which are created by you, only these Notes will be deleted. No body can access this note after deletion, This note will be deleted from Classrooms as well.',
   S.NOTES_ARE_DELETED_BY_CREATOR: 'Notes are deleted by the Creator',
   S.NOTE_EDIT_NOTE: 'Notes will be updated in all Classroom as well.',
+  S.YOU_DO_NOT_HAVE_ACCESS_NOTE:
+      'You don\'t have access to this Note. Ask creator to share this Note in a Classroom.',
+  S.NOTE_DISCARD: 'Do you really want to discard this Note?',
+  S.TEXT_EDITOR_DISCARD: 'Do you really want to discard this Text?',
 
   // Quiz + Exam
   S.EXAM: 'Exam',
@@ -115,6 +149,7 @@ const EN_US = {
   S.CREATE_EXAM: 'Create Exam',
   S.EXAM_DELETE_NOTE:
       'You will not able to restore this exam. Your scheduled exam will not effected by deletion of this exam.',
+  S.EXAM_DISCARD: 'Do you really want to discard this Exam?',
 
   // Quiz + Question
   S.QUESTION: 'Question',
@@ -148,6 +183,7 @@ const EN_US = {
       'You can not restore question after delete. Your created exams are safe and this deletion does not effect them.',
   S.QUESTION_EDIT_NOTE:
       'Question editing here will not effect any of your created or scheduled exams.',
+  S.QUESTION_DISCARD: 'Do you really want to discard this Question?',
 
   // Classroom
   S.ADD_CLASSROOM: 'Add Classroom',
@@ -157,7 +193,6 @@ const EN_US = {
   S.WHO_CAN_JOIN: 'Who can join?',
   S.ANYONE_CAN_JOIN: 'Anyone can join!',
   S.ACCEPT_JOIN_REQUESTS: 'Accept join requests!',
-  S.WHO_CAN_SHARE_NOTES: 'Who can share notes?',
   S.WHO_CAN_SHARE_MESSAGES: 'Who can share messages?',
   S.ADMIN_ONLY: 'Admin Only',
   S.ALL: 'All',
@@ -176,6 +211,13 @@ const EN_US = {
   S.CLASSROOM_DELETE_NOTE:
       'It will delete all messages, Exams for this Classroom, and Notes sharing. You will not able to restore this.',
   S.CLASSROOM_DELETED_BY_CREATOR: 'Classroom is deleted by Creator.',
+  S.YOU_DO_NOT_HAVE_ACCESS_CLASSROOM:
+      'You don\'t have access to this Classroom',
+  S.DO_YOU_WANT_SEND_JOIN_REQUEST: '"@title", do you want send join request?',
+  S.WANT_TO_JOIN: '"@${C.TITLE}", want to join',
+  S.LEAVE_CLASSROOM_MESSAGE:
+      'You will not be able to see messages, Exams, Notes belongs to this Classroom.',
+  S.CLASSROOM_DISCARD: 'Do you really want to discard this Classroom?',
 
   S.RUNNING_EXAM: 'Running Exam',
   S.UPCOMING_EXAM: 'Upcoming Exam',
@@ -216,8 +258,18 @@ const EN_US = {
   S.VIEW_RESULT: 'View Result',
   S.START_TIME: 'Start Time',
   S.EXPIRE_TIME: 'Expire Time',
-  S.NO_EXPIRE_TIME: 'No Expire Time',
+  S.NO_EXPIRE_TIME: 'No expire time',
   S.SEND_REQUEST: 'Send request',
+  S.NUMBER_OF_QUESTIONS: 'Number of questions',
+  S.NUMBER_OF_QUESTIONS_HELPER_TEXT: 'It will pick your created questions only',
+  S.DELETE_RUNNING_EXAM_NOTE:
+      'If you delete this exam, anyone giving exam will be exit form exam screen and no record left for this exam.',
+  S.DELETE_UPCOMING_EXAM_NOTE: 'No one will able to give this exam',
+  S.DELETE_COMPLETED_EXAM_NOTE:
+      'If you delete this exam from here, You will lose result and will not able to see results again, this will delete result for all.',
+  S.REASON_OF_DELETION: 'Reason of deletion',
+  S.ENTER_REASON: 'Enter Reason',
+  S.PLEASE_SELECT_EXAM_TO_SCHEDULE: 'Please select exam to schedule.',
 
   // Running Exam
   S.START: 'Start',
@@ -258,10 +310,21 @@ const EN_US = {
   S.YOU_CAN_NOT_RESUME_EXAM_BECAUSE_YOU_ARE_OUT_OF_TIME:
       'You Can\'t resume the exam. Because you are out of time.',
   S.YOU_CAN_NOT_RESUME_EXAM: 'You Can\'t resume the exam.',
+  S.THIS_EXAM_IS_DELETED: '"@${C.TITLE}" Exam is deleted',
+  S.EXAM_DELETED_NOTE:
+      '"@${C.TITLE}" Exam is deleted by the creator of exam, the reason for this exam cancellation is - \n@${C.REASON}',
+  S.SWITCH_QUESTIONS: 'Switch Questions',
+  S.DISCARD_RUNNING_EXAM:
+      'Do you really want to exit this Exam? All your submitted answer are stored.',
+  S.SUBMIT_EXAM: 'Finish Exam',
+  S.SUBMIT_EXAM_MESSAGE:
+      'Have you answered all questions? Do you want to Finish this exam?',
 
   // Chat
   S.TYPE_HERE: 'Type here...',
   S.MESSAGED_DELETED: 'This message is deleted',
+  S.COPY: 'Copy',
+  S.MESSAGE_COPIED: 'Message Copied',
 
   // Share
   S.SHARE: 'Share',
@@ -280,9 +343,21 @@ const EN_US = {
   S.ENGLISH_IN: 'English (India)',
   S.HINDI_IN: 'Hindi (India)',
 
+  // Sharing
+  S.CLASSROOM_DETAILS_SHARING_TEXT:
+      '@title\nClassroom is shared by @user with you.\nopen it here @link',
+  S.NOTE_DETAILS_SHARING_TEXT:
+      '@title\nNote is shared by @user with you.\nopen it here @link',
+  S.EXAM_DETAILS_SHARING_TEXT:
+      '@title\nExam is shared by @user with you.\nopen it here @link',
+
   // Buttons
   S.CONTINUE: 'Continue',
   S.OKAY: 'Okay',
   S.PLUS_ADD: '+ Add',
   S.CANCEL: 'Cancel',
+
+  // Video
+  S.QUALITY: 'Quality',
+  S.SPEED: 'Speed',
 };

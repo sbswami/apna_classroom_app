@@ -1,13 +1,13 @@
 import 'package:apna_classroom_app/api/classroom.dart';
 import 'package:apna_classroom_app/api/storage.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
-import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
-import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
-import 'package:apna_classroom_app/components/menu_item.dart';
+import 'package:apna_classroom_app/components/menu/apna_menu.dart';
+import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
 import 'package:apna_classroom_app/components/tags/exam_tag_input.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
@@ -15,6 +15,7 @@ import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/classroom/search_person.dart';
 import 'package:apna_classroom_app/screens/classroom/widgets/person_card.dart';
+import 'package:apna_classroom_app/screens/media/media_picker/media_picker.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
 import 'package:apna_classroom_app/util/validators.dart';
@@ -22,6 +23,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class AddClassroom extends StatefulWidget {
+  final classroom;
+
+  const AddClassroom({Key key, this.classroom}) : super(key: key);
   @override
   _AddClassroomState createState() => _AddClassroomState();
 }
@@ -29,10 +33,9 @@ class AddClassroom extends StatefulWidget {
 class _AddClassroomState extends State<AddClassroom> {
   // Constants
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final Map<String, dynamic> formData = {
+  Map<String, dynamic> formData = {
     C.PRIVACY: E.PRIVATE,
     C.WHO_CAN_JOIN: E.REQUEST_BEFORE_JOIN,
-    C.WHO_CAN_SHARE_NOTES: E.ADMIN_ONLY,
     C.WHO_CAN_SEND_MESSAGES: E.ADMIN_ONLY,
   };
 
@@ -41,6 +44,21 @@ class _AddClassroomState extends State<AddClassroom> {
   // Init
   @override
   void initState() {
+    if (widget.classroom != null) {
+      formData = {
+        C.ID: widget.classroom[C.ID],
+        C.TITLE: widget.classroom[C.TITLE],
+        C.DESCRIPTION: widget.classroom[C.DESCRIPTION],
+        C.PRIVACY: widget.classroom[C.PRIVACY],
+        C.WHO_CAN_JOIN: widget.classroom[C.WHO_CAN_JOIN],
+        C.WHO_CAN_SEND_MESSAGES: widget.classroom[C.WHO_CAN_SEND_MESSAGES],
+        C.MEDIA: widget.classroom[C.MEDIA],
+      };
+
+      subjects = widget.classroom[C.SUBJECT].cast<String>().toSet();
+      exams = widget.classroom[C.EXAM].cast<String>().toSet();
+    }
+
     super.initState();
   }
 
@@ -77,29 +95,30 @@ class _AddClassroomState extends State<AddClassroom> {
       }
 
       // Members
-      formData[C.MEMBERS] = members.map((e) {
-        Map member = {C.ID: e[C.ID], C.ROLE: E.MEMBER};
-        if (admins.any((element) => element == e[C.ID])) {
-          member[C.ROLE] = E.ADMIN;
-        }
-        return member;
-      }).toList();
-      formData[C.MEMBERS].insert(0, {
-        C.ID: getUserId(),
-        C.ROLE: E.ADMIN,
-      });
-      showProgress();
-      if (formData[C.IMAGE] != null && formData[C.THUMBNAIL] != null) {
-        formData[C.PHOTO_URL] = await uploadImage(formData[C.IMAGE]);
-        formData[C.THUMBNAIL_URL] =
-            await uploadImageThumbnail(formData[C.THUMBNAIL]);
-        formData.remove(C.IMAGE);
-        formData.remove(C.THUMBNAIL);
-      } else {
-        formData.remove(C.THUMBNAIL_URL);
-        formData.remove(C.PHOTO_URL);
+      if (widget.classroom == null) {
+        formData[C.MEMBERS] = members.map((e) {
+          Map member = {C.ID: e[C.ID], C.ROLE: E.MEMBER};
+          if (admins.any((element) => element == e[C.ID])) {
+            member[C.ROLE] = E.ADMIN;
+          }
+          return member;
+        }).toList();
+        formData[C.MEMBERS].insert(0, {
+          C.ID: getUserId(),
+          C.ROLE: E.ADMIN,
+        });
       }
 
+      showProgress();
+      if (formData[C.MEDIA] != null && formData[C.MEDIA][C.ID] == null) {
+        formData[C.MEDIA][C.URL] = await uploadImage(formData[C.MEDIA][C.FILE]);
+        formData[C.MEDIA][C.THUMBNAIL_URL] =
+            await uploadImageThumbnail(formData[C.MEDIA][C.THUMBNAIL]);
+        formData[C.MEDIA].remove(C.FILE);
+        formData[C.MEDIA].remove(C.THUMBNAIL);
+      }
+      print(formData);
+      // return;
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
       var classroom = await createClassroom(formData);
@@ -116,19 +135,16 @@ class _AddClassroomState extends State<AddClassroom> {
 
   // Image Picker
   pickImage() async {
-    var result = await showApnaImagePicker(context, showDelete: true);
+    var result = await showApnaMediaPicker(true, deleteOption: true);
+    print(result);
     if (result == null) return;
-
-    if (result[3]) {
+    if (result[C.DELETE] ?? false) {
       return setState(() {
-        formData[C.IMAGE] = null;
-        formData[C.THUMBNAIL] = null;
+        formData[C.MEDIA] = null;
       });
     }
-
     setState(() {
-      formData[C.THUMBNAIL] = result[1];
-      formData[C.IMAGE] = result[2];
+      formData[C.MEDIA] = result;
     });
   }
 
@@ -245,167 +261,165 @@ class _AddClassroomState extends State<AddClassroom> {
     Get.back();
   }
 
-  // Import via Excel
-  importViaExcel() {}
+  // On Back
+  Future<bool> _onBack() async {
+    var result = await wantToDiscard(() => true, S.CLASSROOM_DISCARD.tr);
+    return (result ?? false);
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(S.ADD_CLASSROOM.tr),
-        actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
-      ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Form(
-            key: formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    children: [
-                      SizedBox(height: 16),
-                      PersonImage(
-                        editMode: true,
-                        onPhotoSelect: pickImage,
-                        thumbnailImage: formData[C.THUMBNAIL],
-                        image: formData[C.IMAGE],
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: S.CLASSROOM_TITLE.tr,
+    bool memberAddable = widget.classroom == null;
+    var media = formData[C.MEDIA] ?? {};
+    return WillPopScope(
+      onWillPop: _onBack,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(S.ADD_CLASSROOM.tr),
+          actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
+        ),
+        body: SingleChildScrollView(
+          child: Center(
+            child: Form(
+              key: formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      children: [
+                        SizedBox(height: 16),
+                        PersonImage(
+                          editMode: true,
+                          onPhotoSelect: pickImage,
+                          url: media[C.URL],
+                          thumbnailUrl: media[C.THUMBNAIL_URL],
+                          thumbnailImage: media[C.THUMBNAIL],
+                          image: media[C.FILE],
                         ),
-                        validator: validTitle,
-                        onSaved: (value) => formData[C.TITLE] = value,
-                        maxLength: 100,
-                      ),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: S.CLASSROOM_DESCRIPTION.tr,
+                        TextFormField(
+                          initialValue: formData[C.TITLE],
+                          decoration: InputDecoration(
+                            labelText: S.CLASSROOM_TITLE.tr,
+                          ),
+                          validator: validTitle,
+                          onSaved: (value) => formData[C.TITLE] = value,
+                          maxLength: 100,
                         ),
-                        onSaved: (value) => onSaved(C.DESCRIPTION, value),
-                        maxLength: 1000,
-                        maxLines: null,
-                        keyboardType: TextInputType.multiline,
-                      ),
-                      InputCard(
-                        key: Key(S.CLASSROOM_PRIVACY),
-                        title: S.CLASSROOM_PRIVACY.tr,
-                        child: RadioGroup(
-                          list: {
-                            E.PRIVATE: S.PRIVATE.tr,
-                            E.PUBLIC: S.PUBLIC.tr,
-                          },
-                          isVertical: true,
-                          defaultValue: formData[C.PRIVACY],
-                          onChange: (value) => onPickOption(C.PRIVACY, value),
+                        TextFormField(
+                          initialValue: formData[C.DESCRIPTION],
+                          decoration: InputDecoration(
+                            labelText: S.CLASSROOM_DESCRIPTION.tr,
+                          ),
+                          onSaved: (value) => onSaved(C.DESCRIPTION, value),
+                          maxLength: 1000,
+                          maxLines: null,
+                          keyboardType: TextInputType.multiline,
                         ),
-                      ),
-                      if (formData[C.PRIVACY] == E.PUBLIC)
                         InputCard(
-                          key: Key(S.WHO_CAN_JOIN),
-                          title: S.WHO_CAN_JOIN.tr,
+                          key: Key(S.CLASSROOM_PRIVACY),
+                          title: S.CLASSROOM_PRIVACY.tr,
                           child: RadioGroup(
                             list: {
-                              E.ANYONE: S.ANYONE_CAN_JOIN.tr,
-                              E.REQUEST_BEFORE_JOIN: S.ACCEPT_JOIN_REQUESTS.tr,
+                              E.PRIVATE: S.PRIVATE.tr,
+                              E.PUBLIC: S.PUBLIC.tr,
                             },
                             isVertical: true,
-                            defaultValue: formData[C.WHO_CAN_JOIN],
+                            defaultValue: formData[C.PRIVACY],
+                            onChange: (value) => onPickOption(C.PRIVACY, value),
+                          ),
+                        ),
+                        if (formData[C.PRIVACY] == E.PUBLIC)
+                          InputCard(
+                            key: Key(S.WHO_CAN_JOIN),
+                            title: S.WHO_CAN_JOIN.tr,
+                            child: RadioGroup(
+                              list: {
+                                E.ANYONE: S.ANYONE_CAN_JOIN.tr,
+                                E.REQUEST_BEFORE_JOIN:
+                                    S.ACCEPT_JOIN_REQUESTS.tr,
+                              },
+                              isVertical: true,
+                              defaultValue: formData[C.WHO_CAN_JOIN],
+                              onChange: (value) =>
+                                  onPickOption(C.WHO_CAN_JOIN, value),
+                            ),
+                          ),
+                        InputCard(
+                          key: Key(S.WHO_CAN_SHARE_MESSAGES),
+                          title: S.WHO_CAN_SHARE_MESSAGES.tr,
+                          child: RadioGroup(
+                            list: {
+                              E.ADMIN_ONLY: S.ADMIN_ONLY.tr,
+                              E.ALL: S.ALL.tr,
+                            },
+                            isVertical: true,
+                            defaultValue: formData[C.WHO_CAN_SEND_MESSAGES],
                             onChange: (value) =>
-                                onPickOption(C.WHO_CAN_JOIN, value),
+                                onPickOption(C.WHO_CAN_SEND_MESSAGES, value),
                           ),
                         ),
-                      InputCard(
-                        key: Key(S.WHO_CAN_SHARE_NOTES),
-                        title: S.WHO_CAN_SHARE_NOTES.tr,
-                        child: RadioGroup(
-                          list: {
-                            E.ADMIN_ONLY: S.ADMIN_ONLY.tr,
-                            E.ALL: S.ALL.tr,
-                          },
-                          isVertical: true,
-                          defaultValue: formData[C.WHO_CAN_SHARE_NOTES],
-                          onChange: (value) =>
-                              onPickOption(C.WHO_CAN_SHARE_NOTES, value),
+                        // Exam Tags
+                        ExamTagInput(
+                          exams: exams,
+                          examError: examError,
+                          examController: examController,
+                          addExam: addExam,
+                          removeExam: removeExam,
+                          addAllLastUsedExam: addAllLastUsedExam,
+                          focusNode: examFocusNode,
                         ),
-                      ),
-                      InputCard(
-                        key: Key(S.WHO_CAN_SHARE_MESSAGES),
-                        title: S.WHO_CAN_SHARE_MESSAGES.tr,
-                        child: RadioGroup(
-                          list: {
-                            E.ADMIN_ONLY: S.ADMIN_ONLY.tr,
-                            E.ALL: S.ALL.tr,
-                          },
-                          isVertical: true,
-                          defaultValue: formData[C.WHO_CAN_SEND_MESSAGES],
-                          onChange: (value) =>
-                              onPickOption(C.WHO_CAN_SEND_MESSAGES, value),
+                        // Subject Tag
+                        SubjectTagInput(
+                          subjects: subjects,
+                          subjectError: subjectError,
+                          subjectController: subjectController,
+                          addSubject: addSubject,
+                          removeSubject: removeSubject,
+                          addAllLastUsed: addAllLastUsed,
+                          focusNode: subjectFocusNode,
                         ),
-                      ),
-                      // Exam Tags
-                      ExamTagInput(
-                        exams: exams,
-                        examError: examError,
-                        examController: examController,
-                        addExam: addExam,
-                        removeExam: removeExam,
-                        addAllLastUsedExam: addAllLastUsedExam,
-                        focusNode: examFocusNode,
-                      ),
-                      // Subject Tag
-                      SubjectTagInput(
-                        subjects: subjects,
-                        subjectError: subjectError,
-                        subjectController: subjectController,
-                        addSubject: addSubject,
-                        removeSubject: removeSubject,
-                        addAllLastUsed: addAllLastUsed,
-                        focusNode: subjectFocusNode,
-                      ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          SecondaryButton(
-                            text: S.ADD_MEMBER.tr,
-                            onPress: addMember,
+                        if (memberAddable)
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SecondaryButton(
+                                text: S.ADD_MEMBER.tr,
+                                onPress: addMember,
+                              ),
+                            ],
                           ),
-                          SecondaryButton(
-                            text: S.IMPORT_VIA_EXCEL.tr,
-                            onPress: importViaExcel,
-                            iconData: Icons.download_rounded,
-                          )
-                        ],
-                      ),
-                      SizedBox(height: 8.0),
-                      Text('${members.length + 1} ${S.MEMBERS.tr}'),
-                      SizedBox(height: 8.0),
-                    ],
+                        SizedBox(height: 8.0),
+                        if (memberAddable)
+                          Text('${members.length + 1} ${S.MEMBERS.tr}'),
+                        SizedBox(height: 8.0),
+                      ],
+                    ),
                   ),
-                ),
-                PersonCard(
-                  person: UserController.to.currentUser,
-                  isAdmin: true,
-                ),
-                Column(
-                  children: members.map<Widget>(
-                    (e) {
-                      bool isAdmin =
-                          admins.any((element) => element == e[C.ID]);
-                      return PersonCard(
-                        person: e,
-                        onLongPress: ({BuildContext context}) =>
-                            onLongPress(e[C.ID], context),
-                        isAdmin: isAdmin,
-                      );
-                    },
-                  ).toList(),
-                ),
-                SizedBox(height: 100),
-              ],
+                  if (memberAddable)
+                    PersonCard(
+                      person: UserController.to.currentUser,
+                      isAdmin: true,
+                    ),
+                  if (memberAddable)
+                    Column(
+                      children: members.map<Widget>(
+                        (e) {
+                          bool isAdmin =
+                              admins.any((element) => element == e[C.ID]);
+                          return PersonCard(
+                            person: e,
+                            onLongPress: ({BuildContext context}) =>
+                                onLongPress(e[C.ID], context),
+                            isAdmin: isAdmin,
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  SizedBox(height: 100),
+                ],
+              ),
             ),
           ),
         ),

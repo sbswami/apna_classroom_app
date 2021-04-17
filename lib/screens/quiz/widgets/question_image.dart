@@ -1,6 +1,6 @@
-import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
-import 'package:apna_classroom_app/components/menu_item.dart';
+import 'package:apna_classroom_app/components/menu/apna_menu.dart';
+import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:apna_classroom_app/util/c.dart';

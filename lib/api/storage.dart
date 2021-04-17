@@ -6,7 +6,6 @@ import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:get/get.dart';
 
-const String PROFILE_IMAGE = 'profileImage';
 const String IMAGES = 'images';
 
 /// Return download link
@@ -18,10 +17,6 @@ Future<String> uploadFile(File file, String path) async {
   String downloadUrl = await snapshot.ref.getDownloadURL();
   Get.back();
   return downloadUrl;
-}
-
-Future<String> uploadProfileImage(File image) {
-  return uploadFile(image, '$PROFILE_IMAGE/${getUserId()}');
 }
 
 /// Upload File and Get Full Path

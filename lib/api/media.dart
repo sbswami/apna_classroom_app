@@ -25,12 +25,9 @@ Future getMedia(Map<String, String> payload) async {
   }
 }
 
-Future listMedia(Map<String, String> payload, List<String> subjects) async {
-  http.Response response = await apiGetCall(
-      payload: payload,
-      url: MEDIA_LIST,
-      isUser: true,
-      list: {C.SUBJECT: subjects});
+Future listMedia(Map<String, String> payload) async {
+  http.Response response =
+      await apiGetCall(payload: payload, url: MEDIA_LIST, isUser: true);
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.LIST];
   }

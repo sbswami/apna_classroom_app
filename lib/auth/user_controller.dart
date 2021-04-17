@@ -15,6 +15,6 @@ String getUserId() {
   return UserController.to.currentUser[C.ID];
 }
 
-bool isCreator(String id) {
-  return getUserId() == id;
-}
+// bool isCreator(String id) {
+//   return getUserId() == id;
+// }

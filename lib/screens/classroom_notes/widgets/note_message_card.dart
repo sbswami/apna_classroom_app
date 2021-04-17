@@ -1,7 +1,8 @@
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/exam_conducted/widgets/message_sender_name.dart';
+import 'package:apna_classroom_app/screens/exam_conducted/widgets/message_sent_time.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/notes_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
-import 'package:apna_classroom_app/util/date_time.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -12,28 +13,39 @@ class NoteMessageCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Stack(
       children: [
-        if (message[C.NOTE] == null)
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(width: 0.5),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: const EdgeInsets.all(8.0),
-            margin: const EdgeInsets.all(8.0),
-            child: Text(S.NOTES_ARE_DELETED_BY_CREATOR.tr,
-                style: Theme.of(context).textTheme.caption),
-          )
-        else
-          NotesCard(note: message[C.NOTE], fromClassroom: true),
-        Container(
-          alignment: Alignment.centerLeft,
-          margin: const EdgeInsets.only(left: 16.0, top: 4.0, bottom: 16.0),
-          child: Text(
-            getFormattedDateTime(dateString: message[C.CREATED_AT]),
-            style: Theme.of(context).textTheme.caption,
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 4.0),
+          child: MessageSenderName(
+            creator: message[C.CREATED_BY],
           ),
+        ),
+        Positioned(
+          bottom: 0,
+          left: 4,
+          child: MessageSentTime(
+            createdAt: message[C.CREATED_AT],
+          ),
+        ),
+        Column(
+          children: [
+            SizedBox(height: 42),
+            if (message[C.NOTE] == null)
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(width: 0.5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                padding: const EdgeInsets.all(8.0),
+                margin: const EdgeInsets.all(8.0),
+                child: Text(S.NOTES_ARE_DELETED_BY_CREATOR.tr,
+                    style: Theme.of(context).textTheme.caption),
+              )
+            else
+              NotesCard(note: message[C.NOTE], fromClassroom: true),
+            SizedBox(height: 24),
+          ],
         ),
       ],
     );

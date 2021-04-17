@@ -13,6 +13,20 @@ Future createMessage(Map<String, dynamic> payload) async {
   }
 }
 
+Future deleteMessage(Map<String, dynamic> payload) async {
+  http.Response response = await apiCall(
+      url: MESSAGE_DELETE, payload: payload, isUser: true, isLoading: false);
+  return response?.statusCode == 200;
+}
+
+Future createMessageList(Map<String, dynamic> payload) async {
+  http.Response response =
+      await apiCall(url: MESSAGE_CREATE_LIST, payload: payload, isUser: true);
+  if (response?.statusCode == 200) {
+    return json.decode(response.body)[C.LIST];
+  }
+}
+
 Future getMessage(Map<String, String> payload) async {
   http.Response response = await apiGetCall(
     payload: payload,

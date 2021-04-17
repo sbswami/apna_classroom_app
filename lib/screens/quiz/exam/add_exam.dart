@@ -1,9 +1,10 @@
 import 'package:apna_classroom_app/api/exam.dart';
-import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
+import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/labeled_check_box.dart';
-import 'package:apna_classroom_app/components/menu_item.dart';
+import 'package:apna_classroom_app/components/menu/apna_menu.dart';
+import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
 import 'package:apna_classroom_app/components/tags/exam_tag_input.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
@@ -60,7 +61,6 @@ class _AddExamState extends State<AddExam> {
       marksController.text = '${widget.exam[C.MARKS] ?? ''}';
       solvingTimeController.text =
           '${getMinute(widget.exam[C.SOLVING_TIME]) ?? ''}';
-      // TODO: map questions correctly
       questions = widget.exam[C.QUESTION].toList();
     }
 
@@ -99,15 +99,17 @@ class _AddExamState extends State<AddExam> {
       int questionsLength = questions.length;
 
       var questionList = questions.map((question) {
+        var _solvingTime = question[C.SOLVING_TIME];
+        var _marks = question[C.MARKS];
         if (!isSolvingTimeCalculated) {
           int solvingTime = formData[C.SOLVING_TIME] ~/ questionsLength;
-          question[C.SOLVING_TIME] = solvingTime;
+          _solvingTime = solvingTime;
         }
         if (!isMarksCalculated) {
           int marks = formData[C.MARKS] ~/ questionsLength;
-          question[C.MARKS] = marks;
+          _marks = marks;
         }
-        return question;
+        return {...question, C.SOLVING_TIME: _solvingTime, C.MARKS: _marks};
       }).toList();
 
       if (!isSolvingTimeCalculated) {
@@ -129,7 +131,7 @@ class _AddExamState extends State<AddExam> {
       var exam = await createExam(formData);
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
-      if (exam != null) Get.back(result: true);
+      if (exam != null) Get.back(result: exam);
     }
   }
 
@@ -309,184 +311,193 @@ class _AddExamState extends State<AddExam> {
     formData[key] = value;
   }
 
+  // On Back
+  Future<bool> _onBack() async {
+    var result = await wantToDiscard(() => true, S.EXAM_DISCARD.tr);
+    return (result ?? false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(S.ADD_EXAM.tr),
-        actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
-      ),
-      body: SingleChildScrollView(
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        labelText: S.EXAM_TITLE.tr,
-                      ),
-                      initialValue: formData[C.TITLE],
-                      validator: validTitle,
-                      maxLength: 100,
-                      onSaved: (value) => formData[C.TITLE] = value,
-                    ),
-                    TextFormField(
-                      initialValue: formData[C.INSTRUCTION],
-                      decoration: InputDecoration(
-                        labelText: S.EXAM_INSTRUCTION.tr,
-                      ),
-                      maxLength: 1000,
-                      keyboardType: TextInputType.multiline,
-                      maxLines: null,
-                      onSaved: (value) => onSaved(C.INSTRUCTION, value),
-                    ),
-                    Row(
-                      children: [
-                        SecondaryButton(
-                          onPress: addQuestion,
-                          text: S.PLUS_QUESTION.tr,
-                        ),
-                      ],
-                    ),
-                    Text('${questions.length} ${S.QUESTION_ADDED.tr}'),
-                    if (questionError != null)
-                      Text(
-                        questionError,
-                        style: TextStyle(
-                          color: Theme.of(context).errorColor,
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-              Column(
-                children: questions
-                    .map(
-                      (e) => QuestionCard(
-                        isFromExam: e[C.CREATED_BY] != null,
-                        question: e,
-                        onLongPress: ({BuildContext context}) =>
-                            onLongPressQuestion(context, e),
-                      ),
-                    )
-                    .toList(),
-              ),
-              LabeledCheckBox(
-                checked: formData[C.MINUS_MARKING],
-                text: S.MINUS_MARKING.tr,
-                onChanged: onChangeMinusMarking,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Column(
-                  children: [
-                    if (formData[C.MINUS_MARKING])
+    return WillPopScope(
+      onWillPop: _onBack,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(S.ADD_EXAM.tr),
+          actions: [IconButton(icon: Icon(Icons.check), onPressed: save)],
+        ),
+        body: SingleChildScrollView(
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
                       TextFormField(
-                        key: Key(C.MINUS_MARKING),
-                        initialValue:
-                            '${formData[C.MINUS_MARKING_PER_QUESTION] ?? ''}',
                         decoration: InputDecoration(
-                            labelText: S.MINUS_MARKS_PER_QUESTION.tr),
+                          labelText: S.EXAM_TITLE.tr,
+                        ),
+                        initialValue: formData[C.TITLE],
+                        validator: validTitle,
+                        maxLength: 100,
+                        onSaved: (value) => formData[C.TITLE] = value,
+                      ),
+                      TextFormField(
+                        initialValue: formData[C.INSTRUCTION],
+                        decoration: InputDecoration(
+                          labelText: S.EXAM_INSTRUCTION.tr,
+                        ),
+                        maxLength: 1000,
+                        keyboardType: TextInputType.multiline,
+                        maxLines: null,
+                        onSaved: (value) => onSaved(C.INSTRUCTION, value),
+                      ),
+                      Row(
+                        children: [
+                          SecondaryButton(
+                            onPress: addQuestion,
+                            text: S.PLUS_QUESTION.tr,
+                          ),
+                        ],
+                      ),
+                      Text('${questions.length} ${S.QUESTION_ADDED.tr}'),
+                      if (questionError != null)
+                        Text(
+                          questionError,
+                          style: TextStyle(
+                            color: Theme.of(context).errorColor,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Column(
+                  children: questions
+                      .map(
+                        (e) => QuestionCard(
+                          isFromExam: e[C.CREATED_BY] != null,
+                          question: e,
+                          onLongPress: ({BuildContext context}) =>
+                              onLongPressQuestion(context, e),
+                        ),
+                      )
+                      .toList(),
+                ),
+                LabeledCheckBox(
+                  checked: formData[C.MINUS_MARKING],
+                  text: S.MINUS_MARKING.tr,
+                  onChanged: onChangeMinusMarking,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    children: [
+                      if (formData[C.MINUS_MARKING])
+                        TextFormField(
+                          key: Key(C.MINUS_MARKING),
+                          initialValue:
+                              '${formData[C.MINUS_MARKING_PER_QUESTION] ?? ''}',
+                          decoration: InputDecoration(
+                              labelText: S.MINUS_MARKS_PER_QUESTION.tr),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter(new RegExp('[0-9]'),
+                                allow: true)
+                          ],
+                          maxLength: 3,
+                          validator: validRequired,
+                          onSaved: (value) =>
+                              formData[C.MINUS_MARKING_PER_QUESTION] = value,
+                        ),
+                      TextFormField(
+                        controller: solvingTimeController,
+                        decoration: InputDecoration(
+                          labelText: S.EXAM_SOLVING_TIME.tr,
+                          hintText: S.MINUTE.tr,
+                          helperText: isSolvingTimeCalculated
+                              ? null
+                              : S.SOLVING_TIME_HELPER_TEXT.tr,
+                        ),
                         keyboardType: TextInputType.number,
                         inputFormatters: <TextInputFormatter>[
                           FilteringTextInputFormatter(new RegExp('[0-9]'),
                               allow: true)
                         ],
                         maxLength: 3,
+                        onChanged: onChangeSolvingTime,
                         validator: validRequired,
-                        onSaved: (value) =>
-                            formData[C.MINUS_MARKING_PER_QUESTION] = value,
+                        onSaved: saveSolvingTime,
                       ),
-                    TextFormField(
-                      controller: solvingTimeController,
-                      decoration: InputDecoration(
-                        labelText: S.EXAM_SOLVING_TIME.tr,
-                        hintText: S.MINUTE.tr,
-                        helperText: isSolvingTimeCalculated
-                            ? null
-                            : S.SOLVING_TIME_HELPER_TEXT.tr,
+                      TextFormField(
+                        controller: marksController,
+                        decoration: InputDecoration(
+                          labelText: S.EXAM_MARKS.tr,
+                          helperText: isMarksCalculated
+                              ? null
+                              : S.EXAM_MARKS_HELPER_TEXT.tr,
+                        ),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter(new RegExp('[0-9]'),
+                              allow: true)
+                        ],
+                        maxLength: 3,
+                        onChanged: onChangeMarks,
+                        validator: validRequired,
+                        onSaved: saveMarks,
                       ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter(new RegExp('[0-9]'),
-                            allow: true)
-                      ],
-                      maxLength: 3,
-                      onChanged: onChangeSolvingTime,
-                      validator: validRequired,
-                      onSaved: saveSolvingTime,
-                    ),
-                    TextFormField(
-                      controller: marksController,
-                      decoration: InputDecoration(
-                        labelText: S.EXAM_MARKS.tr,
-                        helperText: isMarksCalculated
-                            ? null
-                            : S.EXAM_MARKS_HELPER_TEXT.tr,
+                      // Exam Tags
+                      ExamTagInput(
+                        exams: exams,
+                        examError: examError,
+                        examController: examController,
+                        addExam: addExam,
+                        removeExam: removeExam,
+                        addAllLastUsedExam: addAllLastUsedExam,
+                        focusNode: examFocusNode,
                       ),
-                      keyboardType: TextInputType.number,
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter(new RegExp('[0-9]'),
-                            allow: true)
-                      ],
-                      maxLength: 3,
-                      onChanged: onChangeMarks,
-                      validator: validRequired,
-                      onSaved: saveMarks,
-                    ),
-                    // Exam Tags
-                    ExamTagInput(
-                      exams: exams,
-                      examError: examError,
-                      examController: examController,
-                      addExam: addExam,
-                      removeExam: removeExam,
-                      addAllLastUsedExam: addAllLastUsedExam,
-                      focusNode: examFocusNode,
-                    ),
-                    // Subject Tag
-                    SubjectTagInput(
-                      subjects: subjects,
-                      subjectError: subjectError,
-                      subjectController: subjectController,
-                      addSubject: addSubject,
-                      removeSubject: removeSubject,
-                      addAllLastUsed: addAllLastUsed,
-                      focusNode: subjectFocusNode,
-                    ),
-                    InputCard(
-                      title: S.EXAM_PRIVACY.tr,
-                      child: RadioGroup(
-                        list: {
-                          E.PUBLIC: S.PUBLIC.tr,
-                          E.PRIVATE: S.PRIVATE.tr,
-                        },
-                        isVertical: true,
-                        defaultValue: formData[C.PRIVACY],
-                        onChange: onChoosePrivacy,
+                      // Subject Tag
+                      SubjectTagInput(
+                        subjects: subjects,
+                        subjectError: subjectError,
+                        subjectController: subjectController,
+                        addSubject: addSubject,
+                        removeSubject: removeSubject,
+                        addAllLastUsed: addAllLastUsed,
+                        focusNode: subjectFocusNode,
                       ),
-                    ),
-                    InputCard(
-                      title: S.DIFFICULTY_LEVEL.tr,
-                      child: RadioGroup(
-                        list: {
-                          E.EASY: S.EASY.tr,
-                          E.NORMAL: S.NORMAL.tr,
-                          E.HARD: S.HARD.tr,
-                        },
-                        isVertical: true,
-                        defaultValue: formData[C.DIFFICULTY],
-                        onChange: onChooseDifficultyLevel,
+                      InputCard(
+                        title: S.EXAM_PRIVACY.tr,
+                        child: RadioGroup(
+                          list: {
+                            E.PUBLIC: S.PUBLIC.tr,
+                            E.PRIVATE: S.PRIVATE.tr,
+                          },
+                          isVertical: true,
+                          defaultValue: formData[C.PRIVACY],
+                          onChange: onChoosePrivacy,
+                        ),
                       ),
-                    ),
-                  ],
+                      InputCard(
+                        title: S.DIFFICULTY_LEVEL.tr,
+                        child: RadioGroup(
+                          list: {
+                            E.EASY: S.EASY.tr,
+                            E.NORMAL: S.NORMAL.tr,
+                            E.HARD: S.HARD.tr,
+                          },
+                          isVertical: true,
+                          defaultValue: formData[C.DIFFICULTY],
+                          onChange: onChooseDifficultyLevel,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

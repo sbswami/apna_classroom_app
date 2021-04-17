@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:apna_classroom_app/components/apna_menu.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
-import 'package:apna_classroom_app/components/menu_item.dart';
+import 'package:apna_classroom_app/components/menu/apna_menu.dart';
+import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:flutter/material.dart';
@@ -94,7 +94,12 @@ class OptionCheckBox extends StatelessWidget {
     return Row(
       children: [
         if (isCheckBox)
-          Checkbox(value: checked, onChanged: _onChanged, activeColor: color),
+          Checkbox(
+            value: checked,
+            onChanged: _onChanged,
+            activeColor: color,
+            checkColor: Theme.of(context).cardColor,
+          ),
         if (!isCheckBox)
           Radio(
             value: valueRadio,

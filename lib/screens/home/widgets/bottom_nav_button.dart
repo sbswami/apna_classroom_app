@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 class BottomNavButton extends StatelessWidget {
   final IconData iconData;
@@ -12,6 +13,11 @@ class BottomNavButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Color color = (selected ?? false)
+        ? Theme.of(context).primaryColor
+        : Get.isDarkMode
+            ? Colors.grey
+            : null;
     return SizedBox(
       // width: 70,
       child: GestureDetector(
@@ -25,14 +31,11 @@ class BottomNavButton extends StatelessWidget {
               Icon(
                 iconData,
                 size: 28,
-                color:
-                    (selected ?? false) ? Theme.of(context).primaryColor : null,
+                color: color,
               ),
               Text(
                 text ?? '',
-                style: (selected ?? false)
-                    ? TextStyle(color: Theme.of(context).primaryColor)
-                    : null,
+                style: TextStyle(color: color),
               ),
             ],
           ),

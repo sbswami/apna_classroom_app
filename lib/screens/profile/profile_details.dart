@@ -18,19 +18,11 @@ class ProfileDetails extends StatelessWidget {
           physics: ClampingScrollPhysics(),
           children: [
             Container(
-              decoration: BoxDecoration(
-                boxShadow: [
-                  BoxShadow(
-                    spreadRadius: 0.3,
-                    blurRadius: 5,
-                  ),
-                ],
-                color: Theme.of(context).cardColor,
-              ),
               height: MediaQuery.of(context).size.width * 0.75,
               child: UrlImage(
-                url: user[C.PHOTO_URL],
+                url: (user[C.MEDIA] ?? {})[C.URL],
                 fit: BoxFit.cover,
+                borderRadius: 0.0,
               ),
             ),
             SizedBox(height: 24),

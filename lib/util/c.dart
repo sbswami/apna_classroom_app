@@ -5,6 +5,8 @@ class C {
 
   static const String ON_TAP = 'onTap';
   static const String PRIMARY = 'primary';
+  static const String UPLOAD = 'upload';
+  static const String DELETE = 'delete';
 
   // API END
 
@@ -23,6 +25,7 @@ class C {
 
   // USER
   static const String USER = 'user';
+  static const String PERSON = 'person';
   static const String UID = 'uid';
   static const String PHONE = 'phone';
   static const String USERNAME = 'username';
@@ -88,12 +91,12 @@ class C {
   static const String CLASSROOM = 'classroom';
   static const String DESCRIPTION = 'description';
   static const String WHO_CAN_JOIN = 'whoCanJoin';
-  static const String WHO_CAN_SHARE_NOTES = 'whoCanShareNotes';
   static const String WHO_CAN_SEND_MESSAGES = 'whoCanSendMessages';
   static const String MEMBERS = 'members';
   static const String ROLE = 'role';
   static const String JOIN_REQUEST = 'joinRequest';
   static const String ADD_TIME = 'ADD_TIME';
+  static const String IS_ADMIN = 'isAdmin';
 
   static const String RUNNING_EXAM = 'runningExam';
   static const String UPCOMING_EXAM = 'upcomingExam';
@@ -117,6 +120,9 @@ class C {
   static const String TO_START_TIME = 'toStartTime';
   static const String FROM_EXPIRE_TIME = 'fromExpireTime';
   static const String TO_EXPIRE_TIME = 'toExpireTime';
+  static const String REASON = 'reason';
+
+  static const String QUESTION_COUNT = 'questionCount';
 
   // Solved Exam
   static const String SOLVED_EXAM = 'solvedExam';
@@ -130,6 +136,10 @@ class C {
 
   // Message
   static const String MESSAGE = 'message';
+  static const String CLASSROOM_ID = 'classroomId';
+  static const String IS_ME = 'isMe';
+  static const String SAME_USER = 'sameUser';
+  static const String DELETED = 'deleted';
 
   // Pagination
   static const String PRESENT = 'present';
@@ -141,4 +151,8 @@ class C {
   static const String NOTIFICATION_ID = 'notificationId';
   static const String CHANNEL_ID = 'channelId';
   static const String PRIORITY = 'priority';
+
+  // Report
+  static const String REPORT = 'report';
+  static const String STATUS = 'status';
 }

@@ -11,8 +11,15 @@ class ArrowSecondaryButton extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-      color: Theme.of(context).cardColor,
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Theme.of(context).cardColor),
+        shape: MaterialStateProperty.all<OutlinedBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+        ),
+      ),
       onPressed: onPress,
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -46,8 +53,6 @@ class ArrowSecondaryButton extends StatelessWidget {
           ],
         ),
       ),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      elevation: 4.0,
     );
   }
 }

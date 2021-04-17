@@ -7,6 +7,7 @@ import 'package:apna_classroom_app/components/labeled_switch.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom_selector.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/classroom_exam_card.dart';
+import 'package:apna_classroom_app/screens/quiz/exam/add_exam.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/exam_picker.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/exam_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -35,7 +36,6 @@ class _ScheduleExamState extends State<ScheduleExam> {
     C.SCHEDULE_EXAM_FOR_LATER: false,
     C.CAN_EXAM_EXPIRE: false,
     C.SHOW_SOLUTION_AND_ANSWER: true,
-    C.CAN_ASK_DOUBT: false,
     C.ALLOWED_DELAY: 10,
   };
 
@@ -46,7 +46,8 @@ class _ScheduleExamState extends State<ScheduleExam> {
       form.save();
 
       if (formData[C.EXAM] == null) {
-        return ok(title: S.SELECT_EXAM, msg: 'Please select exam to schedule.');
+        return ok(
+            title: S.SELECT_EXAM, msg: S.PLEASE_SELECT_EXAM_TO_SCHEDULE.tr);
       }
 
       if (formData[C.SCHEDULE_EXAM_FOR_LATER] &&
@@ -93,6 +94,15 @@ class _ScheduleExamState extends State<ScheduleExam> {
 
       if (formData[C.EXPIRE_TIME] != null) {
         payload[C.EXPIRE_TIME] = formData[C.EXPIRE_TIME].toString();
+      } else if (formData[C.MUST_JOIN_INSTANTLY]) {
+        // Expire time = StartTime + AllowedDelayed + SolvingTime
+        int expireIn = formData[C.EXAM][C.SOLVING_TIME] * 1000 +
+            (formData[C.ALLOWED_DELAY] ?? 0) * 1000 +
+            (formData[C.START_TIME] ?? DateTime.now()).millisecondsSinceEpoch;
+        payload[C.EXPIRE_TIME] = DateTime.fromMillisecondsSinceEpoch(
+          expireIn,
+        ).toString();
+        payload[C.CAN_EXAM_EXPIRE] = true;
       }
 
       payload[C.EXAM] = formData[C.EXAM][C.ID];
@@ -135,7 +145,9 @@ class _ScheduleExamState extends State<ScheduleExam> {
       list.insert(0, widget.classroom);
     }
     setState(() {
-      classrooms = list;
+      classrooms.removeWhere(
+          (element) => list.any((item) => item[C.ID] == element[C.ID]));
+      classrooms.insertAll(0, list);
     });
   }
 
@@ -152,7 +164,7 @@ class _ScheduleExamState extends State<ScheduleExam> {
     });
   }
 
-  // Solving Time
+  // Allowed delay
   saveAllowedDelay(String value) {
     if (value.isEmpty || int.parse(value) == 0)
       return formData.remove(C.ALLOWED_DELAY);
@@ -178,6 +190,16 @@ class _ScheduleExamState extends State<ScheduleExam> {
     setState(() {
       formData[C.EXPIRE_TIME] = dateTime;
     });
+  }
+
+  // Create Exam
+  _createExam() async {
+    var result = await Get.to(() => AddExam());
+    if (result != null) {
+      setState(() {
+        formData[C.EXAM] = result;
+      });
+    }
   }
 
   @override
@@ -226,15 +248,9 @@ class _ScheduleExamState extends State<ScheduleExam> {
                             ),
                             SizedBox(height: 8.0),
                             ArrowSecondaryButton(
-                              onPress: () {},
+                              onPress: _createExam,
                               text: S.CREATE_NEW_EXAM.tr,
                               preIcon: Icons.school_rounded,
-                            ),
-                            SizedBox(height: 8.0),
-                            ArrowSecondaryButton(
-                              onPress: () {},
-                              text: S.RANDOM_QUESTION_EXAM.tr,
-                              preIcon: Icons.all_inclusive_rounded,
                             ),
                           ],
                         ),
@@ -382,13 +398,7 @@ class _ScheduleExamState extends State<ScheduleExam> {
                             onSwitch(C.SHOW_SOLUTION_AND_ANSWER, value),
                         title: S.SHOW_SOLUTION_AND_ANSWER.tr,
                       ),
-                      SizedBox(height: 8.0),
-                      LabeledSwitch(
-                        value: formData[C.CAN_ASK_DOUBT],
-                        onChanged: (value) => onSwitch(C.CAN_ASK_DOUBT, value),
-                        title: S.CAN_ASK_DOUBT.tr,
-                      ),
-                      SizedBox(height: 16.0),
+                      SizedBox(height: 64.0),
                     ],
                   ),
                 ),

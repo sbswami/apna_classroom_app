@@ -40,12 +40,16 @@ class PersonCard extends StatelessWidget {
         child: Row(
           children: [
             if (isSelected != null)
-              Checkbox(value: isSelected, onChanged: onSelected),
+              Checkbox(
+                value: isSelected,
+                onChanged: onSelected,
+                checkColor: Theme.of(context).cardColor,
+              ),
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: PersonImage(
-                thumbnailUrl: person[C.THUMBNAIL_URL],
+                thumbnailUrl: (person[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
                 size: 50,
               ),
             ),

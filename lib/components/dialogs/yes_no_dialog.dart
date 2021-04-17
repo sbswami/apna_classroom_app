@@ -1,6 +1,7 @@
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -46,7 +47,7 @@ class YesNoDialog extends StatelessWidget {
             onPress: () => Get.back(result: (no ?? () {})()),
           ),
         PrimaryButton(
-          text: yesName ?? S.OKAY,
+          text: yesName ?? S.OKAY.tr,
           onPress: () {
             Get.back(result: (yes ?? () {})());
           },
@@ -88,6 +89,38 @@ wantToDelete(Function onDelete, String msg) {
       msg: msg,
       yes: onDelete,
       yesName: S.DELETE.tr,
+      noName: S.CANCEL.tr,
+      destructive: true,
+    ),
+  );
+}
+
+wantToDiscard(Function onDiscard, String msg) {
+  return showDialog(
+    context: Get.context,
+    barrierDismissible: true,
+    builder: (BuildContext context) => YesNoDialog(
+      title: S.ARE_YOU_SURE_YOU_WANT_TO_DISCARD.tr,
+      msg: msg,
+      yes: onDiscard,
+      yesName: S.DISCARD.tr,
+      noName: S.CANCEL.tr,
+      destructive: true,
+    ),
+  );
+}
+
+wantToLeave({Function onLeave, String msg, String title}) {
+  return showDialog(
+    context: Get.context,
+    barrierDismissible: true,
+    builder: (BuildContext context) => YesNoDialog(
+      title: S.ARE_YOU_SURE_YOU_WANT_TO_LEAVE.trParams({
+        C.TITLE: title,
+      }),
+      msg: msg,
+      yes: onLeave,
+      yesName: S.LEAVE.tr,
       noName: S.CANCEL.tr,
       destructive: true,
     ),

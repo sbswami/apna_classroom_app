@@ -1,6 +1,6 @@
 // API Root
-const String API_ROOT = 'http://192.168.155.179:3000';
-const String API_ROOT_GET = '192.168.155.179:3000';
+const String API_ROOT = 'http://192.168.108.180:3000';
+const String API_ROOT_GET = '192.168.108.180:3000';
 
 // User Routes
 const String USER_ROOT = '/user';
@@ -10,6 +10,7 @@ const String USER_GET = '$USER_ROOT/get';
 const String USER_CHECK_USERNAME = '$USER_ROOT/check-username';
 const String USER_UPDATE = '$USER_ROOT/update';
 const String USER_SEARCH_PERSON = '$USER_ROOT/search';
+const String USER_GET_PERSON = '$USER_ROOT/get-person';
 const String USER_SUBJECTS = '$USER_ROOT/subjects';
 const String USER_EXAMS = '$USER_ROOT/exams';
 
@@ -26,6 +27,7 @@ const String NOTE_CREATE = '$NOTE_ROOT/create';
 const String NOTE_GET = '$NOTE_ROOT/get';
 const String NOTE_LIST = '$NOTE_ROOT/list';
 const String NOTE_DELETE = '$NOTE_ROOT/delete';
+const String NOTE_ADD_TO_ACCESS_LIST = '$NOTE_ROOT/add-to-access-list';
 
 // Question Routes
 const String QUESTION_ROOT = '/question';
@@ -42,6 +44,7 @@ const String EXAM_CREATE = '$EXAM_ROOT/create';
 const String EXAM_GET = '$EXAM_ROOT/get';
 const String EXAM_LIST = '$EXAM_ROOT/list';
 const String EXAM_DELETE = '$EXAM_ROOT/delete';
+const String EXAM_ADD_TO_ACCESS_LIST = '$EXAM_ROOT/add-to-access-list';
 
 // Classroom
 const String CLASSROOM_ROOT = '/classroom';
@@ -49,6 +52,7 @@ const String CLASSROOM_ROOT = '/classroom';
 const String CLASSROOM_CREATE = '$CLASSROOM_ROOT/create';
 const String CLASSROOM_GET = '$CLASSROOM_ROOT/get';
 const String ADD_MEMBERS_CREATE = '$CLASSROOM_ROOT/add-members';
+const String REMOVE_MEMBER = '$CLASSROOM_ROOT/remove-member';
 const String CLASSROOM_LIST = '$CLASSROOM_ROOT/list';
 const String CLASSROOM_DELETE = '$CLASSROOM_ROOT/delete';
 
@@ -87,6 +91,15 @@ const String TEXT_GET = '$TEXT_ROOT/get';
 const String MESSAGE_ROOT = '/message';
 
 const String MESSAGE_CREATE = '$MESSAGE_ROOT/create';
+const String MESSAGE_CREATE_LIST = '$MESSAGE_ROOT/create-list';
 const String MESSAGE_GET = '$MESSAGE_ROOT/get';
 const String MESSAGE_LIST = '$MESSAGE_ROOT/list';
 const String MESSAGE_NOTE = '$MESSAGE_ROOT/note';
+const String MESSAGE_DELETE = '$MESSAGE_ROOT/delete';
+
+// Report Routes
+const String REPORT_ROOT = '/report';
+
+const String REPORT_CREATE = '$REPORT_ROOT/create';
+const String REPORT_GET = '$REPORT_ROOT/get';
+const String REPORT_LIST = '$REPORT_ROOT/list';

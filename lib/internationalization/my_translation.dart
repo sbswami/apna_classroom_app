@@ -20,3 +20,8 @@ getLocal(String value) {
 
   return Locale(data[0], data[1]);
 }
+
+getLocalToString({Locale locale}) {
+  if (locale == null) locale = Get.locale;
+  return '${locale.languageCode}_${locale.countryCode}';
+}

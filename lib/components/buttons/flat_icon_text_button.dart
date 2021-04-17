@@ -14,29 +14,36 @@ class FlatIconTextButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        RaisedButton(
-          padding: const EdgeInsets.all(12.0),
-          shape: RoundedRectangleBorder(
-              // side: BorderSide(width: 1, color: Theme.of(context).primaryColor),
-              borderRadius: BorderRadius.circular(10)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                iconData,
-                color: Theme.of(context).primaryColor,
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(Theme.of(context).cardColor),
+            shape: MaterialStateProperty.all<OutlinedBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10.0),
               ),
-              SizedBox(height: 8),
-              Text(
-                text,
-                style: Theme.of(context)
-                    .textTheme
-                    .button
-                    .copyWith(color: Theme.of(context).primaryColor),
-              )
-            ],
+            ),
           ),
-          color: Theme.of(context).cardColor,
+          child: Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  iconData,
+                  color: Theme.of(context).primaryColor,
+                ),
+                SizedBox(height: 8),
+                Text(
+                  text,
+                  style: Theme.of(context)
+                      .textTheme
+                      .button
+                      .copyWith(color: Theme.of(context).primaryColor),
+                )
+              ],
+            ),
+          ),
           onPressed: onPressed,
         ),
         SizedBox(height: 4),

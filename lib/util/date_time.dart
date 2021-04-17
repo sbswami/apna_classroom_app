@@ -60,10 +60,17 @@ int getSecondDiff(
     {DateTime first, String firstSt, DateTime second, String secondSt}) {
   if (firstSt != null) first = DateTime.parse(firstSt).toLocal();
   if (secondSt != null) second = DateTime.parse(secondSt).toLocal();
-  return second.difference(first).inSeconds;
+  return second?.difference(first)?.inSeconds;
 }
 
 bool isFutureDate({DateTime date, String dateSt}) {
-  if (!dateSt.isNullOrBlank) date = DateTime.parse(dateSt);
+  if (!(dateSt == null || dateSt == '')) date = DateTime.parse(dateSt);
   return date.millisecondsSinceEpoch > DateTime.now().millisecondsSinceEpoch;
+}
+
+String getReadableDuration(Duration duration) {
+  String twoDigits(int n) => n.toString().padLeft(2, "0");
+  String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60));
+  String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+  return "${twoDigits(duration.inHours)}:$twoDigitMinutes:$twoDigitSeconds";
 }

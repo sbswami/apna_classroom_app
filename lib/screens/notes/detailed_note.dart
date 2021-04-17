@@ -1,5 +1,6 @@
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
+import 'package:apna_classroom_app/components/cards/detailed_card.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/share/apna_share.dart';
@@ -9,6 +10,8 @@ import 'package:apna_classroom_app/screens/notes/add_notes.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/notes_card.dart';
 import 'package:apna_classroom_app/screens/notes/widgets/single_note.dart';
 import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/constants.dart';
+import 'package:apna_classroom_app/util/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -25,7 +28,7 @@ class DetailedNote extends StatefulWidget {
 
 class _DetailedNoteState extends State<DetailedNote> {
   // Variables
-  bool isLoading = true;
+  NoteStates state = NoteStates.Loading;
   Map<String, dynamic> note;
 
   // Load Data
@@ -34,15 +37,28 @@ class _DetailedNoteState extends State<DetailedNote> {
       C.ID: widget.note[C.ID],
       C.CLASSROOM: (widget.fromClassroom ?? false).toString()
     });
+    if (_note == null) {
+      state = NoteStates.Deleted;
+    } else if (_note[C.CREATED_BY] != null) {
+      state = NoteStates.Access;
+    } else {
+      state = NoteStates.Private;
+    }
     setState(() {
       note = _note;
-      isLoading = false;
     });
+
+    if (_note != null &&
+        !isCreator(_note[C.CREATED_BY]) &&
+        !_note[C.ACCESS_LIST].contains(getUserId()) &&
+        _note[C.PRIVACY] == E.PUBLIC) {
+      await addToAccessListNote({C.ID: _note[C.ID]});
+    }
   }
 
   // Share Notes in classroom
   shareNote() {
-    apnaShare(SharingContentType.NOTE, note);
+    apnaShare(SharingContentType.Note, note);
   }
 
   // Delete
@@ -52,7 +68,7 @@ class _DetailedNoteState extends State<DetailedNote> {
     }, S.NOTE_DELETE_NOTE.tr);
     if (!(result ?? false)) return;
     bool isDeleted = await deleteNote({
-      C.ID: widget.note[C.ID],
+      C.ID: [widget.note[C.ID]],
     });
     if (!isDeleted)
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
@@ -65,7 +81,7 @@ class _DetailedNoteState extends State<DetailedNote> {
     var result = await Get.to(() => AddNotes(note: note));
     if (result ?? false) {
       setState(() {
-        isLoading = true;
+        state = NoteStates.Loading;
         note = null;
         isEdited = true;
       });
@@ -97,32 +113,40 @@ class _DetailedNoteState extends State<DetailedNote> {
             if (isCreator((note ?? {})[C.CREATED_BY]))
               IconButton(
                   icon: Icon(Icons.delete_rounded), onPressed: _onDelete),
-            IconButton(icon: Icon(Icons.share), onPressed: shareNote),
+            if (note != null)
+              IconButton(icon: Icon(Icons.share), onPressed: shareNote),
           ],
         ),
         body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            NotesCard(note: (note ?? widget.note)),
-            if (isLoading)
-              DetailsSkeleton(
-                type: DetailsType.CardInfo,
-              ),
-            if (note == null)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  S.NOTES_ARE_DELETED_BY_CREATOR.tr,
-                  style: Theme.of(context).textTheme.headline6,
+            if (widget.note[C.TITLE] != null || state == NoteStates.Access)
+              NotesCard(note: (note ?? widget.note)),
+            if (state == NoteStates.Loading)
+              Expanded(
+                child: DetailsSkeleton(
+                  type: DetailsType.CardInfo,
                 ),
-              ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: listCount,
-                itemBuilder: (BuildContext context, int position) {
-                  return SingleNote(note: note[C.LIST][position]);
-                },
-              ),
-            )
+              )
+            else if (state == NoteStates.Deleted)
+              DetailedCard(
+                text: S.NOTES_ARE_DELETED_BY_CREATOR.tr,
+                onOkay: _onBack,
+              )
+            else if (state == NoteStates.Private)
+              DetailedCard(
+                text: S.YOU_DO_NOT_HAVE_ACCESS_NOTE.tr,
+                onOkay: _onBack,
+              )
+            else if (state == NoteStates.Access)
+              Expanded(
+                child: ListView.builder(
+                  itemCount: listCount,
+                  itemBuilder: (BuildContext context, int position) {
+                    return SingleNote(note: note[C.LIST][position]);
+                  },
+                ),
+              )
           ],
         ),
         floatingActionButton: isCreator((note ?? {})[C.CREATED_BY])
@@ -134,4 +158,11 @@ class _DetailedNoteState extends State<DetailedNote> {
       ),
     );
   }
+}
+
+enum NoteStates {
+  Loading,
+  Access,
+  Deleted,
+  Private,
 }

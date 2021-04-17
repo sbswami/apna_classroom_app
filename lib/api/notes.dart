@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:apna_classroom_app/api/api_constants.dart';
 import 'package:apna_classroom_app/api/helper.dart';
 import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/constants.dart';
 import 'package:http/http.dart' as http;
 
 Future createNote(Map<String, dynamic> payload) async {
@@ -22,6 +23,11 @@ Future getNote(Map<String, String> payload) async {
   if (response.statusCode == 200) {
     return json.decode(response.body)[C.NOTE];
   }
+  if (response.statusCode == 403) {
+    return {
+      C.PRIVACY: E.PRIVATE,
+    };
+  }
 }
 
 Future listNote(Map<String, String> payload, List<String> subjects) async {
@@ -36,8 +42,15 @@ Future listNote(Map<String, String> payload, List<String> subjects) async {
 }
 
 Future<bool> deleteNote(Map<String, dynamic> payload) async {
+  http.Response response =
+      await apiCall(url: NOTE_DELETE, payload: payload, isUser: true);
+
+  return response.statusCode == 200;
+}
+
+Future<bool> addToAccessListNote(Map<String, dynamic> payload) async {
   http.Response response = await apiCall(
-      url: NOTE_DELETE, payload: payload, isUser: true, isLoading: true);
+      url: NOTE_ADD_TO_ACCESS_LIST, payload: payload, isUser: true);
 
   return response.statusCode == 200;
 }
