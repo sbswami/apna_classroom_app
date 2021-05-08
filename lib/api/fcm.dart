@@ -84,7 +84,7 @@ handleOpenAppNotification(Map message) async {
             // Add message to
             break;
           }
-          // POP notification
+          // POP notification - NO
           break;
       }
       break;

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/menu/apna_menu.dart';
 import 'package:apna_classroom_app/components/menu/menu_item.dart';
@@ -16,7 +17,6 @@ class OptionCheckBox extends StatelessWidget {
   final String url;
   final File image;
   final Uint8List bytes;
-  final String thumbnailUrl;
   final File thumbnailImage;
   final Uint8List thumbnailBytes;
   final Function onDelete;
@@ -35,7 +35,6 @@ class OptionCheckBox extends StatelessWidget {
       this.url,
       this.image,
       this.bytes,
-      this.thumbnailUrl,
       this.thumbnailImage,
       this.thumbnailBytes,
       this.onDelete,
@@ -130,8 +129,11 @@ class OptionCheckBox extends StatelessWidget {
   }
 
   Widget getOption() {
-    if (thumbnailUrl != null) {
-      return UrlImage(url: thumbnailUrl);
+    if (url != null) {
+      return UrlImage(
+        url: url,
+        fileName: FileName.THUMBNAIL,
+      );
     }
     if (thumbnailImage != null) {
       return Image.file(thumbnailImage);

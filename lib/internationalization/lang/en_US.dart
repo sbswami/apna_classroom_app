@@ -3,12 +3,15 @@ import 'package:apna_classroom_app/util/c.dart';
 
 const EN_US = {
   // Basic
-  S.APP_NAME: 'Apna Classroom',
-  S.APP_N: 'Apna',
+  S.APP_NAME: 'CQN (Classroom Quiz Notes)',
+  S.APP_DESCRIPTION:
+      'CQN (Classroom Quiz Notes) app is built for sharing knowledge, making communication between student and teacher, and online exams. Every feature on this application is built just to help you, and we would like to get feedback from you. Please share your feedback via social media or Store rating.\n\nThank you for downloading the "CQN (Classroom Quiz Notes)" app',
+  S.APP_N: 'CQN',
+  S.APP_VERSION: 'App Version',
 
   // Sharing and etc things
   S.SHARING_NOTE:
-      'Hey There, I am using this amazing application and I loved it. This app is helpful for student and teachers.\nDownload it now!\n@link',
+      'Hey There, I am using this amazing application and I loved it. This app is helpful for students and teachers.\nDownload it now!\n@${C.LINK}',
 
   // Design
   S.SOMETHING_WENT_WRONG: 'Something Went Wrong',
@@ -19,38 +22,46 @@ const EN_US = {
   S.BAD_REQUEST_PLEASE_GIVE_US_FEEDBACK:
       'Bad request, Please give us feedback!',
 
-  // Design
-  S.NEW_UPDATE: 'New Upload',
+  // Update
+  S.NEW_UPDATE: 'New Update',
   S.SKIP_THIS_VERSION: 'Skip this version',
   S.UPDATE: 'Update',
+
+  // Maintenance
+  S.UNDER_MAINTENANCE: 'Under Maintenance',
+  S.UNDER_MAINTENANCE_MSG:
+      'The app is under maintenance, Please check back after some time',
 
   // Empty State
   S.NOT_FOUND: 'Not Found',
   S.NOT_FOUND_MSG: 'We did not find anything',
   S.CLEAR_FILTER: 'Clear Filter',
   S.START_CHAT: 'Start Chat',
-  S.START_CHAT_MSG: 'Share Notes, Photos, PDF, Exam and lot more.',
+  S.START_CHAT_MSG: 'Share Notes, Photos, PDF, Exam, and a lot more.',
   S.NO_MEDIA_MSG: 'We did not find any media uploaded.  ',
 
   // LOGIN
   S.LOGIN: 'Login',
   S.PHONE_NUMBER_LABEL: 'Enter 10 digit phone number',
-  S.PLEASE_ENTER_VALID_PHONE_NUMBER: 'Enter valid phone number',
+  S.PLEASE_ENTER_VALID_PHONE_NUMBER: 'Enter a valid phone number',
   S.LOGIN_FAILED: 'Login Failed',
   S.WRONG_PHONE_NUMBER_LIMIT_EXCEED:
-      'Either wrong phone number or you exceed the limit of verification in 4 Hours. Try with the correct phone number or Try after 4 Hours',
+      'Wrong phone number, Try with the correct phone number.',
   S.CODE_SENT: 'Code Sent',
-  S.LOGGED_IN_WITH_NEW_DEVICE: 'You have logged in with new device',
+  S.LOGGED_IN_WITH_NEW_DEVICE: 'You have logged in with a new device',
   S.LOGGED_OUT_FROM_THIS_DEVICE:
-      'You are logged out from this device, only one device can logged in at a time',
+      'You are logged out from this device, only one device can be logged in at a time',
+  S.CODE: 'Code',
+  S.WRONG_OTP: 'Wrong OTP',
+  S.OTP_MESSAGE: 'OTP mismatch, Please try again or Resend OTP!',
 
   // Profile
   S.PROFILE: 'Profile',
   S.ENTER_YOUR_NAME: 'Enter your name',
   S.USERNAME: 'Username',
-  S.USERNAME_INVALID: 'Username is not valid',
+  S.USERNAME_INVALID: 'The username is not valid',
   S.USERNAME_ALREADY_EXISTS: 'Username already exists',
-  S.NAME_INVALID: 'Name is not valid',
+  S.NAME_INVALID: 'The name is not valid',
   S.RESEND_OTP: 'Resend OTP?',
   S.HIDE_MY_PHONE_NUMBER: 'Hide my Phone Number',
   S.PHONE_NUMBER: 'Phone Number',
@@ -70,30 +81,30 @@ const EN_US = {
   S.ADD_ALL_LAST_USED: 'Add all last used',
   S.PUBLIC: 'Public',
   S.PRIVATE: 'Private',
-  S.NOT_A_VALID_TITLE: 'Please enter valid title, Character limit to 100',
+  S.NOT_A_VALID_TITLE: 'Please enter a valid title, Character limit to 100',
   S.ADD_AT_LEAST_ONE_SUBJECT: 'Add at least one subject!',
   S.PDF_VIEWER: 'PDF Viewer',
   S.IMAGE_VIEWER: 'Image Viewer',
   S.SEARCH: 'Search',
   S.OPEN_IMAGE: 'Open Image',
   S.EDIT: 'Edit',
-  S.ADD_AT_LEAST_ONE_EXAM: 'Add at lease one exam!',
+  S.ADD_AT_LEAST_ONE_EXAM: 'Add at least one exam!',
   S.SUBJECT: 'Subject',
-  S.ARE_YOU_SURE_YOU_WANT_TO_DELETE: 'Are you sure you want to delete?',
+  S.ARE_YOU_SURE_YOU_WANT_TO_DELETE: 'Are you sure you want to delete it?',
   S.ARE_YOU_SURE_YOU_WANT_TO_LEAVE:
       'Are you sure you want to leave @${C.TITLE}?',
   S.CAN_NOT_DELETE_NOW:
-      'Can not delete now, Please try again later or send us feedback.',
+      'Can not delete it now, Please try again later or send us feedback.',
   S.ARE_YOU_SURE_YOU_WANT_TO_EDIT: 'Are you sure you want to edit?',
   S.IMAGE: 'Image',
   S.PDF: 'PDF',
   S.VIDEO: 'Video',
   S.LEAVE: 'Leave',
   S.REPORT: 'Report',
-  S.ENTER_YOUR_COMPLAIN: 'Enter your complain',
+  S.ENTER_YOUR_COMPLAIN: 'Enter your complaint',
   S.REPORT_SUBMITTED_MESSAGE:
-      'We got your report, we will check and resolve as soon as possible.',
-  S.ARE_YOU_SURE_YOU_WANT_TO_DISCARD: 'Are you sure you want to discard?',
+      'We got your complaint, we will check and resolve it as soon as possible.',
+  S.ARE_YOU_SURE_YOU_WANT_TO_DISCARD: 'Are you sure you want to discard it?',
   S.DISCARD: 'Discard',
 
   // Notes + Quiz
@@ -102,6 +113,12 @@ const EN_US = {
   S.ACCEPTED_FORMATS: 'PDF, JPEG, MP4',
   S.EDITOR: 'Editor',
   S.UPLOAD: 'Upload',
+  S.UPLOADED: 'Uploaded',
+  S.UPLOADING_FILE: 'Uploading File',
+  S.DOWNLOADING_FILE: 'Downloading File',
+  S.DOWNLOADED: 'Downloaded',
+  S.UPLOADING_BY_CREATOR:
+      'Creator uploading this file, Please check after some time.',
 
   // Notes
   S.ADD_NOTES: 'Add Notes',
@@ -115,15 +132,15 @@ const EN_US = {
   S.MOVE_TO_BOTTOM: 'Move to bottom',
   S.PLEASE_ENTER_THE_NOTE_TITLE: 'Please enter the note Title',
   S.NOTE_DELETE_NOTE:
-      'No body can access this note after deletion, This note will be deleted from Classrooms as well.',
+      'Nobody can access this note after deletion, This note will be deleted from Classrooms as well.',
   S.NOTE_LIST_DELETE_NOTE:
-      'Notes which are created by you, only these Notes will be deleted. No body can access this note after deletion, This note will be deleted from Classrooms as well.',
+      'Notes which are created by you, only these Notes will be deleted. Nobody can access this note after deletion, This note will be deleted from Classrooms as well.',
   S.NOTES_ARE_DELETED_BY_CREATOR: 'Notes are deleted by the Creator',
-  S.NOTE_EDIT_NOTE: 'Notes will be updated in all Classroom as well.',
+  S.NOTE_EDIT_NOTE: 'Notes will be updated in all Classrooms as well.',
   S.YOU_DO_NOT_HAVE_ACCESS_NOTE:
-      'You don\'t have access to this Note. Ask creator to share this Note in a Classroom.',
-  S.NOTE_DISCARD: 'Do you really want to discard this Note?',
-  S.TEXT_EDITOR_DISCARD: 'Do you really want to discard this Text?',
+      'You don\'t have access to this Note. Ask the creator to share this Note in a Classroom.',
+  S.NOTE_DISCARD: 'Do you want to discard this Note without saving?',
+  S.TEXT_EDITOR_DISCARD: 'Do you want to discard this Text without saving?',
 
   // Quiz + Exam
   S.EXAM: 'Exam',
@@ -148,8 +165,8 @@ const EN_US = {
   S.QUESTION_ADDED: 'Question Added',
   S.CREATE_EXAM: 'Create Exam',
   S.EXAM_DELETE_NOTE:
-      'You will not able to restore this exam. Your scheduled exam will not effected by deletion of this exam.',
-  S.EXAM_DISCARD: 'Do you really want to discard this Exam?',
+      'You will not able to restore this exam. Your scheduled exam will not be affected by the deletion of this exam.',
+  S.EXAM_DISCARD: 'Do you want to discard this Exam without save?',
 
   // Quiz + Question
   S.QUESTION: 'Question',
@@ -157,9 +174,9 @@ const EN_US = {
   S.NOT_A_VALID_QUESTION: 'Please enter valid question, Character limit to 500',
   S.ADD_IMAGE: '+ Image',
   S.IMAGE_NAME: 'Image name',
-  S.PLEASE_ENTER_IMAGE_NAME: 'Please enter image name',
+  S.PLEASE_ENTER_IMAGE_NAME: 'Please enter the image name',
   S.ANSWER_TYPE: 'Answer Type',
-  S.MULTI_CHOICE: 'Multi choice',
+  S.MULTI_CHOICE: 'Multichoice',
   S.SINGLE_CHOICE: 'Single choice',
   S.DIRECT_ANSWER: 'Direct answer',
   S.ENTER_OPTION: 'Enter Option',
@@ -174,16 +191,16 @@ const EN_US = {
   S.SECOND: 'Second',
   S.ENTER_MARKS: 'Enter Marks',
   S.ADD_SOLUTION: 'Add Solution',
-  S.PLEASE_SELECT_CORRECT_ANSWER: 'Please select correct answer!',
+  S.PLEASE_SELECT_CORRECT_ANSWER: 'Please select the correct answer!',
   S.PLEASE_ADD_AT_LEAST_OPTIONS: 'Please add at least 2 options',
   S.MARKS: 'Marks',
   S.OPTION: 'Option',
   S.ANSWER: 'Answer',
   S.QUESTION_DELETE_NOTE:
-      'You can not restore question after delete. Your created exams are safe and this deletion does not effect them.',
+      'You can not restore questions after delete. Your created exams are safe and this deletion does not affect them.',
   S.QUESTION_EDIT_NOTE:
-      'Question editing here will not effect any of your created or scheduled exams.',
-  S.QUESTION_DISCARD: 'Do you really want to discard this Question?',
+      'Question editing here will not affect any of your created or scheduled exams.',
+  S.QUESTION_DISCARD: 'Do you want to discard this Question without save?',
 
   // Classroom
   S.ADD_CLASSROOM: 'Add Classroom',
@@ -210,14 +227,19 @@ const EN_US = {
   S.PUBLIC_CLASSROOMS: 'Public Classrooms',
   S.CLASSROOM_DELETE_NOTE:
       'It will delete all messages, Exams for this Classroom, and Notes sharing. You will not able to restore this.',
-  S.CLASSROOM_DELETED_BY_CREATOR: 'Classroom is deleted by Creator.',
+  S.CLASSROOM_DELETED_BY_CREATOR: 'The classroom is deleted by Creator.',
   S.YOU_DO_NOT_HAVE_ACCESS_CLASSROOM:
       'You don\'t have access to this Classroom',
-  S.DO_YOU_WANT_SEND_JOIN_REQUEST: '"@title", do you want send join request?',
+  S.DO_YOU_WANT_SEND_JOIN_REQUEST:
+      '"@${C.TITLE}", do you want to send a join request?',
+  S.DELETE_JOIN_REQUEST: 'Do you want to delete the join request?',
   S.WANT_TO_JOIN: '"@${C.TITLE}", want to join',
   S.LEAVE_CLASSROOM_MESSAGE:
       'You will not be able to see messages, Exams, Notes belongs to this Classroom.',
-  S.CLASSROOM_DISCARD: 'Do you really want to discard this Classroom?',
+  S.CLASSROOM_DISCARD: 'Do you want to discard this Classroom?',
+  S.YOU_HAVE_REQUESTED_TO_JOIN: 'You have requested to join',
+  S.JOIN_REQUESTS: 'Join Requests',
+  S.ACCEPT: 'Accept',
 
   S.RUNNING_EXAM: 'Running Exam',
   S.UPCOMING_EXAM: 'Upcoming Exam',
@@ -238,22 +260,22 @@ const EN_US = {
   S.SELECT_EXAM: 'Select Exam',
   S.CREATE_NEW_EXAM: 'Create New Exam',
   S.RANDOM_QUESTION_EXAM: 'Random Question Exam',
-  S.MUST_JOIN_ON_START: 'Must Join on Start',
-  S.DELAY_ALLOWED: "Allowed Delay",
-  S.MUST_FINISH_WITHIN_TIME: 'Must finish within time',
+  S.MUST_JOIN_ON_START: 'Must join as soon as the Exam starts',
+  S.DELAY_ALLOWED: "How late is allowed",
+  S.MUST_FINISH_WITHIN_TIME: 'Must finish within the time',
   S.ALLOW_RESUME_EXAM: 'Allow resume exam',
-  S.ALLOW_TO_ATTEND_MULTIPLE_TIME: 'Allow to attend multiple time',
-  S.SCHEDULE_EXAM_FOR_LATER: 'Schedule exam for later',
+  S.ALLOW_TO_ATTEND_MULTIPLE_TIME: 'Allow attempting multiple time',
+  S.SCHEDULE_EXAM_FOR_LATER: 'Start exam later',
   S.EXAM_START_TIME: 'Exam start time',
   S.SELECT_START_TIME: 'Select start time',
-  S.CAN_EXAM_EXPIRE: 'Can exam expire?',
+  S.CAN_EXAM_EXPIRE: 'Can the exam expire?',
   S.EXAM_EXPIRE_TIME: 'Exam expire time',
-  S.SELECT_EXPIRE_TIME: 'Select expire time',
+  S.SELECT_EXPIRE_TIME: 'Select expiry time',
   S.SHOW_SOLUTION_AND_ANSWER: 'Show solution and answer',
   S.CAN_ASK_DOUBT: 'Can ask doubt?',
-  S.PLEASE_SELECT_DATE_TIME: 'Please select date and time.',
+  S.PLEASE_SELECT_DATE_TIME: 'Please select the date and time.',
   S.PLEASE_EXPIRE_TIME_AFTER_START_TIME:
-      'Please select expire time after start time.',
+      'Please select expiration time after start time.',
   S.JOIN: 'Join',
   S.VIEW_RESULT: 'View Result',
   S.START_TIME: 'Start Time',
@@ -263,13 +285,13 @@ const EN_US = {
   S.NUMBER_OF_QUESTIONS: 'Number of questions',
   S.NUMBER_OF_QUESTIONS_HELPER_TEXT: 'It will pick your created questions only',
   S.DELETE_RUNNING_EXAM_NOTE:
-      'If you delete this exam, anyone giving exam will be exit form exam screen and no record left for this exam.',
+      'If you delete this exam, anyone giving the exam will be an exit from the exam screen, and no record left for this exam.',
   S.DELETE_UPCOMING_EXAM_NOTE: 'No one will able to give this exam',
   S.DELETE_COMPLETED_EXAM_NOTE:
-      'If you delete this exam from here, You will lose result and will not able to see results again, this will delete result for all.',
+      'If you delete this exam from here, You will lose results and will not able to see results again, this will delete results for all.',
   S.REASON_OF_DELETION: 'Reason of deletion',
   S.ENTER_REASON: 'Enter Reason',
-  S.PLEASE_SELECT_EXAM_TO_SCHEDULE: 'Please select exam to schedule.',
+  S.PLEASE_SELECT_EXAM_TO_SCHEDULE: 'Please select an exam to schedule.',
 
   // Running Exam
   S.START: 'Start',
@@ -279,12 +301,13 @@ const EN_US = {
   S.CLEAR: 'Clear',
   S.CORRECT_ANSWER_IS: 'Correct answer is',
   S.YOU_SUBMITTED_CORRECT_ANSWER: 'Submitted correct answer',
-  S.YOU_SUBMITTED_WRONG_ANSWER: 'Submitted wrong answer',
+  S.YOU_SUBMITTED_WRONG_ANSWER: 'Submitted the wrong answer',
   S.I_HAVE_DOUBT: 'I have doubt',
   S.SHOW_SOLUTION: 'Show Solution',
   S.PLEASE_SELECT_ANSWER_AND_THEN_SUBMIT:
-      'Please select answer and then submit.',
-  S.PLEASE_ENTER_ANSWER_AND_THEN_SUBMIT: 'Please enter answer and then submit.',
+      'Please select an answer and then submit it.',
+  S.PLEASE_ENTER_ANSWER_AND_THEN_SUBMIT:
+      'Please enter the answer and then submit.',
   S.RESULT: 'Result',
   S.STARTED_AT: 'Started at',
   S.EXAM_COMPLETED_IN: 'Exam complete in',
@@ -295,7 +318,8 @@ const EN_US = {
   S.SHOW_ANSWERS: 'Show answers',
   S.YOU_LATE: 'You\'r late',
   S.EXAM_ENDED: 'Exam Ended',
-  S.OUT_OF_TIME_EXAM_WLL_BE_SAVED: 'You are out of time. Exam will be save.',
+  S.OUT_OF_TIME_EXAM_WLL_BE_SAVED:
+      'You are out of time. The exam will be saved.',
   S.YOU_ARE_LATE_CAN_NOT_JOIN_EXAM_NOW:
       'Sorry, You are late for this exam. You can\'t Join Exam now.',
   S.EXAM_EXPIRED: 'Exam Expired',
@@ -312,10 +336,10 @@ const EN_US = {
   S.YOU_CAN_NOT_RESUME_EXAM: 'You Can\'t resume the exam.',
   S.THIS_EXAM_IS_DELETED: '"@${C.TITLE}" Exam is deleted',
   S.EXAM_DELETED_NOTE:
-      '"@${C.TITLE}" Exam is deleted by the creator of exam, the reason for this exam cancellation is - \n@${C.REASON}',
+      '"@${C.TITLE}" Exam is deleted by the creator of the exam, the reason for this exam cancellation is - \n@${C.REASON}',
   S.SWITCH_QUESTIONS: 'Switch Questions',
   S.DISCARD_RUNNING_EXAM:
-      'Do you really want to exit this Exam? All your submitted answer are stored.',
+      'Do you want to exit this Exam? All your submitted answers are stored.',
   S.SUBMIT_EXAM: 'Finish Exam',
   S.SUBMIT_EXAM_MESSAGE:
       'Have you answered all questions? Do you want to Finish this exam?',
@@ -328,7 +352,7 @@ const EN_US = {
 
   // Share
   S.SHARE: 'Share',
-  S.SHARE_TO_CLASSROOM: 'Share to Classroom',
+  S.SHARE_TO_CLASSROOM: 'In Classroom',
   S.SHARE_OUTSIDE: 'Share Outside',
 
   // Drawer
@@ -337,6 +361,9 @@ const EN_US = {
   S.LIGHT_MODE: 'Light mode',
   S.DARK_MODE: 'Dark mode',
   S.INVITE: 'Invite',
+  S.RATE_US: 'Rate Us',
+  S.NEED_HELP: 'Need Help',
+  S.ABOUT: 'About',
 
   // Languages
   S.ENGLISH_USA: 'English (USA)',
@@ -345,11 +372,11 @@ const EN_US = {
 
   // Sharing
   S.CLASSROOM_DETAILS_SHARING_TEXT:
-      '@title\nClassroom is shared by @user with you.\nopen it here @link',
+      '@${C.TITLE}\nClassroom is shared by @${C.USER} with you.\nopen it here @${C.LINK}',
   S.NOTE_DETAILS_SHARING_TEXT:
-      '@title\nNote is shared by @user with you.\nopen it here @link',
+      '@${C.TITLE}\nNote is shared by @user with you.\nopen it here @${C.LINK}',
   S.EXAM_DETAILS_SHARING_TEXT:
-      '@title\nExam is shared by @user with you.\nopen it here @link',
+      '@${C.TITLE}\nExam is shared by @user with you.\nopen it here @${C.LINK}',
 
   // Buttons
   S.CONTINUE: 'Continue',
@@ -360,4 +387,12 @@ const EN_US = {
   // Video
   S.QUALITY: 'Quality',
   S.SPEED: 'Speed',
+  S.FILE_NOT_ALLOWED: 'The file is not allowed',
+  S.COMPLETE_GUIDE_LINE: 'The file should be less than 200MB',
+
+  // Social Media
+  S.TWITTER: 'Twitter',
+  S.FACEBOOK: 'Facebook',
+  S.INSTAGRAM: 'Instagram',
+  S.YOUTUBE: 'YouTube',
 };

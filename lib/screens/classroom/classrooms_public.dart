@@ -1,4 +1,7 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/classroom.dart';
+import 'package:apna_classroom_app/api/join_request.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
@@ -30,6 +33,10 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
   @override
   void initState() {
     super.initState();
+
+    // Set Screen
+    trackScreen(ScreenNames.ClassroomsPublic);
+
     loadClassroom();
   }
 
@@ -52,6 +59,13 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
     setState(() {
       isLoading = false;
       classrooms.addAll(_classroom[C.LIST]);
+    });
+
+    // Track Public classroom event
+    track(EventName.SEE_PUBLIC_CLASSROOMS, {
+      EventProp.SEARCH: searchTitle,
+      EventProp.SUBJECTS: selectedSubjects,
+      EventProp.EXAMS: selectedExams,
     });
   }
 
@@ -94,6 +108,12 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
 
   // On Title Click
   onTitleClick(Map classroom, int index) {
+    if (classroom[C.JOIN_REQUEST] != null) {
+      return wantToDelete(
+        () => _deleteJoinRequest(classroom, index),
+        S.DELETE_JOIN_REQUEST.tr,
+      );
+    }
     joinRequest(classroom, index);
   }
 
@@ -102,7 +122,7 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
       return yesOrNo(
         title: S.JOIN.tr,
         msg: S.WANT_TO_JOIN.trParams({
-          'title': classroom[C.TITLE],
+          C.TITLE: classroom[C.TITLE],
         }),
         yesName: S.JOIN.tr,
         yes: () => join(classroom, index),
@@ -121,15 +141,36 @@ class _ClassroomPublicState extends State<ClassroomPublic> {
     }
   }
 
+  // Join
   join(Map classroom, int index) async {
     await joinClassroom(classroom);
     setState(() {
       classrooms.removeAt(index);
     });
+    // Track event Joined event
+    track(EventName.JOIN_CLASSROOM, {EventProp.TYPE: 'Joined'});
   }
 
-  sendRequest(Map classroom, int index) {
-    // TODO: send join request
+  // Send Join request
+  sendRequest(Map classroom, int index) async {
+    var joinRequest = await createJoinRequest({C.CLASSROOM: classroom[C.ID]});
+    Get.snackbar(classroom[C.TITLE], S.YOU_HAVE_REQUESTED_TO_JOIN.tr);
+    setState(() {
+      classroom[C.JOIN_REQUEST] = joinRequest;
+      classrooms[index] = classroom;
+    });
+
+    // Track event Requested event
+    track(EventName.JOIN_CLASSROOM, {EventProp.TYPE: 'Requested'});
+  }
+
+  // Delete join request
+  _deleteJoinRequest(Map classroom, int index) async {
+    await deleteJoinRequest({C.ID: classroom[C.JOIN_REQUEST][C.ID]});
+    setState(() {
+      classroom.remove(C.JOIN_REQUEST);
+      classrooms[index] = classroom;
+    });
   }
 
   // On refresh

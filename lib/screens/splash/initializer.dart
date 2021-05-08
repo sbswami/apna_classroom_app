@@ -1,12 +1,14 @@
+import 'package:apna_classroom_app/api/api_constants.dart';
 import 'package:apna_classroom_app/api/fcm.dart';
 import 'package:apna_classroom_app/api/remote_config/remote_config.dart';
 import 'package:apna_classroom_app/api/remote_config/remote_config_constants.dart';
 import 'package:apna_classroom_app/api/remote_config/remote_config_defaults.dart';
 import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
+import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/update_dialog.dart';
-import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
+import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/chat/controllers/chat_messages_controller.dart';
 import 'package:apna_classroom_app/screens/classroom/controllers/classroom_list_controller.dart';
 import 'package:apna_classroom_app/screens/home/controllers/home_tab_controller.dart';
@@ -37,16 +39,18 @@ class _InitializerState extends State<Initializer> {
     Get.put(HomeTabController());
     Get.put(ChatMessagesController());
     Get.put(ClassroomListController());
-    Get.put(UploadController());
     super.initState();
     configureFirebase();
     _checkUser();
   }
 
   _checkUser() async {
+    await _setEnv();
     await initRemoteConfig();
     _checkForUpdate();
+    _checkMaintenance();
     int _useLevel = await checkUser();
+
     setState(() {
       userLevel = _useLevel;
       loading = false;
@@ -69,9 +73,37 @@ class _InitializerState extends State<Initializer> {
     }
   }
 
+  // Check for Maintenance
+  _checkMaintenance() {
+    if (remoteConfig[RCC.MAINTENANCE].asBool()) {
+      ok(
+        title: S.UNDER_MAINTENANCE.tr,
+        msg: S.UNDER_MAINTENANCE_MSG.tr,
+        isDismissible: false,
+        noButton: true,
+      );
+    }
+  }
+
+  // Set Env
+  _setEnv() async {
+    String env = await getEnv();
+    if (env == null) return;
+
+    switch (env) {
+      case 'DEV':
+        apiRootGet = API_ROOT_GET_DEV;
+        apiRoot = 'http://$apiRootGet';
+        break;
+      case 'PROD':
+        apiRootGet = API_ROOT_GET_PROD;
+        apiRoot = 'http://$apiRootGet';
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    // return ApnaVideoPlayer();
     if (loading) return Splash();
     return getScreenForUser(userLevel);
   }

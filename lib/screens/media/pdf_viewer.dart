@@ -1,5 +1,8 @@
 import 'dart:io';
 
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
@@ -33,14 +36,29 @@ class _PdfViewerState extends State<PdfViewer> {
     loadPdf();
   }
 
+  _onFinish() {
+    if (mounted) loadPdf();
+  }
+
   loadPdf() async {
     if (widget.url != null) {
-      File _pdf = await getFile(widget.url);
-      setState(() {
-        setController(_pdf);
-        isLoading = false;
-      });
+      File _pdf = await getFile(
+        widget.url,
+        name: FileName.MAIN,
+        onLoadFinish: _onFinish,
+      );
+      if (_pdf != null) {
+        setState(() {
+          setController(_pdf);
+          isLoading = false;
+        });
+      }
     }
+
+    // Track Event
+    track(EventName.PDF_VIEWER, {
+      EventProp.TYPE: widget.url == null ? 'File' : 'URL',
+    });
   }
 
   setController(File file) {

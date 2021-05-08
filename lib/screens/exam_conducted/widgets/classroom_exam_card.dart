@@ -22,7 +22,8 @@ class ClassroomExamCard extends StatelessWidget {
       child: Row(
         children: [
           PersonImage(
-            thumbnailUrl: classroom[C.THUMBNAIL_URL],
+            stopPreview: true,
+            url: classroom[C.URL],
             size: 50,
           ),
           SizedBox(width: 8.0),

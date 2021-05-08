@@ -1,4 +1,7 @@
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
@@ -20,8 +23,6 @@ class _ProfileEditState extends State<ProfileEdit> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   Map<String, dynamic> _formData = {};
 
-  //
-
   // Save
   save() async {
     final form = _formKey.currentState;
@@ -29,14 +30,22 @@ class _ProfileEditState extends State<ProfileEdit> {
       form.save();
       showProgress();
       if (_formData[C.MEDIA] != null && _formData[C.MEDIA][C.ID] == null) {
-        _formData[C.MEDIA][C.URL] =
-            await uploadImage(_formData[C.MEDIA][C.FILE]);
-        _formData[C.MEDIA][C.THUMBNAIL_URL] =
-            await uploadImageThumbnail(_formData[C.MEDIA][C.THUMBNAIL]);
+        var storageResponse = await uploadToStorage(
+          file: _formData[C.MEDIA][C.FILE],
+          type: FileType.IMAGE,
+          thumbnail: _formData[C.MEDIA][C.THUMBNAIL],
+        );
+
+        _formData[C.MEDIA][C.URL] = storageResponse[StorageConstant.PATH];
         _formData[C.MEDIA].remove(C.FILE);
         _formData[C.MEDIA].remove(C.THUMBNAIL);
       }
       await updateUser(_formData);
+
+      // Track
+      track(EventName.EDIT_PROFILE, {
+        EventProp.HIDE_PHONE_NUMBER: _formData[C.HIDE_MY_NUMBER],
+      });
       Get.back();
       Get.back();
     }
@@ -45,7 +54,7 @@ class _ProfileEditState extends State<ProfileEdit> {
   // Pick profile pick
   pickProfilePick() async {
     var result = await showApnaMediaPicker(true, deleteOption: true);
-    print(result);
+
     if (result == null) return;
     if (result[C.DELETE] ?? false) {
       return setState(() {
@@ -66,6 +75,9 @@ class _ProfileEditState extends State<ProfileEdit> {
     };
 
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.EditProfile);
   }
 
   @override
@@ -89,7 +101,6 @@ class _ProfileEditState extends State<ProfileEdit> {
                     editMode: true,
                     thumbnailImage: media[C.THUMBNAIL],
                     image: media[C.FILE],
-                    thumbnailUrl: media[C.THUMBNAIL_URL],
                     url: media[C.URL],
                     onPhotoSelect: pickProfilePick,
                   ),

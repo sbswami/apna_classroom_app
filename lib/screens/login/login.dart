@@ -1,7 +1,11 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
+import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/about/about.dart';
 import 'package:apna_classroom_app/screens/login/widgets/otp_input.dart';
 import 'package:apna_classroom_app/screens/splash/initializer.dart';
 import 'package:apna_classroom_app/util/assets.dart';
@@ -20,9 +24,10 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final FocusNode phoneInput = FocusNode();
   final formData = {};
 
-  void login() {
+  void login({bool resend = false}) {
     final form = _formKey.currentState;
     if (form.validate()) {
       form.save();
@@ -34,45 +39,74 @@ class _LoginState extends State<Login> {
         setState(() {
           isCodeSent = true;
         });
+        track(EventName.SEND_OTP, {EventProp.RESEND: resend});
       });
+      phoneInput.unfocus();
     }
   }
 
   void submitOtp() async {
     showProgress();
     UserCredential userCredential = await signInWithPhoneNumber(otp.join(''));
-    if (userCredential != null) {
-      await handleAuthResult(userCredential);
-      Get.offAll(getScreenForUser(await checkUser()));
+    // Tack Event
+    track(EventName.SUBMIT_OTP, {EventProp.CORRECT: userCredential != null});
+
+    if (userCredential == null) {
+      Get.back();
+      ok(title: S.WRONG_OTP.tr, msg: S.OTP_MESSAGE.tr);
+
+      setState(() {
+        otp = ['0', '0', '0', '0', '0', '0'];
+      });
+      return;
     }
-    Get.back();
+
+    await handleAuthResult(userCredential);
+    Get.offAll(getScreenForUser(await checkUser()));
   }
 
   // States
   bool isCodeSent = false;
+
+  // Open About page
+  _openAbout() {
+    Get.to(() => AboutScreen());
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    track(EventName.VIEWED_LOGIN, {});
+    trackScreen(ScreenNames.Login);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(S.LOGIN.tr),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.info_outline_rounded), onPressed: _openAbout)
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18.0),
-              child: Image.asset(A.APP_ICON),
+              child:
+                  Container(child: Image.asset(A.APP_ICON_ALONE), height: 350),
             ),
             Form(
               key: _formKey,
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Flexible(
                     flex: 1,
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 16.0, top: 11.0),
+                      padding: const EdgeInsets.only(left: 16.0),
                       child: TextFormField(
                         decoration:
                             InputDecoration(hintText: Hint.COUNTRY_CODE),
@@ -93,6 +127,7 @@ class _LoginState extends State<Login> {
                           FilteringTextInputFormatter(new RegExp('[0-9]'),
                               allow: true)
                         ],
+                        focusNode: phoneInput,
                         onSaved: (value) => formData[C.PHONE_NUMBER] = value,
                         keyboardType: TextInputType.phone,
                         validator: phoneValidate,
@@ -114,7 +149,7 @@ class _LoginState extends State<Login> {
     );
   }
 
-  final otp = ['0', '0', '0', '0', '0', '0'];
+  List otp = ['0', '0', '0', '0', '0', '0'];
   Widget getOtpUi() {
     if (isCodeSent) {
       return Padding(
@@ -128,7 +163,7 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () => login(resend: true),
                   child: Text(S.RESEND_OTP.tr),
                   style: ButtonStyle(),
                 )

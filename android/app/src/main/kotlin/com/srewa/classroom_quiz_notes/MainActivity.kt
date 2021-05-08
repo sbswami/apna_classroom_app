@@ -1,4 +1,4 @@
-package com.srewa.apna_classroom_app
+package com.srewa.classroom_quiz_notes
 
 import io.flutter.embedding.android.FlutterActivity
 

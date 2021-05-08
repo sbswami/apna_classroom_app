@@ -15,6 +15,7 @@ class ChatMessagesController extends GetxController {
 
   insertMessages(List _messages) {
     this.messages.insertAll(0, _messages);
+    messageVibrate();
   }
 
   addMessages(List _messages) {
@@ -35,6 +36,7 @@ class ChatMessagesController extends GetxController {
     message.remove(C.NOTE);
     message.remove(C.MEDIA);
     messages[index] = message;
+    messageVibrate();
   }
 }
 

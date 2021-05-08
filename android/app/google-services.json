@@ -8,12 +8,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:873285277734:android:9ecc6340f61ef18afbeee7",
+        "mobilesdk_app_id": "1:873285277734:android:a76bac65aebc81ccfbeee7",
         "android_client_info": {
-          "package_name": "com.srewa.apna_classroom_app"
+          "package_name": "com.srewa.classroom_quiz_notes"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "873285277734-36usfdc02b516qvspkrr0shepg4ruem0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.srewa.classroom_quiz_notes",
+            "certificate_hash": "7a8b36e8a82bb1227466aadc1415a144665a5a0c"
+          }
+        },
         {
           "client_id": "873285277734-uc2345l9k61hk3e1p7obfk2pmqb473v6.apps.googleusercontent.com",
           "client_type": 3
@@ -30,6 +38,13 @@
             {
               "client_id": "873285277734-uc2345l9k61hk3e1p7obfk2pmqb473v6.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "873285277734-i0l3icahhaip1hr6n4s3e0jav5e9iidh.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.srewa.classroom-quiz-notes"
+              }
             }
           ]
         }

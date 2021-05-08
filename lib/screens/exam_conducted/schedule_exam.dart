@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam_conducted.dart';
 import 'package:apna_classroom_app/components/buttons/arrow_secondary_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
@@ -107,6 +109,26 @@ class _ScheduleExamState extends State<ScheduleExam> {
 
       payload[C.EXAM] = formData[C.EXAM][C.ID];
       var examConducted = await createExamConducted(payload);
+
+      // Track Schedule Exam
+      track(EventName.SCHEDULE_EXAM, {
+        EventProp.CLASSROOM_COUNT: classrooms?.length,
+        EventProp.MUST_JOIN_ON_START: payload[C.MUST_JOIN_INSTANTLY],
+        EventProp.SHOW_SOLUTION_AND_ANSWER: payload[C.SHOW_SOLUTION_AND_ANSWER],
+        EventProp.MULTIPLE_ATTEMPT: payload[C.ALLOW_ATTEND_MULTIPLE_TIME],
+        EventProp.ALLOW_RESUME: payload[C.ALLOW_RESUME_EXAM],
+        EventProp.CAN_EXPIRE: payload[C.CAN_EXAM_EXPIRE],
+        EventProp.QUESTION_COUNT: formData[C.EXAM][C.QUESTION]?.length,
+        EventProp.MINUS_MARKING: formData[C.EXAM][C.MINUS_MARKING],
+        EventProp.SOLVING_TIME: formData[C.EXAM][C.SOLVING_TIME],
+        EventProp.MARKS: formData[C.EXAM][C.MARKS],
+        EventProp.EXAMS: formData[C.EXAM][C.EXAM],
+        EventProp.SUBJECTS: formData[C.EXAM][C.SUBJECT],
+        EventProp.PRIVACY: formData[C.EXAM][C.PRIVACY],
+        EventProp.DIFFICULTY: formData[C.EXAM][C.DIFFICULTY],
+        EventProp.HAS_INSTRUCTION: formData[C.EXAM][C.INSTRUCTION] != null,
+      });
+
       if (examConducted != null) Get.back(result: true);
     }
   }
@@ -134,7 +156,7 @@ class _ScheduleExamState extends State<ScheduleExam> {
   List classrooms = [];
   addClassroom() {
     Get.to(ClassroomSelector(
-      selectedClassroom: classrooms.map<String>((e) => e[C.ID]).toList(),
+      selectedClassroom: List.from(classrooms),
       onSelect: onSelect,
     ));
   }
@@ -194,7 +216,13 @@ class _ScheduleExamState extends State<ScheduleExam> {
 
   // Create Exam
   _createExam() async {
-    var result = await Get.to(() => AddExam());
+    var result = await Get.to(() => AddExam(
+          accessedFrom: ScreenNames.ScheduleExam,
+        ));
+
+    // Track screen back
+    trackScreen(ScreenNames.ScheduleExam);
+
     if (result != null) {
       setState(() {
         formData[C.EXAM] = result;
@@ -206,6 +234,9 @@ class _ScheduleExamState extends State<ScheduleExam> {
   void initState() {
     classrooms.add(widget.classroom);
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.ScheduleExam);
   }
 
   @override

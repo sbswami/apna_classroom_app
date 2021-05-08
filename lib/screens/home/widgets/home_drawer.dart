@@ -1,13 +1,20 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
+import 'package:apna_classroom_app/components/dialogs/update_dialog.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
+import 'package:apna_classroom_app/components/menu/apna_menu.dart';
 import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/about/about.dart';
 import 'package:apna_classroom_app/screens/profile/change_language.dart';
 import 'package:apna_classroom_app/screens/profile/profile_details.dart';
 import 'package:apna_classroom_app/theme/app_theme.dart';
+import 'package:apna_classroom_app/util/assets.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
+import 'package:apna_classroom_app/util/helper.dart';
 import 'package:apna_classroom_app/util/local_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +30,9 @@ class HomeDrawer extends StatelessWidget {
       Get.changeTheme(AppTheme.darkTheme);
       setDarkMode(true);
     }
+
+    // Track Change theme
+    track(EventName.CHANGE_THEME, {EventProp.IS_DARK: Get.isDarkMode});
   }
 
   // Open Profile
@@ -32,17 +42,70 @@ class HomeDrawer extends StatelessWidget {
 
   // Sign out
   _signOut() {
+    // Track Logout event
+    track(EventName.LOGOUT, {});
     signOut();
   }
 
   // Invite
-  _invite() {
-    Share.share(
-      S.SHARING_NOTE.trParams({
-        'link': Constants.PLAY_STORE_LINK, // TODO: add deeplink for invite
-      }),
+  _invite() async {
+    await Share.share(
+      S.SHARING_NOTE.trParams({'link': getAppLink()}),
       subject: S.APP_NAME.tr,
     );
+
+    // Track Invite
+    track(EventName.INVITE, {});
+  }
+
+  _openSocialMedia(String link) {
+    openUrl(link);
+
+    // Track Social media clicks
+    track(EventName.NEED_HELP, {EventProp.SOCIAL_MEDIA: link});
+  }
+
+  // Need Help
+  _needHelp() async {
+    List<MenuItem> items = [
+      MenuItem(
+        text: S.TWITTER.tr,
+        asset: A.TWITTER,
+        onTap: () => _openSocialMedia(Constants.TWITTER_LINK),
+      ),
+      MenuItem(
+        text: S.INSTAGRAM.tr,
+        asset: A.INSTAGRAM,
+        onTap: () => _openSocialMedia(Constants.INSTAGRAM_LINK),
+      ),
+      MenuItem(
+        text: S.FACEBOOK.tr,
+        asset: A.FACEBOOK,
+        onTap: () => _openSocialMedia(Constants.FACEBOOK_LINK),
+      ),
+      MenuItem(
+        text: S.YOUTUBE.tr,
+        asset: A.YOUTUBE,
+        onTap: () => _openSocialMedia(Constants.YOUTUBE_LINK),
+      ),
+    ];
+    await showApnaMenu(Get.context, items, type: MenuType.BottomSheet);
+  }
+
+  // Rate us
+  _rateUs() {
+    openStore(popApp: false);
+
+    // Track Rate us click
+    track(EventName.RATE_US, {});
+  }
+
+  // About
+  _about() async {
+    await Get.to(() => AboutScreen());
+
+    // Track About clicks
+    track(EventName.ABOUT, {});
   }
 
   @override
@@ -61,24 +124,28 @@ class HomeDrawer extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     PersonImage(
-                      thumbnailUrl: (user[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
+                      url: (user[C.MEDIA] ?? {})[C.URL],
                       size: 70,
+                      stopPreview: true,
                     ),
                     SizedBox(width: 16.0),
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          user[C.NAME],
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                        SizedBox(height: 8.0),
-                        Text(
-                          user[C.USERNAME],
-                          style: TextStyle(fontSize: 12, color: Colors.white),
-                        ),
-                      ],
+                    Container(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            user[C.NAME] ?? '',
+                            style: TextStyle(fontSize: 18, color: Colors.white),
+                          ),
+                          SizedBox(height: 8.0),
+                          Text(
+                            user[C.USERNAME] ?? '',
+                            style: TextStyle(fontSize: 12, color: Colors.white),
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 );
@@ -99,9 +166,7 @@ class HomeDrawer extends StatelessWidget {
                   },
                   iconData: Icons.public_rounded,
                 ),
-                SizedBox(height: 12.0),
                 Divider(),
-                SizedBox(height: 12.0),
                 MenuItem(
                   text: Get.isDarkMode ? S.LIGHT_MODE.tr : S.DARK_MODE.tr,
                   iconData: Get.isDarkMode
@@ -109,17 +174,31 @@ class HomeDrawer extends StatelessWidget {
                       : Icons.brightness_2_rounded,
                   onTap: switchTheme,
                 ),
-                SizedBox(height: 12.0),
                 Divider(),
-                SizedBox(height: 12.0),
                 MenuItem(
                   text: S.INVITE.tr,
                   onTap: _invite,
                   iconData: Icons.group_add_rounded,
                 ),
-                SizedBox(height: 12.0),
                 Divider(),
-                SizedBox(height: 12.0),
+                MenuItem(
+                  text: S.NEED_HELP.tr,
+                  onTap: _needHelp,
+                  iconData: Icons.help,
+                ),
+                Divider(),
+                MenuItem(
+                  text: S.RATE_US.tr,
+                  onTap: _rateUs,
+                  iconData: Icons.star_border_rounded,
+                ),
+                Divider(),
+                MenuItem(
+                  text: S.ABOUT.tr,
+                  onTap: _about,
+                  iconData: Icons.info,
+                ),
+                Divider(),
                 MenuItem(
                   text: S.LOG_OUT.tr,
                   onTap: _signOut,

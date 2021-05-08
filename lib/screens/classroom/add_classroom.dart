@@ -1,5 +1,8 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/classroom.dart';
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage_api.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
@@ -60,6 +63,9 @@ class _AddClassroomState extends State<AddClassroom> {
     }
 
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.AddClassroom);
   }
 
   // On Save
@@ -111,17 +117,32 @@ class _AddClassroomState extends State<AddClassroom> {
 
       showProgress();
       if (formData[C.MEDIA] != null && formData[C.MEDIA][C.ID] == null) {
-        formData[C.MEDIA][C.URL] = await uploadImage(formData[C.MEDIA][C.FILE]);
-        formData[C.MEDIA][C.THUMBNAIL_URL] =
-            await uploadImageThumbnail(formData[C.MEDIA][C.THUMBNAIL]);
+        var storageResponse = await uploadToStorage(
+          file: formData[C.MEDIA][C.FILE],
+          type: FileType.IMAGE,
+          thumbnail: formData[C.MEDIA][C.THUMBNAIL],
+        );
+        formData[C.MEDIA][C.URL] = storageResponse[StorageConstant.PATH];
         formData[C.MEDIA].remove(C.FILE);
         formData[C.MEDIA].remove(C.THUMBNAIL);
       }
-      print(formData);
-      // return;
+
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
       var classroom = await createClassroom(formData);
+
+      // Track Add classroom event
+      track(EventName.ADD_CLASSROOM, {
+        EventProp.PRIVACY: formData[C.PRIVACY],
+        EventProp.MEMBER_COUNT: formData[C.MEMBERS]?.length,
+        EventProp.SUBJECTS: subjects,
+        EventProp.EXAMS: exams,
+        EventProp.WHO_CAN_SHARE_MESSAGE: formData[C.WHO_CAN_SEND_MESSAGES],
+        EventProp.WHO_CAN_JOIN: formData[C.WHO_CAN_JOIN],
+        EventProp.IMAGE: formData[C.MEDIA] != null,
+        EventProp.EDIT: widget.classroom != null,
+      });
+
       Get.back();
       if (classroom != null) Get.back(result: true);
     }
@@ -206,6 +227,10 @@ class _AddClassroomState extends State<AddClassroom> {
   List admins = [];
   addMember() async {
     var result = await Get.to(SearchPerson());
+
+    // Track Back this screen
+    trackScreen(ScreenNames.AddClassroom);
+
     if (result == null) return;
     members.removeWhere(
       (element) => result.any((item) => element[C.ID] == item[C.ID]),
@@ -294,7 +319,6 @@ class _AddClassroomState extends State<AddClassroom> {
                           editMode: true,
                           onPhotoSelect: pickImage,
                           url: media[C.URL],
-                          thumbnailUrl: media[C.THUMBNAIL_URL],
                           thumbnailImage: media[C.THUMBNAIL],
                           image: media[C.FILE],
                         ),
@@ -317,6 +341,7 @@ class _AddClassroomState extends State<AddClassroom> {
                           maxLines: null,
                           keyboardType: TextInputType.multiline,
                         ),
+                        SizedBox(height: 8),
                         InputCard(
                           key: Key(S.CLASSROOM_PRIVACY),
                           title: S.CLASSROOM_PRIVACY.tr,
@@ -330,6 +355,7 @@ class _AddClassroomState extends State<AddClassroom> {
                             onChange: (value) => onPickOption(C.PRIVACY, value),
                           ),
                         ),
+                        SizedBox(height: 8),
                         if (formData[C.PRIVACY] == E.PUBLIC)
                           InputCard(
                             key: Key(S.WHO_CAN_JOIN),
@@ -346,6 +372,7 @@ class _AddClassroomState extends State<AddClassroom> {
                                   onPickOption(C.WHO_CAN_JOIN, value),
                             ),
                           ),
+                        SizedBox(height: 8),
                         InputCard(
                           key: Key(S.WHO_CAN_SHARE_MESSAGES),
                           title: S.WHO_CAN_SHARE_MESSAGES.tr,

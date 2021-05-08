@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:flutter/material.dart';
@@ -10,15 +11,9 @@ class LabeledImage extends StatelessWidget {
   final File image;
   final String url;
   final File thumbnailImage;
-  final String thumbnailUrl;
 
   const LabeledImage(
-      {Key key,
-      this.label,
-      this.image,
-      this.url,
-      this.thumbnailImage,
-      this.thumbnailUrl})
+      {Key key, this.label, this.image, this.url, this.thumbnailImage})
       : super(key: key);
 
   onTap() {
@@ -54,8 +49,8 @@ class LabeledImage extends StatelessWidget {
   }
 
   Widget getContent() {
-    if (thumbnailUrl != null) {
-      return UrlImage(url: thumbnailUrl);
+    if (url != null) {
+      return UrlImage(url: url, fileName: FileName.THUMBNAIL);
     }
     if (thumbnailImage != null) {
       return Image.file(thumbnailImage);

@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam.dart';
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
@@ -9,10 +11,10 @@ import 'package:apna_classroom_app/util/c.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:get/get.dart';
 
-const String FIREBASE_PREFIX_URL = 'https://apnaclassroomapp.page.link';
-const String WEBSITE_LINK = 'apna.srewa.com';
+const String FIREBASE_PREFIX_URL = 'https://cqn.page.link';
+const String WEBSITE_LINK = 'cqn.srewa.com';
 
-const String ANDROID_PACKAGE = 'com.srewa.apna_classroom_app';
+const String ANDROID_PACKAGE = 'com.srewa.classroom_quiz_notes';
 
 Future<Uri> getDeepLink(String screen,
     {Map<String, String> payload, String title, String description}) async {
@@ -64,11 +66,14 @@ handleDeepLink(Uri link) async {
     case Path.CLASSROOM_TAB:
       break;
     case Path.CLASSROOM_DETAILS:
-      Get.to(
+      await Get.to(
         () => ClassroomDetails(
           classroom: {C.ID: parameters[C.ID]},
         ),
       );
+
+      // Set current Screen to classroom tab
+      trackScreen(ScreenNames.ClassroomTab);
       break;
 
     // Exam
@@ -76,11 +81,14 @@ handleDeepLink(Uri link) async {
       break;
     case Path.EXAM_DETAILS:
       await addToAccessListExam({C.ID: parameters[C.ID]});
-      Get.to(
+      await Get.to(
         () => DetailedExam(
           exam: {C.ID: parameters[C.ID]},
         ),
       );
+
+      // Track home screen
+      trackScreen(ScreenNames.ClassroomTab);
       break;
 
     // Question
@@ -94,11 +102,14 @@ handleDeepLink(Uri link) async {
       break;
     case Path.NOTE_DETAILS:
       await addToAccessListNote({C.ID: parameters[C.ID]});
-      Get.to(
+      await Get.to(
         () => DetailedNote(
           note: {C.ID: parameters[C.ID]},
         ),
       );
+
+      // Track screen
+      trackScreen(ScreenNames.ClassroomTab);
       break;
   }
 }

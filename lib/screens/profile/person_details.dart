@@ -1,3 +1,6 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
@@ -27,12 +30,21 @@ class _PersonDetailsState extends State<PersonDetails> {
       person = _person;
       isLoading = false;
     });
+
+    // Track event
+    track(EventName.VIEWED_PERSON, {
+      EventProp.HIDE_PHONE_NUMBER: _person[C.HIDE_MY_NUMBER],
+    });
   }
 
   // Init State
   @override
   void initState() {
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.PersonDetails);
+
     loadPerson();
   }
 
@@ -57,6 +69,7 @@ class _PersonDetailsState extends State<PersonDetails> {
                       url: (person[C.MEDIA] ?? {})[C.URL],
                       fit: BoxFit.cover,
                       borderRadius: 0.0,
+                      fileName: FileName.MAIN,
                     ),
                   ),
                   SizedBox(height: 24),

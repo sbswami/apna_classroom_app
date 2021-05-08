@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/solved_exam.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/date_time/count_down.dart';
@@ -34,28 +36,47 @@ class _RunningExamQuestionState extends State<RunningExamQuestion> {
     pageController.jumpToPage(index - 1);
   }
 
-  submitExam() async {
-    var result = await yesOrNo(
-        title: S.SUBMIT_EXAM.tr,
-        msg: S.SUBMIT_EXAM_MESSAGE.tr,
-        yesName: S.SUBMIT.tr,
-        yes: () => true,
-        noName: S.CANCEL.tr);
+  submitExam({bool overrideDialog = false}) async {
+    var result;
+    if (overrideDialog) {
+      result = true;
+    } else {
+      result = await yesOrNo(
+          title: S.SUBMIT_EXAM.tr,
+          msg: S.SUBMIT_EXAM_MESSAGE.tr,
+          yesName: S.SUBMIT.tr,
+          yes: () => true,
+          noName: S.CANCEL.tr);
+    }
     if (!(result ?? false)) return;
     var _solvedExam = await createSolvedExam({
       C.ID: RunningExamController.to.solvedExam[C.ID],
       C.FINISHED: true,
       C.FINISHED_TIME: DateTime.now().toString(),
     });
-    _solvedExam[C.ATTENDER] = UserController.to.currentUser;
 
-    Get.off(SingleResult(solvedExam: _solvedExam));
+    // Track event
+    track(EventName.FINISH_EXAM, {
+      EventProp.TYPE: overrideDialog ? 'Time Out' : 'Submit',
+      EventProp.EXAMS: widget.examConducted[C.EXAM][C.EXAM],
+      EventProp.SUBJECTS: widget.examConducted[C.EXAM][C.SUBJECT],
+    });
+
+    _solvedExam[C.ATTENDER] = UserController.to.currentUser;
+    await Get.off(SingleResult(
+      solvedExam: _solvedExam,
+      accessedFrom: ScreenNames.RunningExam,
+    ));
+    if (overrideDialog) Get.back();
   }
 
   @override
   void initState() {
     _questionsLength = RunningExamController.to.answers.length;
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.RunningExam);
   }
 
   _onCountDownEnd() async {
@@ -65,7 +86,7 @@ class _RunningExamQuestionState extends State<RunningExamQuestion> {
           msg: S.OUT_OF_TIME_EXAM_WLL_BE_SAVED.tr,
           buttonName: S.VIEW_RESULT.tr,
           ok: () async {
-            await submitExam();
+            await submitExam(overrideDialog: true);
           },
           isDismissible: false);
     }

@@ -12,7 +12,7 @@ import 'package:get/get.dart';
 
 class ClassroomSelector extends StatefulWidget {
   final Function(List list) onSelect;
-  final List<String> selectedClassroom;
+  final List selectedClassroom;
 
   const ClassroomSelector({
     Key key,
@@ -29,7 +29,7 @@ class _ClassroomSelectorState extends State<ClassroomSelector> {
   List<String> selectedSubjects = [];
   List<String> selectedExams = [];
   List classrooms = [];
-  List<String> selectedClassroom = [];
+  List selectedClassroom = [];
   String searchTitle;
 
   @override
@@ -100,30 +100,25 @@ class _ClassroomSelectorState extends State<ClassroomSelector> {
   }
 
   // On Select Question
-  onSelectClassroom(String id, bool selected) {
+  onSelectClassroom(_classroom, bool selected) {
     setState(() {
       if (selected)
-        selectedClassroom.add(id);
+        selectedClassroom.add(_classroom);
       else {
-        selectedClassroom.remove(id);
+        selectedClassroom
+            .removeWhere((element) => _classroom[C.ID] == element[C.ID]);
       }
     });
   }
 
   onSelect() async {
-    await widget.onSelect(
-      classrooms
-          .where(
-            (element) => selectedClassroom.contains(element[C.ID]),
-          )
-          .toList(),
-    );
+    await widget.onSelect(selectedClassroom);
     Get.back();
   }
 
-  onLongPress(BuildContext context, String id) {
+  onLongPress(BuildContext context, _classroom) {
     setState(() {
-      selectedClassroom.add(id);
+      selectedClassroom.add(_classroom);
     });
   }
 
@@ -190,19 +185,18 @@ class _ClassroomSelectorState extends State<ClassroomSelector> {
                   itemBuilder: (context, position) {
                     var classroom = classrooms[position];
                     bool isSelected = selectedClassroom
-                        .any((element) => element == classroom[C.ID]);
+                        .any((element) => element[C.ID] == classroom[C.ID]);
 
                     return ClassroomCard(
                       classroom: classroom,
                       isSelected: isSelected,
-                      onChanged: (value) =>
-                          onSelectClassroom(classroom[C.ID], value),
+                      onChanged: (value) => onSelectClassroom(classroom, value),
                       onLongPress: ({BuildContext context}) =>
-                          onLongPress(context, classroom[C.ID]),
+                          onLongPress(context, classroom),
                       onTitleTap: () =>
-                          onSelectClassroom(classroom[C.ID], !isSelected),
+                          onSelectClassroom(classroom, !isSelected),
                       onIconClick: () =>
-                          onSelectClassroom(classroom[C.ID], !isSelected),
+                          onSelectClassroom(classroom, !isSelected),
                     );
                   },
                 ),

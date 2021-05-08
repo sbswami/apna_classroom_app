@@ -1,3 +1,6 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
@@ -8,6 +11,15 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ProfileDetails extends StatelessWidget {
+  ProfileDetails() {
+    _trackEvents();
+  }
+
+  _trackEvents() {
+    trackScreen(ScreenNames.ProfileDetails);
+    track(EventName.VIEWED_SELF_PROFILE, {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -23,6 +35,7 @@ class ProfileDetails extends StatelessWidget {
                 url: (user[C.MEDIA] ?? {})[C.URL],
                 fit: BoxFit.cover,
                 borderRadius: 0.0,
+                fileName: FileName.MAIN,
               ),
             ),
             SizedBox(height: 24),
@@ -57,8 +70,9 @@ class ProfileDetails extends StatelessWidget {
       }),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.edit),
-        onPressed: () {
-          Get.to(ProfileEdit());
+        onPressed: () async {
+          await Get.to(ProfileEdit());
+          _trackEvents();
         },
       ),
     );

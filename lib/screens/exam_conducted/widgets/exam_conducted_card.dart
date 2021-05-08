@@ -1,3 +1,4 @@
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/quiz/exam/detailed_exam.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -7,19 +8,25 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class ExamConductedCard extends StatelessWidget {
+  final String screen;
   final Map examConducted;
   final List buttons;
 
-  const ExamConductedCard({Key key, this.examConducted, this.buttons})
+  const ExamConductedCard(
+      {Key key, this.examConducted, this.buttons, this.screen})
       : super(key: key);
 
-  onTap() {
-    if (isCreator(examConducted[C.CREATED_BY]))
-      Get.to(
+  onTap() async {
+    if (isCreator(examConducted[C.CREATED_BY])) {
+      await Get.to(
         () => DetailedExam(
           examConducted: examConducted,
         ),
       );
+
+      // Track back screen
+      trackScreen(screen);
+    }
   }
 
   @override

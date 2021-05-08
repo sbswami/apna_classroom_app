@@ -29,13 +29,23 @@ class _SingleNoteState extends State<SingleNote> {
     loadThumbnail();
   }
 
+  _onFinish() {
+    if (mounted) loadThumbnail();
+  }
+
   void loadThumbnail() async {
     if (widget.note[C.MEDIA] != null) {
-      File _thumbnail = await getFile(widget.note[C.MEDIA][C.THUMBNAIL_URL]);
-      setState(() {
-        thumbnail = _thumbnail;
-        isLoading = false;
-      });
+      File _thumbnail = await getFile(
+        widget.note[C.MEDIA][C.URL],
+        onLoadFinish: _onFinish,
+      );
+
+      if (_thumbnail != null) {
+        setState(() {
+          thumbnail = _thumbnail;
+          isLoading = false;
+        });
+      }
     }
   }
 
@@ -115,6 +125,7 @@ class _SingleNoteState extends State<SingleNote> {
         ),
       );
     } else if (widget.note[C.MEDIA] != null) {
+      print(thumbnail);
       return ClipRRect(
         child: Image.file(thumbnail),
         borderRadius: BorderRadius.circular(10),

@@ -15,6 +15,10 @@ String getUserId() {
   return UserController.to.currentUser[C.ID];
 }
 
+bool isLoggedIn() {
+  return getUserId() != null;
+}
+
 // bool isCreator(String id) {
 //   return getUserId() == id;
 // }

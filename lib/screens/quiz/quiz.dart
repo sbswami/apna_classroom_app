@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/screens/home/widgets/apna_bottom_navigation_bar.dart';
 import 'package:apna_classroom_app/screens/home/widgets/home_app_bar.dart';
 import 'package:apna_classroom_app/screens/home/widgets/home_drawer.dart';
@@ -29,12 +31,18 @@ class _QuizState extends State<Quiz> with SingleTickerProviderStateMixin {
   void initState() {
     _tabController = TabController(vsync: this, length: 2);
     _tabController.addListener(() {
+      String screen;
       QuizTabController.to.changeTab(_tabController.index);
       if (_tabController.index == 0) {
         searchController.text = examSearchTitle ?? '';
+        screen = ScreenNames.ExamsTab;
       } else {
         searchController.text = questionSearchTitle ?? '';
+        screen = ScreenNames.QuestionsTab;
       }
+
+      // Track Screen
+      trackScreen(screen);
     });
     super.initState();
   }
@@ -55,12 +63,22 @@ class _QuizState extends State<Quiz> with SingleTickerProviderStateMixin {
     final update = Provider.of<QuizProvider>(context, listen: false);
     switch (QuizTabController.to.activeTab) {
       case 0:
-        var result = await Get.to(AddExam());
+        var result = await Get.to(AddExam(
+          accessedFrom: ScreenNames.ExamsTab,
+        ));
+
+        // Track screen back
+        trackScreen(ScreenNames.ExamsTab);
+
         update.updateExam = (result != null);
 
         break;
       case 1:
         var result = await Get.to(AddQuestion());
+
+        // Track screen back
+        trackScreen(ScreenNames.QuestionsTab);
+
         update.updateQuestion = (result ?? false);
         break;
     }

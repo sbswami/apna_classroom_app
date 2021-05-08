@@ -1,5 +1,9 @@
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/api/user.dart';
+import 'package:apna_classroom_app/auth/auth.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
@@ -38,14 +42,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       showProgress();
       if (_formData[C.MEDIA] != null) {
-        _formData[C.MEDIA][C.URL] =
-            await uploadImage(_formData[C.MEDIA][C.FILE]);
-        _formData[C.MEDIA][C.THUMBNAIL_URL] =
-            await uploadImageThumbnail(_formData[C.MEDIA][C.THUMBNAIL]);
+        var storageResponse = await uploadToStorage(
+          file: _formData[C.MEDIA][C.FILE],
+          type: FileType.IMAGE,
+          thumbnail: _formData[C.MEDIA][C.THUMBNAIL],
+        );
+        _formData[C.MEDIA][C.URL] = storageResponse[StorageConstant.PATH];
         _formData[C.MEDIA].remove(C.FILE);
         _formData[C.MEDIA].remove(C.THUMBNAIL);
       }
       await updateUser(_formData);
+      // Track Create Profile Event
+      track(EventName.CREATE_PROFILE, {
+        EventProp.HIDE_PHONE_NUMBER: _formData[C.HIDE_MY_NUMBER],
+        EventProp.IMAGE: _formData[C.MEDIA] != null,
+      });
+
+      updateFirebaseUser();
       Get.back();
       Get.offAll(Home());
     }
@@ -53,7 +66,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   pickProfilePick() async {
     var result = await showApnaMediaPicker(true, deleteOption: true);
-    print(result);
+
     if (result == null) return;
     if (result[C.DELETE] ?? false) {
       return setState(() {
@@ -63,6 +76,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       _formData[C.MEDIA] = result;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // Set Screen
+    trackScreen(ScreenNames.CreateProfile);
   }
 
   @override
@@ -80,13 +100,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 children: [
                   Image.asset(
-                    A.APP_ICON,
+                    A.LOADING,
                     scale: 3,
                   ),
                   PersonImage(
                     editMode: true,
                     thumbnailImage: (_formData[C.MEDIA] ?? {})[C.THUMBNAIL],
-                    image: (_formData[C.MEDIA] ?? {})[C.IMAGE],
+                    image: (_formData[C.MEDIA] ?? {})[C.FILE],
                     onPhotoSelect: pickProfilePick,
                   ),
                   SizedBox(height: 16),

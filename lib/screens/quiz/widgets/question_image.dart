@@ -1,3 +1,4 @@
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/menu/apna_menu.dart';
 import 'package:apna_classroom_app/components/menu/menu_item.dart';
@@ -107,9 +108,10 @@ class _QuestionImageState extends State<QuestionImage> {
     if (widget.questionImage[C.THUMBNAIL] != null) {
       return Image.file(widget.questionImage[C.THUMBNAIL]);
     }
-    if (widget.questionImage[C.THUMBNAIL_URL] != null) {
+    if (widget.questionImage[C.URL] != null) {
       return UrlImage(
-        url: widget.questionImage[C.THUMBNAIL_URL],
+        url: widget.questionImage[C.URL],
+        fileName: FileName.THUMBNAIL,
       );
     }
     return SizedBox();

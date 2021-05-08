@@ -6,7 +6,7 @@ initRemoteConfig() async {
   await remoteConfigInstance.setDefaults(remoteConfig);
 
   try {
-    await remoteConfigInstance.fetch(expiration: const Duration(hours: 5));
+    await remoteConfigInstance.fetch(expiration: const Duration(hours: 0));
   } catch (e) {
     print(e);
   }

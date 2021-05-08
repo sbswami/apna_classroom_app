@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/question.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
@@ -21,7 +23,7 @@ const String PER_PAGE_QUESTION = '10';
 class Questions extends StatefulWidget {
   final String questionTitle;
   final Function(List list) onSelect;
-  final List<String> selectedQuestion;
+  final List selectedQuestion;
 
   const Questions({
     Key key,
@@ -40,7 +42,7 @@ class _QuestionsState extends State<Questions>
   List<String> selectedSubjects = [];
   List<String> selectedExams = [];
   List questions = [];
-  List<String> selectedQuestions = [];
+  List selectedQuestions = [];
   String searchTitle;
 
   loadQuestion() async {
@@ -60,6 +62,15 @@ class _QuestionsState extends State<Questions>
       isLoading = false;
       questions.addAll(questionList);
     });
+
+    if (widget.onSelect == null) {
+      // Track Viewed Question Event
+      track(EventName.VIEWED_QUESTION_TAB, {
+        EventProp.SEARCH: searchTitle,
+        EventProp.SUBJECTS: selectedSubjects,
+        EventProp.EXAMS: selectedExams,
+      });
+    }
   }
 
   @override
@@ -137,12 +148,13 @@ class _QuestionsState extends State<Questions>
 
   // On Select Question
   bool isSelectable = false;
-  onSelectQuestion(String id, bool selected) {
+  onSelectQuestion(question, bool selected) {
     setState(() {
       if (selected)
-        selectedQuestions.add(id);
+        selectedQuestions.add(question);
       else {
-        selectedQuestions.remove(id);
+        selectedQuestions
+            .removeWhere((element) => question[C.ID] == element[C.ID]);
         if (selectedQuestions.length == 0 && widget.onSelect == null) {
           isSelectable = false;
         }
@@ -151,32 +163,27 @@ class _QuestionsState extends State<Questions>
   }
 
   onSelect() {
-    widget.onSelect(
-      questions
-          .where(
-            (element) => selectedQuestions.contains(element[C.ID]),
-          )
-          .toList(),
-    );
+    widget.onSelect(selectedQuestions);
   }
 
-  onLongPress(BuildContext context, String id) {
+  onLongPress(BuildContext context, question) {
     setState(() {
       isSelectable = true;
-      selectedQuestions.add(id);
+      selectedQuestions.add(question);
     });
   }
 
   // Create Exam
   createExam() async {
-    var questionList = questions
-        .where(
-          (element) => selectedQuestions.contains(element[C.ID]),
-        )
-        .toList();
+    var questionList = selectedQuestions;
     var result = await Get.to(AddExam(
       questions: questionList,
+      accessedFrom: ScreenNames.QuestionsTab,
     ));
+
+    // Track screen back
+    trackScreen(ScreenNames.QuestionsTab);
+
     final update = Provider.of<QuizProvider>(context, listen: false);
     update.updateExam = (result != null);
   }
@@ -204,10 +211,20 @@ class _QuestionsState extends State<Questions>
     }, S.QUESTION_DELETE_NOTE.tr);
     if (!(result ?? false)) return;
     bool isDeleted = await deleteQuestion({
-      C.ID: selectedQuestions,
+      C.ID: selectedQuestions.map((e) => e[C.ID]).toList(),
     });
     if (!isDeleted)
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+
+    // Track delete event
+    selectedQuestions?.forEach((question) {
+      track(EventName.DELETE_QUESTION, {
+        EventProp.TYPE: question[C.ANSWER_TYPE],
+        EventProp.SUBJECTS: question[C.SUBJECT],
+        EventProp.EXAMS: question[C.EXAM],
+        EventProp.ACCESSED_FROM: ScreenNames.QuestionsTab,
+      });
+    });
     onRefresh();
   }
 
@@ -301,16 +318,15 @@ class _QuestionsState extends State<Questions>
                       final question = questions[position];
                       if (isSelectable) {
                         isSelected = selectedQuestions
-                            .any((element) => element == question[C.ID]);
+                            .any((element) => element[C.ID] == question[C.ID]);
                       }
                       return QuestionCard(
                         question: question,
                         isSelected: isSelected,
                         isEditable: true,
-                        onChanged: (value) =>
-                            onSelectQuestion(question[C.ID], value),
+                        onChanged: (value) => onSelectQuestion(question, value),
                         onLongPress: ({BuildContext context}) =>
-                            onLongPress(context, question[C.ID]),
+                            onLongPress(context, question),
                         onRefresh: onRefresh,
                       );
                     },

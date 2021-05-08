@@ -31,6 +31,9 @@ class _PlayingDurationState extends State<PlayingDuration> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(getReadableDuration(widget.controller.value.position));
+    return Text(
+      getReadableDuration(widget.controller.value.position),
+      style: TextStyle(color: Colors.white),
+    );
   }
 }

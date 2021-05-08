@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/question.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
@@ -47,6 +49,21 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
       question = _question;
       isLoading = false;
     });
+
+    // Track Event
+    track(EventName.VIEWED_QUESTION_DETAILS, {
+      EventProp.TYPE: question[C.ANSWER_TYPE],
+      EventProp.IMAGE: question[C.MEDIA]?.length,
+      EventProp.SUBJECTS: question[C.SUBJECT],
+      EventProp.EXAMS: question[C.EXAM],
+      EventProp.MARKS: question[C.MARKS],
+      EventProp.SOLVING_TIME: question[C.SOLVING_TIME],
+      EventProp.IS_HINT: question[C.ANSWER_HINT] != null,
+      EventProp.IS_SOLUTION: question[C.SOLUTION] != null,
+      EventProp.ACCESSED_FROM: (widget.isFromExam ?? false)
+          ? ScreenNames.DetailedExam
+          : ScreenNames.QuestionsTab,
+    });
   }
 
   // Delete
@@ -60,6 +77,15 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
     });
     if (!isDeleted)
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+
+    // Track delete event
+    track(EventName.DELETE_QUESTION, {
+      EventProp.TYPE: question[C.ANSWER_TYPE],
+      EventProp.SUBJECTS: question[C.SUBJECT],
+      EventProp.EXAMS: question[C.EXAM],
+      EventProp.ACCESSED_FROM: ScreenNames.DetailedQuestion,
+    });
+
     Get.back(result: true);
   }
 
@@ -67,6 +93,10 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
   bool isEdited = false;
   _onEdit() async {
     var result = await Get.to(() => AddQuestion(question: question));
+
+    // Track screen back
+    trackScreen(ScreenNames.DetailedQuestion);
+
     if (result ?? false) {
       setState(() {
         isLoading = true;
@@ -86,6 +116,10 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
   @override
   void initState() {
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.DetailedQuestion);
+
     loadQuestion();
   }
 
@@ -121,7 +155,6 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
                         children: question[C.MEDIA]
                                 ?.map<Widget>(
                                   (e) => LabeledImage(
-                                    thumbnailUrl: e[C.THUMBNAIL_URL],
                                     url: e[C.URL],
                                     label: e[C.TITLE],
                                   ),
@@ -208,7 +241,6 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
                   OptionCheckBox(
                     checked: option[C.CORRECT],
                     text: option[C.TEXT],
-                    thumbnailUrl: (option[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
                     url: (option[C.MEDIA] ?? {})[C.URL],
                     isCheckBox: question[C.ANSWER_TYPE] == E.MULTI_CHOICE,
                     valueRadio: index,

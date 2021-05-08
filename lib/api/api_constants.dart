@@ -1,6 +1,14 @@
+// Prod endpoint
+const String API_ROOT_GET_PROD = 'cqn-api.srewa.com';
+const String API_ROOT_PROD = 'http://$API_ROOT_GET_PROD';
+
+// Dev endpoint
+const String API_ROOT_GET_DEV = 'cqn-api-dev.srewa.com';
+const String API_ROOT_DEV = 'http://$API_ROOT_GET_DEV';
+
 // API Root
-const String API_ROOT = 'http://192.168.108.180:3000';
-const String API_ROOT_GET = '192.168.108.180:3000';
+String apiRoot = API_ROOT_PROD;
+String apiRootGet = API_ROOT_GET_PROD;
 
 // User Routes
 const String USER_ROOT = '/user';
@@ -103,3 +111,10 @@ const String REPORT_ROOT = '/report';
 const String REPORT_CREATE = '$REPORT_ROOT/create';
 const String REPORT_GET = '$REPORT_ROOT/get';
 const String REPORT_LIST = '$REPORT_ROOT/list';
+
+// Join Request Routes
+const String JOIN_REQUEST_ROOT = '/join-request';
+
+const String JOIN_REQUEST_CREATE = '$JOIN_REQUEST_ROOT/create';
+const String JOIN_REQUEST_DELETE = '$JOIN_REQUEST_ROOT/delete';
+const String JOIN_REQUEST_LIST = '$JOIN_REQUEST_ROOT/list';

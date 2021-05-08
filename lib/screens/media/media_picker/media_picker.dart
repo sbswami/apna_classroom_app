@@ -1,4 +1,6 @@
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage.dart';
 import 'package:apna_classroom_app/components/apna_file_picker.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/components/images/apna_image_picker.dart';
@@ -213,8 +215,24 @@ showApnaMediaPicker(bool onlyImage, {bool deleteOption}) async {
       ),
     ),
   );
+
   if (result == null) return;
   if (result[C.DELETE] ?? false) return {C.DELETE: true};
+
+  if (result[C.RESULT] is Iterable) {
+    int beforeSize = result[C.RESULT]?.length;
+
+    result[C.RESULT]?.removeWhere((element) => element == null);
+
+    int afterSize = result[C.RESULT]?.length;
+
+    if (beforeSize != afterSize) {
+      Get.snackbar(S.FILE_NOT_ALLOWED.tr, S.COMPLETE_GUIDE_LINE.tr);
+    }
+  }
+
+  // Track event
+  track(EventName.PICK_MEDIA, {});
 
   if (result[C.UPLOAD]) {
     return result[C.RESULT];

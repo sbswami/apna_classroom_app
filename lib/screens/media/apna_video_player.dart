@@ -1,13 +1,25 @@
+import 'dart:io';
+
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
+import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
+import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/media/widgets/video_player_overlay.dart';
-import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:video_player/video_player.dart';
 
 class ApnaVideoPlayer extends StatefulWidget {
-  final media;
+  final String title;
+  final File file;
+  final String url;
 
-  const ApnaVideoPlayer({Key key, this.media}) : super(key: key);
+  const ApnaVideoPlayer({Key key, this.title, this.file, this.url})
+      : super(key: key);
+
   @override
   _ApnaVideoPlayerState createState() => _ApnaVideoPlayerState();
 }
@@ -21,29 +33,6 @@ class _ApnaVideoPlayerState extends State<ApnaVideoPlayer> {
 
   @override
   void initState() {
-    // Only Horizontal via
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight,
-    ]);
-    // Hide status bar
-    SystemChrome.setEnabledSystemUIOverlays([]);
-
-    _controller = VideoPlayerController.network(
-      'http://192.168.108.180:4000/file/stream?path=this_is_uid_12345/videos/movie.mkv',
-    )..setLooping(true);
-    // ..initialize().then((value) => _controller.play);
-
-    _initializeVideoPlayerFuture = _controller.initialize();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    // Ensure disposing of the VideoPlayerController to free up resources.
-    _controller.dispose();
-
     // Set back to normal
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeRight,
@@ -51,7 +40,57 @@ class _ApnaVideoPlayerState extends State<ApnaVideoPlayer> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+
+    _initController();
+
+    super.initState();
+  }
+
+  // Init video controller
+  _initController() async {
+    if (!mounted) return;
+    // If video is from file
+    if (widget.file != null) {
+      _controller = VideoPlayerController.file(widget.file)..setLooping(true);
+    }
+
+    // If video is from url
+    else if (widget.url != null) {
+      File file = await getFile(
+        widget.url,
+        name: FileName.MAIN,
+        onLoadFinish: _initController,
+      );
+      if (file == null) {
+        return;
+      }
+      _controller = VideoPlayerController.file(file)..setLooping(true);
+    }
+
+    _initializeVideoPlayerFuture = _controller.initialize().then(
+          (value) => _controller.play(),
+        );
+
+    _initializeVideoPlayerFuture
+        .onError((error, stackTrace) => _initController());
+
+    // To load screen
+    setState(() {});
+
+    // Track event
+    track(EventName.VIDEO_PLAYER, {});
+  }
+
+  @override
+  void dispose() {
+    // Ensure disposing of the VideoPlayerController to free up resources.
+    if (_controller != null) _controller.dispose();
+
+    // Set back to normal
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     super.dispose();
   }
 
@@ -74,12 +113,37 @@ class _ApnaVideoPlayerState extends State<ApnaVideoPlayer> {
     });
   }
 
+  // set quality
+  // _setQuality(String quality) {
+  //   _controller.pause();
+  //   _initController(quality: quality);
+  //   setState(() {
+  //     overlayActive = false;
+  //   });
+  //   setLastUsedVideoQuality(quality);
+  // }
+
   @override
   Widget build(BuildContext context) {
+    if (_controller == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title ?? S.VIDEO.tr),
+        ),
+        body: Column(
+          children: [
+            SizedBox(height: 64),
+            Text(
+              S.PROCESSING.tr,
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            DetailsSkeleton(type: DetailsType.Image),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       backgroundColor: Colors.black87,
-      // Use a FutureBuilder to display a loading spinner while waiting for the
-      // VideoPlayerController to finish initializing.
       body: Stack(
         children: [
           FutureBuilder(
@@ -117,7 +181,9 @@ class _ApnaVideoPlayerState extends State<ApnaVideoPlayer> {
             VideoPlayerOverlay(
               controller: _controller,
               playPause: _playPause,
-              title: (widget.media ?? {})[C.TITLE],
+              title: widget.title,
+              // qualities: widget.qualities,
+              // setQuality: _setQuality,
               // overlaySwitch: _overlaySwitch,
             )
         ],

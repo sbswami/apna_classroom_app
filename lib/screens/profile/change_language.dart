@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
 import 'package:apna_classroom_app/internationalization/my_translation.dart';
@@ -21,6 +23,12 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   }
 
   _updateLang() {
+    // Track Language change Event
+    track(EventName.CHANGE_LANGUAGE, {
+      EventProp.NEW_LANGUAGE: selectedLang,
+      EventProp.OLD_LANGUAGE: Get.locale.toString()
+    });
+
     Get.updateLocale(getLocal(selectedLang));
     setLocale(localeString: selectedLang);
   }

@@ -1,3 +1,6 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom_details.dart';
@@ -11,8 +14,10 @@ class ClassroomMessageCard extends StatelessWidget {
   const ClassroomMessageCard({Key key, this.classroomMessage})
       : super(key: key);
 
-  _onTap() {
-    Get.to(ClassroomDetails(classroom: classroomMessage));
+  _onTap() async {
+    await Get.to(ClassroomDetails(classroom: classroomMessage));
+    // Set Chat screen back
+    trackScreen(ScreenNames.Chat);
   }
 
   @override
@@ -29,7 +34,8 @@ class ClassroomMessageCard extends StatelessWidget {
                   height: MediaQuery.of(context).size.width * 0.5,
                   width: MediaQuery.of(context).size.width * 0.8,
                   child: UrlImage(
-                    url: (classroomMessage[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
+                    url: (classroomMessage[C.MEDIA] ?? {})[C.URL],
+                    fileName: FileName.THUMBNAIL,
                     fit: BoxFit.cover,
                   ),
                 ),

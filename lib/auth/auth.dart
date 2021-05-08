@@ -1,6 +1,9 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/fcm.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/api/user_details.dart';
+import 'package:apna_classroom_app/app.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
@@ -17,6 +20,7 @@ import 'package:get/get.dart';
 Future<int> checkUser() async {
   int userLevel = 0;
   // await Future.delayed(Duration(seconds: 2));
+
   if (FirebaseAuth.instance.currentUser != null) {
     bool isUser = await getUser();
     if (isUser ?? false) userLevel++;
@@ -95,7 +99,6 @@ sendOtp(String phoneNumber, {Function onCodeSent}) async {
   }, () async {
     Get.back();
     onCodeSent();
-    ok(title: S.CODE_SENT.tr);
   }, () async {
     Get.back();
   });
@@ -110,7 +113,12 @@ Future<UserCredential> signInWithPhoneNumber(String smsCode) async {
       verificationId: verificationId,
       smsCode: smsCode,
     );
-    userCredential = await auth.signInWithCredential(credential);
+
+    try {
+      userCredential = await auth.signInWithCredential(credential);
+    } catch (exception) {
+      return null;
+    }
   }
 
   final User user = userCredential.user;
@@ -139,6 +147,12 @@ postLoginLoadData() async {
     C.FCM_TOKEN: await getToken(),
   });
 
+  // Track Login Event
+  track(
+    EventName.LOGIN,
+    {EventProp.FIRST_TIME: UserController.to.currentUser[C.NAME] == null},
+  );
+
   // Fetch all subjects and exams
   List subjects = await getSubjectsUser();
   List exams = await getExamsUser();
@@ -146,9 +160,17 @@ postLoginLoadData() async {
   await RecentlyUsedController.to.addAllExam(exams.cast<String>());
 }
 
+// Update Firebase user
+updateFirebaseUser() {
+  var user = UserController.to.currentUser;
+  var currentUser = FirebaseAuth.instance.currentUser;
+  currentUser.updateProfile(displayName: user[C.NAME]);
+  ApnaApp.analytics.setUserId(user[C.UID]);
+}
+
 signOut() async {
   await FirebaseAuth.instance.signOut();
   await clearAllLocalStorage();
-  await Get.offAll(Login());
   UserController.to.updateUser({});
+  await Get.offAll(Login());
 }

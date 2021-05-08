@@ -1,6 +1,9 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/home/controllers/home_tab_controller.dart';
 import 'package:apna_classroom_app/screens/home/widgets/bottom_nav_button.dart';
+import 'package:apna_classroom_app/screens/quiz/quiz_tab_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -11,6 +14,28 @@ class ApnaBottomNavigationBar extends StatelessWidget {
       : super(key: key);
 
   _onTabChange(int tab) {
+    String screen;
+    switch (tab) {
+      case 0:
+        screen = ScreenNames.ClassroomTab;
+        break;
+
+      case 1:
+        if (QuizTabController.to.activeTab == 0) {
+          screen = ScreenNames.ExamsTab;
+        } else {
+          screen = ScreenNames.QuestionsTab;
+        }
+        break;
+
+      case 2:
+        screen = ScreenNames.NotesTab;
+        break;
+    }
+
+    // Track Screen
+    trackScreen(screen);
+
     HomeTabController.to.changeTab(tab);
     pageController.jumpToPage(tab);
   }

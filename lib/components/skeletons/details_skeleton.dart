@@ -83,8 +83,6 @@ class DetailsSkeleton extends StatelessWidget {
           _PersonItem(),
           _PersonItem(),
           _PersonItem(),
-          _PersonItem(),
-          _PersonItem(),
         ];
 
       default:
@@ -99,7 +97,7 @@ class _Image extends StatelessWidget {
   const _Image({Key key, this.height}) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Container(height: height ?? 250, child: Image.asset(A.APP_ICON));
+    return Container(height: height ?? 250, child: Image.asset(A.LOADING));
   }
 }
 

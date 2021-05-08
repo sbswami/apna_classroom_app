@@ -1,5 +1,7 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
 import 'package:apna_classroom_app/api/message.dart';
 import 'package:apna_classroom_app/api/report.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/dialogs/info_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/single_input_dialog.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
@@ -223,7 +225,10 @@ class Message extends StatelessWidget {
         );
       case E.MEDIA:
         if (message[C.MEDIA] == null) return getDeletedNote();
-        return UrlImage(url: message[C.MEDIA][C.THUMBNAIL_URL]);
+        return UrlImage(
+          url: message[C.MEDIA][C.URL],
+          fileName: FileName.THUMBNAIL,
+        );
       case E.EXAM_CONDUCTED:
         if (message[C.EXAM_CONDUCTED] == null) return getDeletedNote();
         bool upcomingExam =
@@ -243,8 +248,10 @@ class Message extends StatelessWidget {
         return ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: ExamConductedCard(
-            buttons: getExamConductedButtons(type, message[C.EXAM_CONDUCTED]),
+            buttons: getExamConductedButtons(
+                type, message[C.EXAM_CONDUCTED], ScreenNames.Chat),
             examConducted: message[C.EXAM_CONDUCTED],
+            screen: ScreenNames.Chat,
           ),
         );
       case E.NOTE:
@@ -252,9 +259,11 @@ class Message extends StatelessWidget {
         return ClipRRect(
           borderRadius: BorderRadius.circular(8.0),
           child: NotesCard(
-              note: message[C.NOTE],
-              fromClassroom: true,
-              maxWidth: MediaQuery.of(Get.context).size.width * 0.8),
+            note: message[C.NOTE],
+            fromClassroom: true,
+            maxWidth: MediaQuery.of(Get.context).size.width * 0.8,
+            screen: ScreenNames.Chat,
+          ),
         );
       case E.CLASSROOM:
         if (message[C.CLASSROOM_ID] == null) return getDeletedNote();

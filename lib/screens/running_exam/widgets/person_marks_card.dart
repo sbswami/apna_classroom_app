@@ -28,7 +28,8 @@ class PersonMarksCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: PersonImage(
-                thumbnailUrl: attender[C.THUMBNAIL_URL],
+                stopPreview: true,
+                url: attender[C.URL],
                 size: 50,
               ),
             ),

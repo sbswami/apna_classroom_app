@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam_conducted.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/screens/empty/empty_list.dart';
@@ -30,6 +32,15 @@ class _AllExamConductedState extends State<AllExamConducted> {
   void initState() {
     title = getExamConductedTitle(widget.type);
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.ExamConducted);
+
+    // Track View event
+    track(EventName.VIEWED_EXAM_CONDUCTED, {
+      EventProp.TYPE: widget.type.toString(),
+    });
+
     loadExamConducted();
   }
 
@@ -110,8 +121,9 @@ class _AllExamConductedState extends State<AllExamConducted> {
                       padding: const EdgeInsets.symmetric(vertical: 4.0),
                       child: ExamConductedCard(
                         examConducted: examConducted,
-                        buttons:
-                            getExamConductedButtons(widget.type, examConducted),
+                        buttons: getExamConductedButtons(widget.type,
+                            examConducted, ScreenNames.ExamConducted),
+                        screen: ScreenNames.ExamConducted,
                       ),
                     );
                   },

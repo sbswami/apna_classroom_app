@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
@@ -23,8 +25,10 @@ import 'package:get/get.dart';
 class AddExam extends StatefulWidget {
   final exam;
   final List questions;
+  final String accessedFrom;
 
-  const AddExam({Key key, this.questions, this.exam}) : super(key: key);
+  const AddExam({Key key, this.questions, this.exam, this.accessedFrom})
+      : super(key: key);
   @override
   _AddExamState createState() => _AddExamState();
 }
@@ -65,6 +69,9 @@ class _AddExamState extends State<AddExam> {
     }
 
     super.initState();
+
+    // Track current screen
+    trackScreen(ScreenNames.AddExam);
   }
 
   // Save
@@ -129,6 +136,24 @@ class _AddExamState extends State<AddExam> {
       formData[C.SUBJECT] = subjects.toList();
 
       var exam = await createExam(formData);
+
+      // Track add exam event
+      track(EventName.ADD_EXAM, {
+        EventProp.QUESTION_COUNT: questions?.length,
+        EventProp.MINUS_MARKING: formData[C.MINUS_MARKING],
+        EventProp.SOLVING_TIME_OVERRIDE: formData[C.SOLVING_TIME],
+        EventProp.MARKS_OVERRIDE: formData[C.MARKS],
+        EventProp.SOLVING_TIME: solvingTimeCalculated,
+        EventProp.MARKS: marksCalculated,
+        EventProp.EXAMS: formData[C.EXAM],
+        EventProp.SUBJECTS: formData[C.SUBJECT],
+        EventProp.PRIVACY: formData[C.PRIVACY],
+        EventProp.DIFFICULTY: formData[C.DIFFICULTY],
+        EventProp.HAS_INSTRUCTION: formData[C.INSTRUCTION] != null,
+        EventProp.ACCESSED_FROM: widget.accessedFrom,
+        EventProp.EDIT: widget.exam != null,
+      });
+
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
       if (exam != null) Get.back(result: exam);
@@ -139,12 +164,10 @@ class _AddExamState extends State<AddExam> {
   List questions = [];
   String questionError;
   addQuestion() async {
-    var result = await Get.to(
-      QuestionPicker(
-        selectedQuestion:
-            questions.map<String>((e) => e[C.ID].toString()).toList(),
-      ),
-    );
+    var result = await Get.to(QuestionPicker(
+      selectedQuestion: List.from(questions),
+    ));
+
     if (result == null) return;
     setState(() {
       questions.removeWhere(
@@ -468,6 +491,7 @@ class _AddExamState extends State<AddExam> {
                         addAllLastUsed: addAllLastUsed,
                         focusNode: subjectFocusNode,
                       ),
+                      SizedBox(height: 16),
                       InputCard(
                         title: S.EXAM_PRIVACY.tr,
                         child: RadioGroup(
@@ -480,6 +504,7 @@ class _AddExamState extends State<AddExam> {
                           onChange: onChoosePrivacy,
                         ),
                       ),
+                      SizedBox(height: 16),
                       InputCard(
                         title: S.DIFFICULTY_LEVEL.tr,
                         child: RadioGroup(
@@ -496,6 +521,7 @@ class _AddExamState extends State<AddExam> {
                     ],
                   ),
                 ),
+                SizedBox(height: 64),
               ],
             ),
           ),

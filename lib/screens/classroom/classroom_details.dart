@@ -1,5 +1,9 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/classroom.dart';
+import 'package:apna_classroom_app/api/join_request.dart';
 import 'package:apna_classroom_app/api/report.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/buttons/arrow_secondary_button.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
@@ -23,6 +27,8 @@ import 'package:apna_classroom_app/screens/classroom/widgets/person_card.dart';
 import 'package:apna_classroom_app/screens/classroom_notes/classroom_notes.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/schedule_exam.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_list.dart';
+import 'package:apna_classroom_app/screens/join_requests/join_requests.dart';
+import 'package:apna_classroom_app/screens/profile/person_details.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
 import 'package:apna_classroom_app/util/helper.dart';
@@ -68,13 +74,29 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     setState(() {
       classroom = _classroom;
     });
-  }
 
-  onShare() {}
+    // Track event
+    if (_classroom == null) {
+      track(EventName.VIEWED_CLASSROOM_DETAILS, {
+        EventProp.TYPE: state.toString(),
+      });
+    } else {
+      track(EventName.VIEWED_CLASSROOM_DETAILS, {
+        EventProp.PRIVACY: classroom[C.PRIVACY],
+        EventProp.SUBJECTS: classroom[C.SUBJECT],
+        EventProp.EXAMS: classroom[C.EXAM],
+        EventProp.WHO_CAN_SHARE_MESSAGE: classroom[C.WHO_CAN_SEND_MESSAGES],
+        EventProp.WHO_CAN_JOIN: classroom[C.WHO_CAN_JOIN],
+        EventProp.TYPE: state.toString(),
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    // Set current screen
+    trackScreen(ScreenNames.ClassroomDetails);
     loadClassroom();
   }
 
@@ -83,12 +105,20 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     var result = await Get.to(ScheduleExam(
       classroom: (classroom ?? widget.classroom),
     ));
+
+    // Track Back Screen
+    trackScreen(ScreenNames.ClassroomDetails);
+
     if (result == true) loadClassroom();
   }
 
   // Add member
   addMember() async {
     var result = await Get.to(SearchPerson());
+
+    // Track Back this screen
+    trackScreen(ScreenNames.ClassroomDetails);
+
     if (result == null) return;
 
     result.removeWhere((element) {
@@ -131,6 +161,15 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     setState(() {
       classroom[C.MEMBERS].removeWhere((element) => element[C.ID][C.ID] == id);
     });
+
+    // Track Leave event
+    track(EventName.LEAVE_CLASSROOM, {
+      EventProp.PRIVACY: classroom[C.PRIVACY],
+      EventProp.EXAMS: classroom[C.EXAM],
+      EventProp.SUBJECTS: classroom[C.SUBJECT],
+      EventProp.SELF: false,
+    });
+
     Get.back();
   }
 
@@ -216,6 +255,15 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     if (!isDeleted) {
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
     }
+
+    // Track delete event
+    track(EventName.DELETE_CLASSROOM, {
+      EventProp.MEMBER_COUNT: classroom[C.MEMBERS]?.length,
+      EventProp.PRIVACY: classroom[C.PRIVACY],
+      EventProp.EXAMS: classroom[C.EXAM],
+      EventProp.SUBJECTS: classroom[C.SUBJECT],
+    });
+
     Get.back(result: true);
   }
 
@@ -242,6 +290,14 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
       );
     }
 
+    // Track Leave event
+    track(EventName.LEAVE_CLASSROOM, {
+      EventProp.PRIVACY: classroom[C.PRIVACY],
+      EventProp.EXAMS: classroom[C.EXAM],
+      EventProp.SUBJECTS: classroom[C.SUBJECT],
+      EventProp.SELF: true,
+    });
+
     Get.back(result: true);
   }
 
@@ -262,6 +318,14 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     });
 
     if (report != null) {
+      // Track Report event
+      track(EventName.REPORT_CLASSROOM, {
+        EventProp.PRIVACY: classroom[C.PRIVACY],
+        EventProp.EXAMS: classroom[C.EXAM],
+        EventProp.SUBJECTS: classroom[C.SUBJECT],
+        EventProp.WHO_CAN_JOIN: classroom[C.WHO_CAN_JOIN],
+      });
+
       return ok(
         title: S.REPORT.tr,
         msg: S.REPORT_SUBMITTED_MESSAGE.tr,
@@ -269,13 +333,12 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
     }
   }
 
-  // Import from excel via
-  importViaExcel() {}
-
   // Edit
   bool isEdited = false;
   _onEdit() async {
     var result = await Get.to(AddClassroom(classroom: classroom));
+    // Set back screen
+    trackScreen(ScreenNames.ClassroomDetails);
     if (result ?? false) {
       setState(() {
         state = ClassroomStates.Loading;
@@ -295,12 +358,28 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
   // Share
   _shareDeepLink() async {
     apnaShare(SharingContentType.Classroom, classroom);
+
+    // Track Share
+    track(EventName.SHARE_CLASSROOM, {
+      EventProp.PRIVACY: classroom[C.PRIVACY],
+      EventProp.WHO_CAN_JOIN: classroom[C.WHO_CAN_JOIN],
+      EventProp.EXAMS: classroom[C.EXAM],
+      EventProp.SUBJECTS: classroom[C.SUBJECT],
+    });
   }
 
   // Join Classroom
   _join() async {
     await joinClassroom(classroom);
     _onBack();
+  }
+
+  // Send Join request
+  _sendRequest() async {
+    await createJoinRequest({C.CLASSROOM: widget.classroom[C.ID]});
+    Get.snackbar(classroom[C.TITLE], S.YOU_HAVE_REQUESTED_TO_JOIN.tr);
+    Get.back();
+    Get.back();
   }
 
   // On Refresh
@@ -330,6 +409,9 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
               );
               break;
             case ClassroomStates.Access:
+              var showJoinRequests = isItAdmin &&
+                  classroom[C.PRIVACY] == E.PUBLIC &&
+                  classroom[C.WHO_CAN_JOIN] == E.REQUEST_BEFORE_JOIN;
               return RefreshIndicator(
                 onRefresh: onRefresh,
                 child: ListView(
@@ -341,6 +423,7 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                         url: (classroom[C.MEDIA] ?? {})[C.URL],
                         fit: BoxFit.cover,
                         borderRadius: 0.0,
+                        fileName: FileName.MAIN,
                       ),
                     ),
                     Padding(
@@ -355,8 +438,10 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                           ),
                           SizedBox(height: 8.0),
                           ArrowSecondaryButton(
-                            onPress: () {
-                              Get.to(Chat(classroom: classroom));
+                            onPress: () async {
+                              await Get.to(Chat(classroom: classroom));
+                              // Track classroom back
+                              trackScreen(ScreenNames.ClassroomTab);
                             },
                             text: S.GO_TO_CHAT.tr,
                             preIcon: Icons.message,
@@ -370,12 +455,29 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                             ),
                           SizedBox(height: 8.0),
                           ArrowSecondaryButton(
-                            onPress: () {
-                              Get.to(ClassroomNotes(classroom: classroom));
+                            onPress: () async {
+                              await Get.to(
+                                  ClassroomNotes(classroom: classroom));
+                              // Track Screen Back
+                              trackScreen(ScreenNames.ClassroomDetails);
                             },
                             text: S.CLASSROOM_NOTES.tr,
                             preIcon: Icons.book,
                           ),
+                          SizedBox(height: 8.0),
+                          if (showJoinRequests)
+                            ArrowSecondaryButton(
+                              onPress: () async {
+                                await Get.to(() => JoinRequests(
+                                      classroom: widget.classroom,
+                                    ));
+
+                                // Track Screen Back
+                                trackScreen(ScreenNames.ClassroomDetails);
+                              },
+                              text: S.JOIN_REQUESTS.tr,
+                              preIcon: Icons.nature_people_rounded,
+                            ),
                         ],
                       ),
                     ),
@@ -387,7 +489,9 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0, vertical: 16.0),
+                        horizontal: 16.0,
+                        vertical: 16.0,
+                      ),
                       child: Column(
                         children: [
                           SizedBox(height: 8.0),
@@ -445,6 +549,14 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                             isAdmin: e[C.ROLE] == E.ADMIN,
                             onLongPress: ({BuildContext context}) =>
                                 _onLongPress(e, context),
+                            onTap: () async {
+                              await Get.to(
+                                () => PersonDetails(person: e[C.ID]),
+                              );
+
+                              // Track screen back
+                              trackScreen(ScreenNames.ClassroomDetails);
+                            },
                           );
                         },
                       ).toList(),
@@ -522,9 +634,7 @@ class _ClassroomDetailsState extends State<ClassroomDetails> {
                   ),
                   PrimaryButton(
                     text: S.SEND_REQUEST.tr,
-                    onPress: () {
-                      // TODO: send request
-                    },
+                    onPress: _sendRequest,
                   ),
                 ],
               );

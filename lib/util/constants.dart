@@ -1,7 +1,29 @@
+import 'package:get/get.dart';
+
 class Constants {
-  static const String PLAY_STORE_LINK = 'https://play.google.com/';
+  static const String INVITE_DEEP_LINK = '';
+  static const String PLAY_STORE_LINK =
+      'https://play.google.com/store/apps/details?id=com.srewa.classroom_quiz_notes';
   static const String APP_STORE_LINK = 'https://www.apple.com/app-store/';
-  static const int APP_VERSION = 1;
+  static const int APP_VERSION = 2;
+  static const String VERSION_NAME = '0.0.2';
+
+  // Social Media
+  static const String FACEBOOK_LINK =
+      'https://www.facebook.com/ClassroomQuizNotes';
+  static const String INSTAGRAM_LINK =
+      'https://www.instagram.com/cqn_official/';
+  static const String TWITTER_LINK = 'https://twitter.com/CQN_Official';
+  static const String YOUTUBE_LINK =
+      'https://www.youtube.com/channel/UCyN_lwpc3ymhWwCGaB47uZA/';
+}
+
+getAppLink() {
+  if (GetPlatform.isAndroid) {
+    return Constants.PLAY_STORE_LINK;
+  } else if (GetPlatform.isIOS) {
+    return Constants.APP_STORE_LINK;
+  }
 }
 
 class Hint {

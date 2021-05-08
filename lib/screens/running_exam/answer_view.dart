@@ -1,6 +1,10 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/running_exam/widgets/running_single_question.dart';
 import 'package:apna_classroom_app/util/c.dart';
+import 'package:apna_classroom_app/util/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -21,6 +25,19 @@ class _AnswerViewState extends State<AnswerView> {
   void initState() {
     questionsLength = widget.solvedExam[C.ANSWER]?.length;
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.AnswerView);
+
+    // Track event
+    track(EventName.SHOW_ANSWER, {
+      EventProp.SELF: widget.solvedExam[C.ATTENDER][C.ID] == getUserId(),
+      EventProp.PERCENTAGE: getPercentage(widget.solvedExam[C.MARKS],
+          widget.solvedExam[C.EXAM_CONDUCTED][C.EXAM][C.MARKS]),
+      EventProp.EXAMS: widget.solvedExam[C.EXAM_CONDUCTED][C.EXAM][C.EXAM],
+      EventProp.SUBJECTS: widget.solvedExam[C.EXAM_CONDUCTED][C.EXAM]
+          [C.SUBJECT],
+    });
   }
 
   onNext(int index) {

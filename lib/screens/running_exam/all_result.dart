@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/solved_exam.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -31,26 +33,44 @@ class _AllResultState extends State<AllResult> {
       _result = result[C.LIST];
       _examConducted = result[C.EXAM_CONDUCTED];
     });
+
+    // Track Event
+    track(EventName.ALL_RESULT, {
+      EventProp.COUNT: _result?.length,
+      EventProp.PRIVACY: _examConducted[C.EXAM][C.PRIVACY],
+      EventProp.DIFFICULTY: _examConducted[C.EXAM][C.DIFFICULTY],
+    });
   }
 
   // open Single Result
-  openSingleResult(id) {
-    Get.to(SingleResult(
+  openSingleResult(id) async {
+    await Get.to(SingleResult(
       solvedExamId: id,
+      accessedFrom: ScreenNames.AllResult,
     ));
+
+    // Track screen back
+    trackScreen(ScreenNames.AllResult);
   }
 
   @override
   void initState() {
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.AllResult);
+
     loadResult();
   }
 
   // On exam tap
-  _onExamTap() {
-    Get.to(
+  _onExamTap() async {
+    await Get.to(
       () => DetailedExam(examConducted: _examConducted),
     );
+
+    // Track back screen
+    trackScreen(ScreenNames.AllResult);
   }
 
   @override

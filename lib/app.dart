@@ -20,10 +20,10 @@ class ApnaApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Apna Classroom',
+      title: 'CQN - Classroom Quiz Notes',
       translations: MyTranslation(),
       locale: locale ?? Get.deviceLocale,
-      navigatorObservers: <NavigatorObserver>[observer],
+      // navigatorObservers: <NavigatorObserver>[observer],
       fallbackLocale: Locale('en', 'US'),
       theme: (isDarkMode ?? Get.isPlatformDarkMode)
           ? AppTheme.darkTheme

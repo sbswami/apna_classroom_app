@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:apna_classroom_app/util/assets.dart';
@@ -11,12 +12,12 @@ import 'package:get/get.dart';
 const DEFAULT_IMAGE_SIZE = 150.0;
 
 class PersonImage extends StatelessWidget {
+  final bool stopPreview;
   final double size;
   final bool editMode;
   final File image;
   final String url;
   final File thumbnailImage;
-  final String thumbnailUrl;
   final Function onPhotoSelect;
 
   const PersonImage(
@@ -26,23 +27,21 @@ class PersonImage extends StatelessWidget {
       this.image,
       this.url,
       this.thumbnailImage,
-      this.thumbnailUrl,
-      this.onPhotoSelect})
+      this.onPhotoSelect,
+      this.stopPreview})
       : super(key: key);
 
   onTap() {
-    if ((image ?? url) != null) {
-      Get.to(ImageViewer(
-        image: image,
-        url: url,
-      ));
-    }
+    Get.to(ImageViewer(
+      image: image,
+      url: url,
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (image ?? url) != null ? onTap : null,
+      onTap: !(stopPreview ?? false) ? onTap : null,
       child: Stack(
         children: [
           Container(
@@ -86,8 +85,9 @@ class PersonImage extends StatelessWidget {
     if (thumbnailImage != null) {
       return Image.file(thumbnailImage, fit: BoxFit.cover);
     }
-    if (thumbnailUrl != null) {
-      return UrlImage(url: thumbnailUrl, fit: BoxFit.cover);
+    if (url != null) {
+      return UrlImage(
+          url: url, fileName: FileName.THUMBNAIL, fit: BoxFit.cover);
     }
     return Image.asset(A.PERSON);
   }

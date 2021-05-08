@@ -1,9 +1,12 @@
 import 'dart:async';
 
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/notes.dart';
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage_api.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
-import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/editor/text_editor.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
@@ -61,7 +64,6 @@ class _AddNotesState extends State<AddNotes> {
                 C.TYPE: media[C.TYPE],
                 C.TITLE: media[C.TITLE],
                 C.URL: media[C.URL],
-                C.THUMBNAIL_URL: media[C.THUMBNAIL_URL],
               };
             }
             if (element[C.TEXT] != null) {
@@ -78,6 +80,9 @@ class _AddNotesState extends State<AddNotes> {
           .cast<Map<String, dynamic>>();
     }
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.AddNote);
   }
 
   // Save
@@ -114,14 +119,10 @@ class _AddNotesState extends State<AddNotes> {
       notesData[C.SUBJECT] = subjects.toList();
       form.save();
 
-      UploadController.to.resetUpload(notes.length);
-      showUploadDialog();
+      showProgress();
       List notesUploaded = await Future.wait(notes.map((note) async {
         String url;
-        String thumbnailUrl;
-
         if (note[C.ID] != null) {
-          UploadController.to.increaseUpload();
           if (note[C.TYPE] == E.TEXT) {
             return {
               C.TEXT: {
@@ -137,21 +138,33 @@ class _AddNotesState extends State<AddNotes> {
               C.TITLE: note[C.TITLE],
               C.TYPE: note[C.TYPE],
               C.URL: note[C.URL],
-              C.THUMBNAIL_URL: note[C.THUMBNAIL_URL],
             }
           };
         }
         switch (note[C.TYPE]) {
           case E.IMAGE:
-            url = await uploadImage(note[C.FILE]);
-            thumbnailUrl = await uploadImageThumbnail(note[C.THUMBNAIL]);
+            var storageResponse = await uploadToStorage(
+                file: note[C.FILE],
+                type: FileType.IMAGE,
+                thumbnail: note[C.THUMBNAIL]);
+            url = storageResponse[StorageConstant.PATH];
             break;
           case E.PDF:
-            url = await uploadPdf(note[C.FILE]);
-            thumbnailUrl = await uploadPdfThumbnail(note[C.THUMBNAIL]);
+            var storageResponse = await uploadToStorage(
+                file: note[C.FILE],
+                type: FileType.DOC,
+                thumbnail: note[C.THUMBNAIL]);
+            url = storageResponse[StorageConstant.PATH];
+            break;
+          case E.VIDEO:
+            var storageResponse = await uploadToStorage(
+                file: note[C.FILE],
+                type: FileType.VIDEO,
+                thumbnail: note[C.THUMBNAIL]);
+            url = storageResponse[StorageConstant.PATH];
             break;
         }
-        UploadController.to.increaseUpload();
+
         switch (note[C.TYPE]) {
           case E.IMAGE:
           case E.PDF:
@@ -161,7 +174,6 @@ class _AddNotesState extends State<AddNotes> {
                 C.TITLE: note[C.TITLE],
                 C.TYPE: note[C.TYPE],
                 C.URL: url,
-                C.THUMBNAIL_URL: thumbnailUrl,
               }
             };
           default:
@@ -175,6 +187,22 @@ class _AddNotesState extends State<AddNotes> {
       }));
       notesData[C.LIST] = notesUploaded;
       var note = await createNote(notesData);
+
+      // Track add notes event
+      track(EventName.ADD_NOTES, {
+        EventProp.PRIVACY: notesData[C.PRIVACY],
+        EventProp.SUBJECTS: notesData[C.SUBJECT],
+        EventProp.COUNT: notes?.length,
+        EventProp.EDIT: widget.note != null,
+      });
+
+      // Track single note event
+      notes.forEach((element) {
+        track(EventName.SINGLE_NOTE, {
+          EventProp.TYPE: element[C.TYPE],
+        });
+      });
+
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       Get.back();
       if (note != null) Get.back(result: true);
@@ -231,6 +259,7 @@ class _AddNotesState extends State<AddNotes> {
   // File Picker
   pickFile() async {
     var result = await showApnaMediaPicker(false);
+
     if (result == null) return;
     setState(() {
       notes.addAll(result);
@@ -320,6 +349,7 @@ class _AddNotesState extends State<AddNotes> {
                   Divider(),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       FlatIconTextButton(
                         onPressed: getNotesFromEditor,
@@ -341,10 +371,9 @@ class _AddNotesState extends State<AddNotes> {
                       style: TextStyle(color: Theme.of(context).errorColor),
                     ),
                   SizedBox(height: 12),
-                ]..addAll(notes
-                    .asMap()
-                    .map(
-                      (i, e) => MapEntry(
+                ]..addAll(notes.asMap().map(
+                    (i, e) {
+                      return MapEntry(
                         i,
                         NoteView(
                           note: e,
@@ -355,9 +384,9 @@ class _AddNotesState extends State<AddNotes> {
                           onEdit: () =>
                               getNotesFromEditor(list: e[C.TEXT], index: i),
                         ),
-                      ),
-                    )
-                    .values),
+                      );
+                    },
+                  ).values),
               ),
             ),
           ),

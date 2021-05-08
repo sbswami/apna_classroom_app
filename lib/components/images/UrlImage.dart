@@ -4,29 +4,47 @@ import 'package:apna_classroom_app/util/assets.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
 
-class UrlImage extends StatelessWidget {
+class UrlImage extends StatefulWidget {
+  final String fileName;
   final String url;
   final BoxFit fit;
   final double borderRadius;
 
-  const UrlImage({Key key, this.url, this.fit, this.borderRadius})
-      : super(key: key);
+  const UrlImage({
+    Key key,
+    this.url,
+    this.fit,
+    this.borderRadius,
+    @required this.fileName,
+  }) : super(key: key);
+
+  @override
+  _UrlImageState createState() => _UrlImageState();
+}
+
+class _UrlImageState extends State<UrlImage> {
+  _onLoadFinish() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
       builder: (BuildContext context, AsyncSnapshot<File> snapshot) {
-        if (url == null || snapshot.hasError) {
+        if (widget.url == null || snapshot.hasError) {
           return Image.asset(
             A.PERSON,
-            fit: fit,
+            fit: widget.fit,
           );
         }
-        if (snapshot.hasData) {
+        if (snapshot.hasData || snapshot.data != null) {
           return ClipRRect(
-            borderRadius: BorderRadius.circular(borderRadius ?? 4.0),
+            borderRadius: BorderRadius.circular(widget.borderRadius ?? 4.0),
             child: Image.file(
               snapshot.data,
-              fit: fit,
+              fit: widget.fit,
             ),
           );
         }
@@ -37,7 +55,11 @@ class UrlImage extends StatelessWidget {
           ),
         );
       },
-      future: getFile(url),
+      future: getFile(
+        widget.url,
+        name: widget.fileName,
+        onLoadFinish: _onLoadFinish,
+      ),
     );
   }
 }

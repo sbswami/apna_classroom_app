@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/solved_exam.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
@@ -159,6 +161,9 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
     } else if (_question[C.SOLUTION][C.TEXT] != null) {
       Get.to(TextViewer(text: _question[C.SOLUTION][C.TEXT]));
     }
+
+    // Track event
+    track(EventName.SHOW_SOLUTION, {EventProp.TYPE: _question[C.ANSWER_TYPE]});
   }
 
   @override
@@ -348,7 +353,6 @@ class _RunningSingleQuestionState extends State<RunningSingleQuestion>
                   onChangeRadio: (int radio) => onChangeRadioOption(radio),
                   text: option[C.TEXT],
                   isCheckBox: _question[C.ANSWER_TYPE] == E.MULTI_CHOICE,
-                  thumbnailUrl: (option[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
                   url: (option[C.MEDIA] ?? {})[C.URL],
                   color: color,
                   isEditable: !answerSubmitted,

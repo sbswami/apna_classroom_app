@@ -22,22 +22,6 @@ class UpdateDialog extends StatelessWidget {
     Get.back();
   }
 
-  _update() async {
-    String url;
-    if (GetPlatform.isAndroid) {
-      url = Constants.PLAY_STORE_LINK;
-    } else if (GetPlatform.isIOS) {
-      url = Constants.APP_STORE_LINK;
-    } else {
-      return Get.back();
-    }
-    if (await canLaunch(url)) {
-      await launch(url);
-      return SystemNavigator.pop(); // This only works for Android
-    }
-    Get.back();
-  }
-
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -64,7 +48,7 @@ class UpdateDialog extends StatelessWidget {
           ),
         PrimaryButton(
           text: S.UPDATE.tr,
-          onPress: _update,
+          onPress: openStore,
         ),
       ],
     );
@@ -77,4 +61,23 @@ showUpdateDialog({bool mustUpdate = false}) {
     barrierDismissible: !mustUpdate,
     builder: (BuildContext context) => UpdateDialog(mustUpdate: mustUpdate),
   );
+}
+
+openStore({bool popApp = true}) async {
+  String url;
+  if (GetPlatform.isAndroid) {
+    url = Constants.PLAY_STORE_LINK;
+  } else if (GetPlatform.isIOS) {
+    url = Constants.APP_STORE_LINK;
+  } else {
+    return Get.back();
+  }
+  if (await canLaunch(url)) {
+    await launch(url);
+    if (popApp) {
+      return SystemNavigator.pop(); // This only works for Android
+    }
+    return;
+  }
+  Get.back();
 }

@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/share/apna_share.dart';
@@ -62,6 +64,12 @@ class _NotesState extends State<Notes>
       isLoading = false;
       notes.addAll(noteList);
     });
+
+    // Track Viewed Notes Event
+    track(EventName.VIEWED_NOTE_TAB, {
+      EventProp.SEARCH: searchTitle,
+      EventProp.SUBJECTS: selectedSubjects,
+    });
   }
 
   onSelectedSubject(subject, selected) async {
@@ -111,6 +119,10 @@ class _NotesState extends State<Notes>
   // Add
   _add() async {
     var result = await Get.to(AddNotes());
+
+    // Track screen back
+    trackScreen(ScreenNames.NotesTab);
+
     if (result ?? false) onRefresh();
   }
 
@@ -123,6 +135,12 @@ class _NotesState extends State<Notes>
     await deleteNote({
       C.ID: selectedNotes,
     });
+
+    // Track delete note
+    track(EventName.DELETE_NOTES, {
+      EventProp.COUNT: selectedNotes?.length,
+    });
+
     onRefresh();
   }
 
@@ -132,6 +150,11 @@ class _NotesState extends State<Notes>
       SharingContentType.NoteList,
       {C.LIST: selectedNotes},
     );
+
+    // Track share note
+    track(EventName.SHARE_NOTES, {
+      EventProp.COUNT: selectedNotes?.length,
+    });
   }
 
   // On Select Question
@@ -236,6 +259,7 @@ class _NotesState extends State<Notes>
                             isSelected: isSelected,
                             onChanged: (value) =>
                                 _onSelectNote(note[C.ID], value),
+                            screen: ScreenNames.NotesTab,
                           );
                         },
                       ),

@@ -1,4 +1,7 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/solved_exam.dart';
+import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/info_card.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
@@ -16,12 +19,15 @@ class SingleResult extends StatefulWidget {
   final String attenderId;
   final String solvedExamId;
 
+  final String accessedFrom;
+
   const SingleResult(
       {Key key,
       this.solvedExam,
       this.conductedExamId,
       this.attenderId,
-      this.solvedExamId})
+      this.solvedExamId,
+      this.accessedFrom})
       : super(key: key);
 
   @override
@@ -31,8 +37,11 @@ class SingleResult extends StatefulWidget {
 class _SingleResultState extends State<SingleResult> {
   Map _solvedExam;
 
-  showAnswer() {
-    Get.to(AnswerView(solvedExam: _solvedExam));
+  showAnswer() async {
+    await Get.to(AnswerView(solvedExam: _solvedExam));
+
+    // Track screen back
+    trackScreen(ScreenNames.SingleResult);
   }
 
   _loadSolvedExam() async {
@@ -48,12 +57,26 @@ class _SingleResultState extends State<SingleResult> {
         _solvedExam = solvedExam;
       });
     }
+
+    // Track Event
+    track(EventName.SINGLE_RESULT, {
+      EventProp.SELF: _solvedExam[C.ATTENDER][C.ID] == getUserId(),
+      EventProp.ACCESSED_FROM: widget.accessedFrom,
+      EventProp.PERCENTAGE: getPercentage(
+          _solvedExam[C.MARKS], _solvedExam[C.EXAM_CONDUCTED][C.EXAM][C.MARKS]),
+      EventProp.EXAMS: _solvedExam[C.EXAM_CONDUCTED][C.EXAM][C.EXAM],
+      EventProp.SUBJECTS: _solvedExam[C.EXAM_CONDUCTED][C.EXAM][C.SUBJECT],
+    });
   }
 
   @override
   void initState() {
-    _loadSolvedExam();
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.SingleResult);
+
+    _loadSolvedExam();
   }
 
   @override

@@ -1,7 +1,10 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/message.dart';
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage_api.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
-import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/chat/controllers/chat_messages_controller.dart';
@@ -89,7 +92,6 @@ class _ChatState extends State<Chat> {
   }
 
   // Media things
-
   _selectMedia() async {
     var result = await showApnaMediaPicker(false);
     if (result == null) return;
@@ -100,6 +102,19 @@ class _ChatState extends State<Chat> {
   void initState() {
     ChatMessagesController.to.newChat(widget.classroom[C.ID]);
     super.initState();
+    // Set Current Screen
+    trackScreen(ScreenNames.Chat);
+
+    // track viewed screen event
+    track(EventName.VIEWED_CHAT_SCREEN, {
+      EventProp.PRIVACY: widget.classroom[C.PRIVACY],
+      EventProp.WHO_CAN_JOIN: widget.classroom[C.WHO_CAN_JOIN],
+      EventProp.IS_ADMIN: widget.classroom[C.IS_ADMIN],
+      EventProp.ACCESSED_FROM: widget.classroom[C.CREATED_BY] == null
+          ? ScreenNames.ClassroomTab
+          : ScreenNames.ClassroomDetails,
+    });
+
     loadMessage();
   }
 
@@ -116,6 +131,7 @@ class _ChatState extends State<Chat> {
               () {
                 var messages = ChatMessagesController.to.messages;
                 int messagesLength = messages.length;
+
                 if (messagesLength == 0 && isLoading) {
                   return DetailsSkeleton(
                     type: DetailsType.Chat,
@@ -129,6 +145,7 @@ class _ChatState extends State<Chat> {
 
                 ClassroomListController.to.setUnseen(widget.classroom[C.ID]);
                 return NotificationListener<ScrollNotification>(
+                  key: Key('notification'),
                   onNotification: (ScrollNotification scrollInfo) {
                     if ((scrollInfo.metrics.pixels ==
                             scrollInfo.metrics.maxScrollExtent) &&
@@ -137,24 +154,34 @@ class _ChatState extends State<Chat> {
                     }
                     return true;
                   },
-                  child: ListView.builder(
+                  child: ListView.custom(
+                    key: Key('list'),
                     reverse: true,
-                    itemCount: messagesLength,
                     padding: const EdgeInsets.all(8.0),
                     controller: _scrollController,
-                    itemBuilder: (BuildContext context, int index) {
-                      final message = messages[index];
-                      String creatorId =
-                          messageCreatedById(message[C.CREATED_BY]);
+                    childrenDelegate: SliverChildBuilderDelegate(
+                      (BuildContext context, int index) {
+                        final message = messages[index];
+                        String creatorId = messageCreatedById(
+                          message[C.CREATED_BY],
+                        );
 
-                      final bool isMe = isCreator(creatorId);
+                        final bool isMe = isCreator(creatorId);
 
-                      return Message(
-                        key: Key(message[C.ID]),
-                        isMe: isMe,
-                        message: message,
-                      );
-                    },
+                        return Message(
+                          key: ValueKey(message[C.ID]),
+                          isMe: isMe,
+                          message: message,
+                        );
+                      },
+                      childCount: messagesLength,
+                      findChildIndexCallback: (Key key) {
+                        final ValueKey valueKey = key;
+                        final String id = valueKey.value;
+                        return messages
+                            .indexWhere((element) => element[C.ID] == id);
+                      },
+                    ),
                   ),
                 );
               },
@@ -230,30 +257,40 @@ bool canSendMessage(String whoCanShare, bool _isAdmin) {
 
 sendMediaToChat(List mediaList, String classroomId) async {
   List messages = [];
-  UploadController.to.resetUpload(mediaList.length);
 
-  showUploadDialog();
+  showProgress();
 
   await Future.wait(mediaList.map((media) async {
     String url;
-    String thumbnailUrl;
-    if (media[C.URL] != null && media[C.THUMBNAIL_URL] != null) {
+    if (media[C.URL] != null) {
       url = media[C.URL];
-      thumbnailUrl = media[C.THUMBNAIL_URL];
     } else {
       switch (media[C.TYPE]) {
         case E.IMAGE:
-          url = await uploadImage(media[C.FILE]);
-          thumbnailUrl = await uploadImageThumbnail(media[C.THUMBNAIL]);
+          var storageResponse = await uploadToStorage(
+              file: media[C.FILE],
+              type: FileType.IMAGE,
+              thumbnail: media[C.THUMBNAIL]);
+          url = storageResponse[StorageConstant.PATH];
           break;
 
         case E.PDF:
-          url = await uploadPdf(media[C.FILE]);
-          thumbnailUrl = await uploadPdfThumbnail(media[C.THUMBNAIL]);
+          var storageResponse = await uploadToStorage(
+              file: media[C.FILE],
+              type: FileType.DOC,
+              thumbnail: media[C.THUMBNAIL]);
+          url = storageResponse[StorageConstant.PATH];
+          break;
+
+        case E.VIDEO:
+          var storageResponse = await uploadToStorage(
+              file: media[C.FILE],
+              type: FileType.VIDEO,
+              thumbnail: media[C.THUMBNAIL]);
+          url = storageResponse[StorageConstant.PATH];
           break;
       }
     }
-    UploadController.to.increaseUpload();
 
     // Send message
     // Create a temporary ID to check later and update the Message object
@@ -267,7 +304,6 @@ sendMediaToChat(List mediaList, String classroomId) async {
         C.TITLE: media[C.TITLE],
         C.TYPE: media[C.TYPE],
         C.URL: url,
-        C.THUMBNAIL_URL: thumbnailUrl,
         C.CREATED_AT: DateTime.now().toString(),
       },
       C.CLASSROOM: classroomId,

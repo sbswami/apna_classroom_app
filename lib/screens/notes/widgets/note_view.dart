@@ -1,9 +1,11 @@
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/editor/text_field.dart';
 import 'package:apna_classroom_app/components/editor/text_viewer.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/menu/apna_menu.dart';
 import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/media/apna_video_player.dart';
 import 'package:apna_classroom_app/screens/media/image_viewer.dart';
 import 'package:apna_classroom_app/screens/media/pdf_viewer.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -139,6 +141,12 @@ class _NoteViewState extends State<NoteView> {
           url: widget.note[C.URL],
         ));
         break;
+      case E.VIDEO:
+        Get.to(ApnaVideoPlayer(
+          title: widget.note[C.TITLE],
+          file: widget.note[C.FILE],
+          url: widget.note[C.URL],
+        ));
     }
   }
 
@@ -225,9 +233,13 @@ class _NoteViewState extends State<NoteView> {
         );
       case E.PDF:
       case E.IMAGE:
+      case E.VIDEO:
         return ClipRRect(
-          child: widget.note[C.THUMBNAIL_URL] != null
-              ? UrlImage(url: widget.note[C.THUMBNAIL_URL])
+          child: widget.note[C.URL] != null
+              ? UrlImage(
+                  url: widget.note[C.URL],
+                  fileName: FileName.THUMBNAIL,
+                )
               : Image.file(widget.note[C.THUMBNAIL]),
           borderRadius: BorderRadius.circular(10),
         );

@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/classroom.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
@@ -62,6 +64,13 @@ class _ClassroomState extends State<Classroom>
         ClassroomListController.to.addClassrooms(_classroom[C.LIST]);
       }
     });
+
+    // Track Viewed Classrooms Event
+    track(EventName.VIEWED_CLASSROOM_TAB, {
+      EventProp.SEARCH: searchTitle,
+      EventProp.SUBJECTS: selectedSubjects,
+      EventProp.EXAMS: selectedExams,
+    });
   }
 
   // Exam and Subject filters
@@ -102,8 +111,11 @@ class _ClassroomState extends State<Classroom>
   }
 
   // On Title Click
-  onTitleClick(Map classroom, int index) {
-    Get.to(Chat(classroom: classroom));
+  onTitleClick(Map classroom, int index) async {
+    await Get.to(Chat(classroom: classroom));
+
+    // Set current back
+    trackScreen(ScreenNames.ClassroomTab);
   }
 
   // On refresh
@@ -115,6 +127,8 @@ class _ClassroomState extends State<Classroom>
   // Open Public Classrooms
   openPublicClassrooms() async {
     await Get.to(ClassroomPublic());
+    // Set this screen back
+    trackScreen(ScreenNames.ClassroomTab);
     ClassroomListController.to.resetClassrooms();
     loadClassroom();
   }
@@ -133,6 +147,8 @@ class _ClassroomState extends State<Classroom>
   // Add
   _add() async {
     var result = await Get.to(AddClassroom());
+    // Set Back Classroom screen
+    trackScreen(ScreenNames.ClassroomTab);
     if (result ?? false) onRefresh();
   }
 

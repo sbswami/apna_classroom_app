@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam.dart';
 import 'package:apna_classroom_app/api/exam_conducted.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
@@ -51,6 +53,21 @@ class _DetailedExamState extends State<DetailedExam> {
         _exam[C.PRIVACY] == E.PUBLIC) {
       await addToAccessListExam({C.ID: _exam[C.ID]});
     }
+
+    // Track viewed event
+    track(EventName.VIEWED_EXAM_DETAILS, {
+      EventProp.QUESTION_COUNT: _exam[C.QUESTION]?.length,
+      EventProp.MINUS_MARKING: _exam[C.MINUS_MARKING],
+      EventProp.SOLVING_TIME: _exam[C.SOLVING_TIME],
+      EventProp.MARKS: _exam[C.MARKS],
+      EventProp.EXAMS: _exam[C.EXAM],
+      EventProp.SUBJECTS: _exam[C.SUBJECT],
+      EventProp.PRIVACY: _exam[C.PRIVACY],
+      EventProp.DIFFICULTY: _exam[C.DIFFICULTY],
+      EventProp.HAS_INSTRUCTION: _exam[C.INSTRUCTION] != null,
+      EventProp.ACCESSED_FROM:
+          widget.examConducted == null ? ScreenNames.ExamsTab : 'ExamConducted',
+    });
   }
 
   // Delete
@@ -64,13 +81,30 @@ class _DetailedExamState extends State<DetailedExam> {
     });
     if (!isDeleted)
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+
+    // Track Delete exam
+    track(EventName.DELETE_EXAM, {
+      EventProp.QUESTION_COUNT: exam[C.QUESTION]?.length,
+      EventProp.EXAMS: exam[C.EXAM],
+      EventProp.SUBJECTS: exam[C.SUBJECT],
+      EventProp.PRIVACY: exam[C.PRIVACY],
+      EventProp.DIFFICULTY: exam[C.DIFFICULTY],
+    });
+
     Get.back(result: true);
   }
 
   // Edit
   bool isEdited = false;
   _onEdit() async {
-    var result = await Get.to(() => AddExam(exam: exam));
+    var result = await Get.to(() => AddExam(
+          exam: exam,
+          accessedFrom: ScreenNames.DetailedExam,
+        ));
+
+    // Track screen back
+    trackScreen(ScreenNames.DetailedExam);
+
     if (result != null) {
       setState(() {
         isLoading = true;
@@ -84,6 +118,10 @@ class _DetailedExamState extends State<DetailedExam> {
   @override
   void initState() {
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.DetailedExam);
+
     loadExam();
   }
 
@@ -96,6 +134,14 @@ class _DetailedExamState extends State<DetailedExam> {
   // Share exam
   _share() async {
     await externalShare(SharingContentType.Exam, exam);
+
+    // Track share exam
+    track(EventName.SHARE_EXAM, {
+      EventProp.QUESTION_COUNT: exam[C.QUESTION]?.length,
+      EventProp.EXAMS: exam[C.EXAM],
+      EventProp.SUBJECTS: exam[C.SUBJECT],
+      EventProp.PRIVACY: exam[C.PRIVACY],
+    });
   }
 
   @override

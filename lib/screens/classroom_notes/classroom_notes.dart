@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/message.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -26,6 +28,13 @@ class _ClassroomNotesState extends State<ClassroomNotes> {
   @override
   void initState() {
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.ClassroomNotes);
+
+    // Track Event
+    track(EventName.VIEWED_CLASSROOM_NOTE, {});
+
     loadNotes();
   }
 
@@ -90,7 +99,10 @@ class _ClassroomNotesState extends State<ClassroomNotes> {
                   controller: _scrollController,
                   itemCount: resultLength,
                   itemBuilder: (context, position) {
-                    return NoteMessageCard(message: notes[position]);
+                    return NoteMessageCard(
+                      message: notes[position],
+                      screen: ScreenNames.ClassroomNotes,
+                    );
                   },
                 ),
               ),

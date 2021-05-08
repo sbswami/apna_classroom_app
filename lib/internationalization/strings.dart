@@ -4,7 +4,9 @@ import 'package:flutter/material.dart';
 class S {
   // Basic
   static const String APP_NAME = 'app_name';
+  static const String APP_DESCRIPTION = 'app_description';
   static const String APP_N = 'app_n';
+  static const String APP_VERSION = 'app_version';
 
   // Sharing and etc things
   static const String SHARING_NOTE = 'sharing_note';
@@ -22,6 +24,10 @@ class S {
   static const String NEW_UPDATE = 'new_update';
   static const String SKIP_THIS_VERSION = 'skip_this_version';
   static const String UPDATE = 'update';
+
+  // Maintenance
+  static const String UNDER_MAINTENANCE = 'under_maintenance';
+  static const String UNDER_MAINTENANCE_MSG = 'under_maintenance_msg';
 
   // Empty State
   static const String NOT_FOUND = 'not_found';
@@ -43,6 +49,9 @@ class S {
   static const String LOGGED_IN_WITH_NEW_DEVICE = 'logged_in_with_new_device';
   static const String LOGGED_OUT_FROM_THIS_DEVICE =
       'logged_out_from_this_device';
+  static const String CODE = 'code';
+  static const String WRONG_OTP = 'wrong_otp';
+  static const String OTP_MESSAGE = 'otp_message';
 
   // Profile
   static const String PROFILE = 'profile';
@@ -101,8 +110,13 @@ class S {
   static const String OPEN_EDITOR = 'open_editor';
   static const String UPLOAD_FILE = 'upload_file';
   static const String UPLOAD = 'upload';
+  static const String UPLOADED = 'uploaded';
   static const String ACCEPTED_FORMATS = 'accepted_formats';
   static const String EDITOR = 'editor';
+  static const String UPLOADING_FILE = 'uploading_file';
+  static const String DOWNLOADING_FILE = 'downloading_file';
+  static const String DOWNLOADED = 'downloaded';
+  static const String UPLOADING_BY_CREATOR = 'uploading_by_creator';
 
   // Notes
   static const String ADD_NOTES = 'add_notes';
@@ -214,11 +228,15 @@ class S {
       'classroom_deleted_by_creator';
   static const String DO_YOU_WANT_SEND_JOIN_REQUEST =
       'do_you_want_send_join_request';
+  static const String DELETE_JOIN_REQUEST = 'delete_join_request';
   static const String YOU_DO_NOT_HAVE_ACCESS_CLASSROOM =
       'you_do_not_have_access';
   static const String WANT_TO_JOIN = 'want_to_join';
   static const String LEAVE_CLASSROOM_MESSAGE = 'leave_classroom_message';
   static const String CLASSROOM_DISCARD = 'classroom_discard';
+  static const String YOU_HAVE_REQUESTED_TO_JOIN = 'you_have_requested_to_join';
+  static const String JOIN_REQUESTS = 'join_requests';
+  static const String ACCEPT = 'accept';
 
   static const String RUNNING_EXAM = 'running_exam';
   static const String UPCOMING_EXAM = 'upcoming_exam';
@@ -340,6 +358,9 @@ class S {
   static const String LIGHT_MODE = 'light_mode';
   static const String DARK_MODE = 'dark_mode';
   static const String INVITE = 'invite';
+  static const String RATE_US = 'rate_us';
+  static const String NEED_HELP = 'need_help';
+  static const String ABOUT = 'about';
 
   // Languages
   static const String ENGLISH_USA = 'english_usa';
@@ -361,6 +382,14 @@ class S {
   // Video
   static const String QUALITY = 'quality';
   static const String SPEED = 'speed';
+  static const String FILE_NOT_ALLOWED = 'file_not_allowed';
+  static const String COMPLETE_GUIDE_LINE = 'complete_guide_line';
+
+  // Social media
+  static const String TWITTER = 'twitter';
+  static const String FACEBOOK = 'facebook';
+  static const String INSTAGRAM = 'instagram';
+  static const String YOUTUBE = 'youtube';
 }
 
 String getDifficulty(String key) {

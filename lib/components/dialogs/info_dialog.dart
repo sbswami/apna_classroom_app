@@ -8,8 +8,10 @@ class InfoDialog extends StatelessWidget {
   final String msg;
   final String buttonName;
   final Function ok;
+  final bool noButton;
 
-  const InfoDialog({Key key, this.title, this.msg, this.buttonName, this.ok})
+  const InfoDialog(
+      {Key key, this.title, this.msg, this.buttonName, this.ok, this.noButton})
       : super(key: key);
 
   @override
@@ -28,10 +30,11 @@ class InfoDialog extends StatelessWidget {
         style: Theme.of(context).textTheme.bodyText2,
       ),
       actions: <Widget>[
-        PrimaryButton(
-          text: buttonName ?? S.OKAY.tr,
-          onPress: ok ?? () => Get.back(),
-        )
+        if (!(noButton ?? false))
+          PrimaryButton(
+            text: buttonName ?? S.OKAY.tr,
+            onPress: ok ?? () => Get.back(),
+          )
       ],
     );
   }
@@ -42,15 +45,20 @@ ok(
     String msg,
     String buttonName,
     Function ok,
+    bool noButton,
     bool isDismissible = true}) {
   return showDialog(
     context: Get.context,
     barrierDismissible: isDismissible,
-    builder: (BuildContext context) => InfoDialog(
-      title: title,
-      msg: msg,
-      ok: ok,
-      buttonName: buttonName,
+    builder: (BuildContext context) => WillPopScope(
+      onWillPop: () async => isDismissible,
+      child: InfoDialog(
+        title: title,
+        msg: msg,
+        ok: ok,
+        noButton: noButton,
+        buttonName: buttonName,
+      ),
     ),
   );
 }

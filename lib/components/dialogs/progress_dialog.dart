@@ -25,7 +25,7 @@ class ProgressDialog extends StatelessWidget {
 }
 
 showProgress({String text}) {
-  showDialog(
+  return showDialog(
     context: Get.context,
     barrierDismissible: false,
     builder: (BuildContext context) => ProgressDialog(

@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/components/images/person_image.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom_details.dart';
@@ -38,6 +40,8 @@ class ClassroomCard extends StatelessWidget {
       return onTitleTap();
     }
     var result = await Get.to(ClassroomDetails(classroom: classroom));
+    // Track Screen Back
+    trackScreen(ScreenNames.ClassroomTab);
     if ((result ?? false) && onRefresh != null) onRefresh();
   }
 
@@ -70,7 +74,8 @@ class ClassroomCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
               child: PersonImage(
-                thumbnailUrl: (classroom[C.MEDIA] ?? {})[C.THUMBNAIL_URL],
+                stopPreview: true,
+                url: (classroom[C.MEDIA] ?? {})[C.URL],
                 size: 50,
               ),
             ),
@@ -91,12 +96,18 @@ class ClassroomCard extends StatelessWidget {
                       ),
                       SizedBox(height: 4.0),
                       if (isPublic ?? false)
-                        Text(
-                          S.JOIN.tr,
-                          style: TextStyle(
-                            color: Theme.of(context).primaryColor,
+                        if (classroom[C.JOIN_REQUEST] != null)
+                          Text(
+                            S.YOU_HAVE_REQUESTED_TO_JOIN.tr,
+                            style: Theme.of(context).textTheme.caption,
+                          )
+                        else
+                          Text(
+                            S.JOIN.tr,
+                            style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                            ),
                           ),
-                        ),
                       if (!(isPublic ?? false))
                         Row(
                           children: [

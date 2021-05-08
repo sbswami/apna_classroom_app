@@ -1,4 +1,5 @@
 import 'package:apna_classroom_app/api/media.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/images/UrlImage.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/screens/empty/empty_info.dart';
@@ -150,7 +151,8 @@ class _OldMediaListState extends State<OldMediaList> {
                     child: Stack(
                       children: [
                         UrlImage(
-                          url: media[C.THUMBNAIL_URL],
+                          fileName: FileName.THUMBNAIL,
+                          url: media[C.URL],
                           fit: BoxFit.cover,
                         ),
                         Positioned(

@@ -2,6 +2,7 @@ class C {
   // DESIGN
   static const String PHONE_CODE = 'phoneCode';
   static const String PHONE_NUMBER = 'phoneNumber';
+  static const String LINK = 'link';
 
   static const String ON_TAP = 'onTap';
   static const String PRIMARY = 'primary';
@@ -14,6 +15,7 @@ class C {
   static const AUTHORIZATION = 'Authorization';
   static const CONTENT_TYPE = 'Content-Type';
   static const APPLICATION_JSON = 'application/json';
+  static const String MULTIPART_FORM = 'multipart/form-data';
 
   // COMMON
   static const String ID = '_id';
@@ -62,11 +64,12 @@ class C {
   static const String IMAGE = 'image';
   static const String VIDEO = 'video';
   static const String URL = 'url';
-  static const String THUMBNAIL_URL = 'thumbnailUrl';
+  // static const String THUMBNAIL_URL = 'thumbnailUrl';
   static const String TYPE = 'type';
   static const String FILE = 'file';
   static const String PATH = 'path';
   static const String THUMBNAIL = 'thumbnail';
+  static const String SIZES = 'sizes';
 
   // Question
   static const String QUESTION = 'question';

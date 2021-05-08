@@ -1,6 +1,6 @@
 # apna_classroom_app
 
-Apna Classroom Application
+CQN (Classroom Quiz Notes)
 
 ## Getting Started
 

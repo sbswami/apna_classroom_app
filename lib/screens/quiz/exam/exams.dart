@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
@@ -56,6 +58,15 @@ class _ExamsState extends State<Exams>
       isLoading = false;
       exams.addAll(examsList);
     });
+
+    if (widget.onSelect == null) {
+      // Track Viewed Exam Event
+      track(EventName.VIEWED_EXAM_TAB, {
+        EventProp.SEARCH: searchTitle,
+        EventProp.SUBJECTS: selectedSubjects,
+        EventProp.EXAMS: selectedExams,
+      });
+    }
   }
 
   // Exam and Subject filters
@@ -123,6 +134,10 @@ class _ExamsState extends State<Exams>
           exam: exam,
           isEditable: true,
         ));
+
+    // Track home screen
+    trackScreen(ScreenNames.ExamsTab);
+
     if (result ?? false) onRefresh();
   }
 

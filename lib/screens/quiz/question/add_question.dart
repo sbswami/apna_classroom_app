@@ -1,9 +1,12 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/question.dart';
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage_api.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/components/buttons/secondary_button.dart';
 import 'package:apna_classroom_app/components/cards/input_card.dart';
-import 'package:apna_classroom_app/components/dialogs/upload_dialog.dart';
+import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/components/dialogs/yes_no_dialog.dart';
 import 'package:apna_classroom_app/components/editor/text_editor.dart';
 import 'package:apna_classroom_app/components/radio/radio_group.dart';
@@ -69,7 +72,6 @@ class _AddQuestionState extends State<AddQuestion> {
             C.TYPE: media[C.TYPE],
             C.TITLE: media[C.TITLE],
             C.URL: media[C.URL],
-            C.THUMBNAIL_URL: media[C.THUMBNAIL_URL],
           };
         }
         if (_solution[C.TEXT] != null) {
@@ -84,6 +86,9 @@ class _AddQuestionState extends State<AddQuestion> {
       }
     }
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.AddQuestion);
   }
 
   // Save
@@ -139,56 +144,56 @@ class _AddQuestionState extends State<AddQuestion> {
         totalUploads++;
       }
 
-      UploadController.to.resetUpload(totalUploads);
-      showUploadDialog();
+      showProgress();
       List media = await Future.wait(images.map((image) async {
         if (image[C.ID] != null) {
-          UploadController.to.increaseUpload();
           return {
             C.ID: image[C.ID],
             C.TYPE: image[C.TYPE],
             C.TITLE: image[C.TITLE],
             C.URL: image[C.URL],
-            C.THUMBNAIL_URL: image[C.THUMBNAIL_URL],
           };
         }
 
-        String url = await uploadImage(image[C.FILE]);
-        String thumbnailUrl = await uploadImageThumbnail(image[C.THUMBNAIL]);
-        UploadController.to.increaseUpload();
+        var storageResponse = await uploadToStorage(
+          file: image[C.FILE],
+          type: FileType.IMAGE,
+          thumbnail: image[C.THUMBNAIL],
+        );
+        String url = storageResponse[StorageConstant.PATH];
+
         return {
           C.TYPE: image[C.TYPE],
           C.TITLE: image[C.TITLE],
           C.URL: url,
-          C.THUMBNAIL_URL: thumbnailUrl,
         };
       }));
       formData[C.MEDIA] = media;
       List optionList = await Future.wait(options.map((option) async {
         if (option[C.TEXT] != null) return option;
         if (option[C.ID] != null || option[C.MEDIA][C.ID] != null) {
-          UploadController.to.increaseUpload();
           return {
             C.MEDIA: {
               C.ID: option[C.MEDIA][C.ID],
               C.TYPE: option[C.MEDIA][C.TYPE],
               C.TITLE: option[C.MEDIA][C.TITLE],
               C.URL: option[C.MEDIA][C.URL],
-              C.THUMBNAIL_URL: option[C.MEDIA][C.THUMBNAIL_URL],
             },
             C.CORRECT: option[C.CORRECT],
           };
         }
-        String url = await uploadImage(option[C.MEDIA][C.FILE]);
-        String thumbnailUrl =
-            await uploadImageThumbnail(option[C.MEDIA][C.THUMBNAIL]);
-        UploadController.to.increaseUpload();
+        var storageResponse = await uploadToStorage(
+          file: option[C.MEDIA][C.FILE],
+          type: FileType.IMAGE,
+          thumbnail: option[C.MEDIA][C.THUMBNAIL],
+        );
+        String url = storageResponse[StorageConstant.PATH];
+
         return {
           C.MEDIA: {
             C.TYPE: option[C.MEDIA][C.TYPE],
             C.TITLE: option[C.MEDIA][C.TITLE],
             C.URL: url,
-            C.THUMBNAIL_URL: thumbnailUrl,
           },
           C.CORRECT: option[C.CORRECT],
         };
@@ -206,14 +211,13 @@ class _AddQuestionState extends State<AddQuestion> {
               }
             };
           }
-          UploadController.to.increaseUpload();
+
           formData[C.SOLUTION] = {
             C.MEDIA: {
               C.ID: solution[C.ID],
               C.TITLE: solution[C.TITLE],
               C.TYPE: solution[C.TYPE],
               C.URL: solution[C.URL],
-              C.THUMBNAIL_URL: solution[C.THUMBNAIL_URL],
             }
           };
         } else {
@@ -223,25 +227,38 @@ class _AddQuestionState extends State<AddQuestion> {
             };
           } else {
             String url;
-            String thumbnailUrl;
             switch (solution[C.TYPE]) {
               case E.IMAGE:
-                url = await uploadImage(solution[C.FILE]);
-                thumbnailUrl =
-                    await uploadImageThumbnail(solution[C.THUMBNAIL]);
+                var storageResponse = await uploadToStorage(
+                  file: solution[C.FILE],
+                  type: FileType.IMAGE,
+                  thumbnail: solution[C.THUMBNAIL],
+                );
+                url = storageResponse[StorageConstant.PATH];
                 break;
               case E.PDF:
-                url = await uploadPdf(solution[C.FILE]);
-                thumbnailUrl = await uploadPdfThumbnail(solution[C.THUMBNAIL]);
+                var storageResponse = await uploadToStorage(
+                  file: solution[C.FILE],
+                  type: FileType.DOC,
+                  thumbnail: solution[C.THUMBNAIL],
+                );
+                url = storageResponse[StorageConstant.PATH];
+                break;
+              case E.VIDEO:
+                var storageResponse = await uploadToStorage(
+                  file: solution[C.FILE],
+                  type: FileType.VIDEO,
+                  thumbnail: solution[C.THUMBNAIL],
+                );
+                url = storageResponse[StorageConstant.PATH];
                 break;
             }
-            UploadController.to.increaseUpload();
+
             formData[C.SOLUTION] = {
               C.MEDIA: {
                 C.TITLE: solution[C.TITLE],
                 C.TYPE: solution[C.TYPE],
                 C.URL: url,
-                C.THUMBNAIL_URL: thumbnailUrl,
               }
             };
           }
@@ -249,6 +266,21 @@ class _AddQuestionState extends State<AddQuestion> {
       }
 
       var question = await createQuestion(formData);
+
+      // Track Event add question
+      track(EventName.ADD_QUESTION, {
+        EventProp.TYPE: formData[C.ANSWER_TYPE],
+        EventProp.IMAGE: images?.length,
+        EventProp.SUBJECTS: subjects,
+        EventProp.EXAMS: exams,
+        EventProp.MARKS: formData[C.MARKS],
+        EventProp.SOLVING_TIME: formData[C.SOLVING_TIME],
+        EventProp.IS_HINT: formData[C.ANSWER_HINT] != null,
+        EventProp.IS_SOLUTION: solution != null,
+        EventProp.SOLUTION_TYPE: (solution ?? {})[C.TYPE],
+        EventProp.EDIT: widget.question != null,
+      });
+
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
       Get.back();
@@ -553,7 +585,6 @@ class _AddQuestionState extends State<AddQuestion> {
                                       onChangeRadioOption(value),
                                   text: value[C.TEXT],
                                   url: media[C.URL],
-                                  thumbnailUrl: media[C.THUMBNAIL_URL],
                                   image: media[C.FILE],
                                   thumbnailImage: media[C.THUMBNAIL],
                                   onDelete: () => onDelete(key),
@@ -667,6 +698,7 @@ class _AddQuestionState extends State<AddQuestion> {
                   if (showAddSolution && solution == null)
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         FlatIconTextButton(
                           onPressed: getSolutionFromEditor,

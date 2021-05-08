@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/components/menu/apna_menu.dart';
 import 'package:apna_classroom_app/components/menu/menu_item.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -14,13 +16,13 @@ class VideoPlayerOverlay extends StatelessWidget {
   final Function playPause;
   final Function overlaySwitch;
 
-  const VideoPlayerOverlay(
-      {Key key,
-      this.controller,
-      this.playPause,
-      this.title,
-      this.overlaySwitch})
-      : super(key: key);
+  const VideoPlayerOverlay({
+    Key key,
+    this.controller,
+    this.playPause,
+    this.title,
+    this.overlaySwitch,
+  }) : super(key: key);
 
   // Forward 10 Second
   _forward10() async {
@@ -39,6 +41,10 @@ class VideoPlayerOverlay extends StatelessWidget {
   // Set Speed
   setSpeed(double speed) {
     controller.setPlaybackSpeed(speed);
+
+    // Track event
+    track(EventName.VIDEO_SPEED, {EventProp.SPEED: speed});
+
     Get.back();
   }
 
@@ -77,12 +83,8 @@ class VideoPlayerOverlay extends StatelessWidget {
           iconData: Icons.speed_rounded,
           onTap: _speedChoose,
           text: '${S.SPEED.tr} ( ${controller.value.playbackSpeed} )'),
-      MenuItem(
-        text: '${S.QUALITY.tr}',
-        iconData: Icons.high_quality_rounded,
-        onTap: () {},
-      )
     ];
+
     showApnaMenu(Get.context, items, type: MenuType.BottomSheet);
   }
 
@@ -162,14 +164,17 @@ class VideoPlayerOverlay extends StatelessWidget {
                 ),
               ),
               SizedBox(width: 8),
-              Text(getReadableDuration(controller.value.duration)),
+              Text(
+                getReadableDuration(controller.value.duration),
+                style: TextStyle(color: Colors.white),
+              ),
             ],
           ),
         ),
         Positioned(
-          top: 4,
+          top: 25,
           right: 20,
-          left: 10,
+          left: 0,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -192,7 +197,10 @@ class VideoPlayerOverlay extends StatelessWidget {
                 ],
               ),
               IconButton(
-                icon: Icon(Icons.settings_rounded),
+                icon: Icon(
+                  Icons.settings_rounded,
+                  color: Colors.white,
+                ),
                 onPressed: _options,
               )
             ],

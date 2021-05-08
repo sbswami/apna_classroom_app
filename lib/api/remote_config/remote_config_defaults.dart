@@ -9,4 +9,5 @@ Map<String, dynamic> remoteConfig = {
         "hi": "नए अपडेट में नई सुविधाओं और बेहतर प्रदर्शन का पता लगाएं।"
       }
       ''',
+  RCC.MAINTENANCE: false,
 };

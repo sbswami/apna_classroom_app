@@ -1,3 +1,4 @@
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/components/check_box_container/check_box_container.dart';
 import 'package:apna_classroom_app/components/chips/group_chips.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -15,6 +16,8 @@ class NotesCard extends StatelessWidget {
   final bool isSelected;
   final Function(bool selected) onChanged;
 
+  final String screen;
+
   const NotesCard(
       {Key key,
       this.note,
@@ -23,7 +26,8 @@ class NotesCard extends StatelessWidget {
       this.onRefresh,
       this.onLongPress,
       this.isSelected,
-      this.onChanged})
+      this.onChanged,
+      this.screen})
       : super(key: key);
 
   onTapNote() async {
@@ -31,6 +35,10 @@ class NotesCard extends StatelessWidget {
       note: note,
       fromClassroom: fromClassroom,
     ));
+
+    // Track screen
+    trackScreen(screen);
+
     if ((result ?? false) && onRefresh != null) onRefresh();
   }
 

@@ -1,6 +1,9 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/util/assets.dart';
@@ -25,14 +28,29 @@ class _ImageViewerState extends State<ImageViewer> {
   bool isLoading = false;
   File image;
 
+  _onFinish() {
+    if (mounted) loadImage();
+  }
+
   loadImage() async {
     if (widget.url != null) {
-      File _image = await getFile(widget.url);
-      setState(() {
-        image = _image;
-        isLoading = false;
-      });
+      File _image = await getFile(
+        widget.url,
+        name: FileName.MAIN,
+        onLoadFinish: _onFinish,
+      );
+      if (_image != null) {
+        setState(() {
+          image = _image;
+          isLoading = false;
+        });
+      }
     }
+
+    // Track Event
+    track(EventName.IMAGE_VIEWER, {
+      EventProp.TYPE: widget.url == null ? 'File' : 'URL',
+    });
   }
 
   @override
@@ -41,6 +59,7 @@ class _ImageViewerState extends State<ImageViewer> {
       isLoading = true;
     }
     super.initState();
+
     loadImage();
   }
 

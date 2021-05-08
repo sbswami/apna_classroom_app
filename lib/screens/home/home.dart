@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/components/share/apna_share.dart';
 import 'package:apna_classroom_app/deeplinks/deeplink.dart';
 import 'package:apna_classroom_app/screens/classroom/classroom.dart';
@@ -7,8 +9,10 @@ import 'package:apna_classroom_app/screens/notes/notes.dart';
 import 'package:apna_classroom_app/screens/quiz/quiz.dart';
 import 'package:apna_classroom_app/screens/quiz/quiz_provider.dart';
 import 'package:apna_classroom_app/util/c.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
@@ -26,10 +30,27 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
+
+    // Dynamic links
     initDynamicLinks();
 
     /// Getting shared data form other apps
     handleContentProvider();
+
+    // Check notification permission
+    _notificationPermission();
+
+    // Initial Screen Classroom Tab
+    trackScreen(ScreenNames.ClassroomTab);
+
+    // Track Viewed Home event
+    track(
+      EventName.VIEWED_HOME,
+      {
+        EventProp.THEME: Get.isDarkMode ? 'Dark' : 'Light',
+        EventProp.LANGUAGE: Get.locale.languageCode,
+      },
+    );
   }
 
   @override
@@ -45,6 +66,7 @@ class _HomeState extends State<Home> {
     _mediaStream = ReceiveSharingIntent.getMediaStream().listen(
         (List<SharedMediaFile> mediaList) async {
       List mediaL = await shareMediaToMedia(mediaList);
+
       if (mediaL.length > 0) {
         internalShare(SharingContentType.Media, {C.MEDIA: mediaL});
       }
@@ -94,6 +116,15 @@ class _HomeState extends State<Home> {
     if (deepLink != null) {
       handleDeepLink(deepLink);
     }
+  }
+
+  // Notification permission
+  _notificationPermission() {
+    AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
+      if (!isAllowed) {
+        AwesomeNotifications().requestPermissionToSendNotifications();
+      }
+    });
   }
 
   @override

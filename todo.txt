@@ -51,8 +51,8 @@ ____Done // 10. Image Picker improvement
     a. add option for user to pick image from exiting image // Done
 ____Done // 11. File Picker Improvement
     a. add option for user to pick file from existing files // Done
-11.a Video Picker add
-    a. Add Video Picker with other pickers
+____Done // 11.a Video Picker add
+    a. Add Video Picker with other pickers // Done
 ____Done // 12. Multi-Select Notes and actions ->
     a. Share internally // DONE
         1. Share externally via deep link // Done
@@ -61,18 +61,6 @@ ____Done // 12.a Share notes to other apps should add
 ____Done // 13. Multi-Select Question
     a. Delete // DONE
     b. Create Exam // DONE
-
-
-Sharing thing need some more security checks, add some security checks like this
-1. Classroom details -> only open when current user is a member of classroom
-    a. If public ask for join // DONE
-    b. if private show private message and leave // Done
-    c. If can send join request show that dialog
-2. Exam -> Only open if exam is public --> Added to access list // Done
-3. Notes -> Open notes only if note is from classroom or it's public -> If private show message to ask owner to share in classroom --> Added to access list // Done
-4. Exam conducted -> Shouldn't create deeplink for this now, User can send classroom link instead
-5. Check for every deep links
-
 ____Done // 14. Multi-Select Exam
     a. Delete exam // _-----_--_--__-__ I think it's not required on multi select for now
     b. Share exam --> Deep link // Done
@@ -123,26 +111,17 @@ ____Done // 30. Chat Message long press -> Open bottom option menus
     c. Share -> Open Classroom Selector and share -> // For Classroom + Notes + Media + Text -> Exclude conducted exam
     d. Report -> Sent to report DB
 ____Done // 31. Remove share option from question
-32. Find all string and add to localization, FE and BE both
 ____Done // 33. Check for dark theme
-34. Add MP4 file support in application
-    a. Pick MP4 and upload
-    b. Load MP4 and Play in different quality
-    c. Compress Video post upload
+____Done // 34. Add MP4 file support in application
+    a. Pick MP4 and upload // Done
+    b. Load MP4 and Play in different quality // Done
+    c. Compress Video post upload // Done
     d. use Firebase functions to compress video and split // NO
-35. Compress images, pdf, mp4 this too big sizes of files
-36. Add image in notes Text Type
-37. Add content provider to accept data sharing from other apps
 ____Done // 38. Login to single device -> Detect active device and logout if the current device is not match with active device with DB
 ____Done // 39. Fix loading dialog
-40. Write script of thing to delete unused files from Firebase storage
 ____Done // 41. Add, Yes / no, Discard options on each critical clicks
 ____Done // 42. Make Native Splash screens // Not from Flutter
 ____Done // 43. Remote Config for App update pop - up
-44. Firebase Analytics - Add on all Major events
-45. Remote config for some A/B testing
-46. Error on Home app bar text filed on tab switch while open search bar
-47. Compress local assets
 ____Done // 48. After add new thing need to reload again should be fixed by auto load after coming back from create screen with successful create
     a. Classroom
     b. Exam
@@ -153,21 +132,77 @@ ____Done // 48. After add new thing need to reload again should be fixed by auto
 ____Done // 49. Progress bar shouldn't be dismiss ,
     a. Progress
     b. upload dialog
-50. First open Guide
-51. Create Dev switch in application // Different Dev API
-52. User Support center
-    a. Write to us on social media
-53. Pop notification on running app if user is not that screen
-54. Fix Share outside app flow
-55. Notes security thing // only creator + access list can share private notes
-56. Add error handling over the project on both front-end and backend
 ____Done // 57. Who can share thing should work in chat screen
-58. Option to leave from access list in exam and notes
-59. Feedback option for user
-60. First 30 -> No Ads + No Remove ad pop up -> after 30 Days -> Show Pop to remove ad by subscription -> Start showing ads
-61. Batter upload dialog with upload files, Image, PDF, video and Background upload option
-62. Add option to accept join requests in classroom details,
-62.
+____Done // 62. Add under maintenance flag
+
+
+----+++++++++++++++++----
+
+-++-- BLOCKED // 36. Add image in notes Text Type
+____Done // 37. Add content provider to accept data sharing from other apps
+-++-- BLOCKED // 40. Write script of thing to delete unused files from Firebase storage
+____Closed // 46. Error on Home app bar text filed on tab switch while open search bar
+-++-- BLOCKED // 47. Compress local assets
+-++-- BLOCKED // 50. First open Guide
+____Done // 52. User Support center
+    a. Write to us on social media // Done, except email
+____Done // 54. Fix Share outside app flow
+____Confused // 55. Notes security thing // only creator + access list can share private notes
+-++-- BLOCKED // 59. Feedback option for user
+
+
+------------++++++++++++++
+
+____Done // 32. Find all string and add to localization FE
+_x__Not now // 35. Compress images, pdf, mp4 this too big sizes of files
+____Done // 51. Create Dev switch in application // Different Dev API
+_x__Not Now // 53. Pop notification on running app if user is not that screen
+_x__Not Now // 58. Option to leave from access list in exam and notes
+_x__Not now // 60. First 30 -> No Ads + No Remove ad pop up -> after 30 Days -> Show Pop to remove ad by subscription -> Start showing ads
+_x__Not now // 61. Batter upload dialog with upload files, Image, PDF, video and Background upload option
+____Done // 62. Add option to accept join requests in classroom details,
+_x__Not now // 63. Limit video size + video quality 1080p + Video length // partially done
+____Done // 66. Make Join Request thing working
+_x__Not now // 67. Localize BE strings
+_x__Not now // 70. Add Option to add age and gender
+
+
+_+_+_+_+_+__+__++_+_+_+_+_+_+_+_+_+_+_+__+__++_+_+_+__+
+
+
+Sharing thing need some more security checks, add some security checks like this
+1. Classroom details -> only open when current user is a member of classroom
+    a. If public ask for join // DONE
+    b. if private show private message and leave // Done
+    c. If can send join request show that dialog
+2. Exam -> Only open if exam is public --> Added to access list // Done
+3. Notes -> Open notes only if note is from classroom or it's public -> If private show message to ask owner to share in classroom --> Added to access list // Done
+4. Exam conducted -> Shouldn't create deeplink for this now, User can send classroom link instead
+5. Check for every deep links
+
+
+44. Firebase Analytics - Add on all Major events
+45. Remote config for some A/B testing
+56. Add error handling over the project on both front-end and backend
+64. Add events for storage service + app service + Application
+____Done // 68. Wrong OTP stuck on processing dialog
+____Done // 69. Time out exam is not showing result on complete, instead showing submit dialog
+71.
+
+
+0. Show download bar below the video, photo, pdf // Not - now
+1. Notification sound isn't working in Pankaj phone // Working for me
+2. Download button on video // Not - now
+3. Background downloading // Not - Now
+4. Overflow name in Drawer // Done
+5. Crash on first time classroom open after login // Done - might be
+6. Show photos from device // Not - Now
+7. encrypt media files // Not - Now => Files are safe in unrooted device only
+8. Local string for Hi, en_IN
+9.
+
+
+
 
 
 

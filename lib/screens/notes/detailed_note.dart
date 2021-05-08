@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/notes.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/cards/detailed_card.dart';
@@ -54,11 +56,24 @@ class _DetailedNoteState extends State<DetailedNote> {
         _note[C.PRIVACY] == E.PUBLIC) {
       await addToAccessListNote({C.ID: _note[C.ID]});
     }
+
+    // Track screen
+    track(EventName.VIEWED_NOTES_DETAILS, {
+      EventProp.PRIVACY: _note[C.PRIVACY],
+      EventProp.SUBJECTS: _note[C.SUBJECT],
+      EventProp.COUNT: _note[C.LIST]?.length,
+    });
   }
 
   // Share Notes in classroom
-  shareNote() {
-    apnaShare(SharingContentType.Note, note);
+  shareNote() async {
+    await apnaShare(SharingContentType.Note, note);
+
+    // Track share note
+    track(EventName.SHARE_NOTE, {
+      EventProp.PRIVACY: note[C.PRIVACY],
+      EventProp.SUBJECTS: note[C.SUBJECT],
+    });
   }
 
   // Delete
@@ -72,6 +87,13 @@ class _DetailedNoteState extends State<DetailedNote> {
     });
     if (!isDeleted)
       return ok(title: S.SOMETHING_WENT_WRONG.tr, msg: S.CAN_NOT_DELETE_NOW.tr);
+
+    // Track delete note
+    track(EventName.DELETE_NOTE, {
+      EventProp.PRIVACY: note[C.PRIVACY],
+      EventProp.SUBJECTS: note[C.SUBJECT],
+    });
+
     Get.back(result: true);
   }
 
@@ -79,6 +101,10 @@ class _DetailedNoteState extends State<DetailedNote> {
   bool isEdited = false;
   _onEdit() async {
     var result = await Get.to(() => AddNotes(note: note));
+
+    // Track screen back
+    trackScreen(ScreenNames.DetailedNotes);
+
     if (result ?? false) {
       setState(() {
         state = NoteStates.Loading;
@@ -92,6 +118,10 @@ class _DetailedNoteState extends State<DetailedNote> {
   @override
   void initState() {
     super.initState();
+
+    // Track screen
+    trackScreen(ScreenNames.DetailedNotes);
+
     loadNote();
   }
 

@@ -8,6 +8,7 @@ const String GET_LAST_ADDED_EXAMS = 'GET_LAST_ADDED_EXAMS';
 const String LOCALE = 'LOCALE';
 const String IS_DARK_MODE = 'IS_DARK_MODE';
 const String SKIP_VERSION = 'SKIP_VERSION';
+const String ENV = 'ENV';
 
 Future<SharedPreferences> getStorage() {
   return SharedPreferences.getInstance();
@@ -75,7 +76,22 @@ Future<void> setSkipVersion(int versionCode) async {
   (await getStorage()).setInt(SKIP_VERSION, versionCode);
 }
 
+// Env
+Future<String> getEnv() async {
+  return (await getStorage()).getString(ENV);
+}
+
+/// [env] can be - PROD , DEV
+Future<void> setEnv(String env) async {
+  (await getStorage()).setString(ENV, env);
+}
+
 // Clear all Data
 Future<void> clearAllLocalStorage() async {
+  // Keep env safe
+  String env = await getEnv();
+
   (await getStorage()).clear();
+
+  setEnv(env);
 }

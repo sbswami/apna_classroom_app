@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/components/chips/group_chips.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/quiz/question/detailed_question.dart';
@@ -32,6 +34,10 @@ class QuestionCard extends StatelessWidget {
       isEditable: isEditable,
       isFromExam: isFromExam,
     ));
+
+    // Track screen back
+    trackScreen(ScreenNames.QuestionsTab);
+
     if ((result ?? false) && onRefresh != null) onRefresh();
   }
 

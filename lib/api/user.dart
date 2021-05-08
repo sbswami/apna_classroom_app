@@ -9,7 +9,8 @@ import 'package:apna_classroom_app/util/helper.dart';
 import 'package:http/http.dart' as http;
 
 Future createUser(Map<String, dynamic> payload) async {
-  http.Response response = await apiCall(url: USER_CREATE, payload: payload);
+  http.Response response =
+      await apiCall(url: USER_CREATE, payload: payload, isLoading: false);
   if (response.statusCode == 200) {
     UserController.to.updateUser(json.decode(response.body)[C.USER]);
   }
@@ -29,8 +30,8 @@ Future getUser() async {
 }
 
 Future updateUser(Map<String, dynamic> payload) async {
-  http.Response response =
-      await apiCall(url: USER_UPDATE, payload: payload, isUser: true);
+  http.Response response = await apiCall(
+      url: USER_UPDATE, payload: payload, isUser: true, isLoading: false);
   if (response.statusCode == 200) {
     UserController.to.updateUser(json.decode(response.body)[C.USER]);
   }

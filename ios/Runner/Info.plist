@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>CQN</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -25,7 +27,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.873285277734-f0dr1g108k5s1d2k8r4ii6nf8q7k87sg</string>
+				<string>com.googleusercontent.apps.873285277734-i0l3icahhaip1hr6n4s3e0jav5e9iidh</string>
 			</array>
 		</dict>
 	</array>
@@ -33,12 +35,24 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>To upload music files</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Get direct photos from camera to take pictures</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Capture Video and audio to share with other friends</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Get user profile picture and pictures to share with others</string>
+	<string>To upload photos, please allow permission to access your photo library.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -58,21 +72,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-
-    <key>UIBackgroundModes</key>
-    <array>
-       <string>fetch</string>
-       <string>remote-notification</string>
-    </array>
-    <key>NSAppleMusicUsageDescription</key>
-    <string>To upload music files</string>
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>To upload photos, please allow permission to access your photo library.</string>
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-      <key>NSAllowsArbitraryLoads</key>
-      <true/>
-    </dict>
 </dict>
 </plist>

@@ -8,8 +8,9 @@ import 'package:get/get.dart';
 
 class NoteMessageCard extends StatelessWidget {
   final message;
+  final String screen;
 
-  const NoteMessageCard({Key key, this.message}) : super(key: key);
+  const NoteMessageCard({Key key, this.message, this.screen}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +44,11 @@ class NoteMessageCard extends StatelessWidget {
                     style: Theme.of(context).textTheme.caption),
               )
             else
-              NotesCard(note: message[C.NOTE], fromClassroom: true),
+              NotesCard(
+                note: message[C.NOTE],
+                fromClassroom: true,
+                screen: screen,
+              ),
             SizedBox(height: 24),
           ],
         ),

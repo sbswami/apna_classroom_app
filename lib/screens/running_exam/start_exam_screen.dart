@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/exam_conducted.dart';
 import 'package:apna_classroom_app/api/solved_exam.dart';
 import 'package:apna_classroom_app/components/buttons/primary_button.dart';
@@ -14,16 +16,16 @@ import 'package:apna_classroom_app/util/helper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class RunningExam extends StatefulWidget {
+class StartExamScreen extends StatefulWidget {
   final examConducted;
 
-  const RunningExam({Key key, this.examConducted}) : super(key: key);
+  const StartExamScreen({Key key, this.examConducted}) : super(key: key);
 
   @override
-  _RunningExamState createState() => _RunningExamState();
+  _StartExamScreenState createState() => _StartExamScreenState();
 }
 
-class _RunningExamState extends State<RunningExam> {
+class _StartExamScreenState extends State<StartExamScreen> {
   bool isLoading = true;
   Map<String, dynamic> examConducted = {};
 
@@ -40,10 +42,16 @@ class _RunningExamState extends State<RunningExam> {
   void initState() {
     Get.put(RunningExamController());
     super.initState();
+
+    // Track Screen
+    trackScreen(ScreenNames.StartExamScreen);
+
     loadExamConducted();
   }
 
   startExam() async {
+    String startExamType = 'Fresh';
+
     // Load Solved exam if any
     var _solvedExam = await getSolvedExam({
       C.EXAM_CONDUCTED: examConducted[C.ID],
@@ -59,6 +67,13 @@ class _RunningExamState extends State<RunningExam> {
 
       // if delay is more then allowed delay
       if (currentDelay > (examConducted[C.ALLOWED_DELAY] ?? 60)) {
+        // Track start exam event
+        track(EventName.START_EXAM, {
+          EventProp.TYPE: 'Late',
+          EventProp.EXAMS: examConducted[C.EXAM][C.EXAM],
+          EventProp.SUBJECTS: examConducted[C.EXAM][C.SUBJECT]
+        });
+
         // User is late to join exam
         return ok(
           title: S.YOU_LATE.tr,
@@ -116,6 +131,7 @@ class _RunningExamState extends State<RunningExam> {
               C.EXAM_CONDUCTED: examConducted[C.ID],
               C.START_TIME: DateTime.now().toString(),
             });
+            startExamType = 'Again';
           } else
             return;
         } else {
@@ -152,6 +168,7 @@ class _RunningExamState extends State<RunningExam> {
             // Current solving time = Exam Solving time - Time spend by user
             solvingTime -= timeSpend;
           }
+          startExamType = 'Resume';
         } else {
           // User is not allowed to resume exam
           return ok(title: S.RESUME_EXAM.tr, msg: S.YOU_CAN_NOT_RESUME_EXAM.tr);
@@ -170,10 +187,21 @@ class _RunningExamState extends State<RunningExam> {
       examConducted[C.EXAM][C.QUESTION],
       _solvedExam,
     );
-    Get.to(RunningExamQuestion(
+
+    // Track start exam event
+    track(EventName.START_EXAM, {
+      EventProp.TYPE: startExamType,
+      EventProp.EXAMS: examConducted[C.EXAM][C.EXAM],
+      EventProp.SUBJECTS: examConducted[C.EXAM][C.SUBJECT]
+    });
+
+    await Get.to(RunningExamQuestion(
       examConducted: examConducted,
       remainingSolvingTime: solvingTime,
     ));
+
+    // Track screen back
+    trackScreen(ScreenNames.StartExamScreen);
   }
 
   @override

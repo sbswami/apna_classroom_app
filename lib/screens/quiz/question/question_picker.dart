@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 class QuestionPicker extends StatefulWidget {
-  final List<String> selectedQuestion;
+  final List selectedQuestion;
 
   const QuestionPicker({Key key, this.selectedQuestion}) : super(key: key);
   @override

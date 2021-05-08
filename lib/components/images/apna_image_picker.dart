@@ -1,12 +1,14 @@
-import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
+import 'package:apna_classroom_app/components/dialogs/progress_dialog.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image/image.dart' as ImageLib;
 import 'package:image_picker/image_picker.dart';
 
 class ApnaImagePicker extends StatelessWidget {
@@ -47,6 +49,9 @@ showApnaImagePicker(BuildContext context, {double maxSize}) async {
       });
   final picker = ImagePicker();
   PickedFile pickedFile;
+
+  showProgress();
+
   switch (result) {
     case _CAMERA:
       pickedFile = await picker.getImage(
@@ -57,21 +62,37 @@ showApnaImagePicker(BuildContext context, {double maxSize}) async {
           source: ImageSource.gallery, maxWidth: maxSize, maxHeight: maxSize);
       break;
     default:
-      return;
+      return Get.back();
   }
 
-  if (pickedFile == null) return;
+  if (pickedFile == null) return Get.back();
   String filePath = pickedFile.path;
-  ImageLib.Image thumbnail = await compressImage(path: filePath);
-  File thumbnailImage = await saveToDevice(
-    path: IMAGE_THUMBNAIL_PATH,
-    bytes: ImageLib.encodePng(thumbnail),
-    extension: '.png',
+  Uint8List thumbnail = await compressImage(path: filePath, thumbnail: true);
+
+  Uint8List compressedFile = await compressImage(path: filePath);
+
+  // Save main image to local
+  Map mainFile = await saveToDevice(
+    bytes: compressedFile,
+    extension: getExtension(filePath),
+    type: FileType.IMAGE,
+    name: FileName.MAIN,
   );
-  File image = await saveToDevice(
-      path: IMAGE_PATH,
-      file: File(filePath),
-      extension: getExtension(filePath));
+  var image = mainFile[C.FILE];
+
+  // Save thumbnail to local
+  Map thumbnailFile = await saveToDevice(
+    // bytes: ImageLib.encodePng(thumbnail),
+    bytes: thumbnail,
+    extension: '.jpg',
+    type: FileType.IMAGE,
+    name: FileName.THUMBNAIL,
+    filename: mainFile[C.NAME],
+  );
+
+  var thumbnailImage = thumbnailFile[C.FILE];
+
+  Get.back();
   return [filePath, thumbnailImage, image];
 }
 

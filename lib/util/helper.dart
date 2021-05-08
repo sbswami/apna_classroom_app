@@ -4,6 +4,8 @@ import 'package:apna_classroom_app/util/c.dart';
 import 'package:apna_classroom_app/util/constants.dart';
 import 'package:device_info/device_info.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:vibration/vibration.dart';
 
 getDeviceID() async {
   final DeviceInfoPlugin deviceInfoPlugin = new DeviceInfoPlugin();
@@ -56,4 +58,18 @@ Iterable<T> zip<T>(Iterable<T> a, Iterable<T> b) sync* {
 String getPercentage(gain, max) {
   if (gain == null || max == null) return '0.0 %';
   return '${((gain / max) * 100).toStringAsFixed(2)} %';
+}
+
+// Open url
+openUrl(String url) async {
+  if (await canLaunch(url)) {
+    await launch(url);
+  }
+}
+
+// message vibrate
+messageVibrate() {
+  Vibration.hasVibrator().then((value) {
+    if (value) Vibration.vibrate(intensities: [0, 1], duration: 50);
+  });
 }

@@ -1,7 +1,11 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/message.dart';
-import 'package:apna_classroom_app/api/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage.dart';
+import 'package:apna_classroom_app/api/storage/storage_api_constants.dart';
 import 'package:apna_classroom_app/auth/user_controller.dart';
 import 'package:apna_classroom_app/components/buttons/flat_icon_text_button.dart';
 import 'package:apna_classroom_app/deeplinks/deeplink.dart';
@@ -14,9 +18,9 @@ import 'package:apna_classroom_app/util/constants.dart';
 import 'package:apna_classroom_app/util/file_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:image/image.dart' as ImageLib;
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:share/share.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 class ApnaShare extends StatelessWidget {
   const ApnaShare({Key key}) : super(key: key);
@@ -31,7 +35,7 @@ class ApnaShare extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               FlatIconTextButton(
-                iconData: Icons.share_rounded,
+                iconData: Icons.phone_android_rounded,
                 text: S.SHARE_TO_CLASSROOM.tr,
                 onPressed: () => Get.back(result: ShareScope.INTERNAL),
               ),
@@ -71,6 +75,11 @@ internalShare(SharingContentType contentType, Map sharingContent) {
     ClassroomSelector(
       onSelect: (List selectedClassrooms) async {
         if (selectedClassrooms.isEmpty) return;
+
+        // Track Sharing event
+        track(EventName.INTERNAL_SHARE, {
+          EventProp.TYPE: contentType.toString(),
+        });
 
         // Message Object
         Map<String, dynamic> messageObj = {};
@@ -125,7 +134,9 @@ internalShare(SharingContentType contentType, Map sharingContent) {
         // Classroom List
         List alreadyUploadedMediaList;
         for (var classroom in selectedClassrooms) {
-          if (!classroom[C.IS_ADMIN]) {
+          // user is admin or anyone can share message
+          if (!(classroom[C.IS_ADMIN] ||
+              classroom[C.WHO_CAN_SEND_MESSAGES] == E.ALL)) {
             continue;
           }
           if (messageList != null) {
@@ -149,8 +160,9 @@ internalShare(SharingContentType contentType, Map sharingContent) {
 
           if (contentType == SharingContentType.Media) {
             alreadyUploadedMediaList = await sendMediaToChat(
-                alreadyUploadedMediaList ?? sharingContent[C.MEDIA],
-                classroom[C.ID]);
+              alreadyUploadedMediaList ?? sharingContent[C.MEDIA],
+              classroom[C.ID],
+            );
             continue;
           }
 
@@ -175,6 +187,11 @@ internalShare(SharingContentType contentType, Map sharingContent) {
 }
 
 externalShare(SharingContentType contentType, Map sharingContent) async {
+  // Track Sharing event
+  track(EventName.EXTERNAL_SHARE, {
+    EventProp.TYPE: contentType.toString(),
+  });
+
   switch (contentType) {
     case SharingContentType.Text:
       Share.share(sharingContent[C.TEXT], subject: S.APP_NAME.tr);
@@ -229,23 +246,85 @@ shareMediaToMedia(List<SharedMediaFile> list) async {
 
   for (var element in list) {
     String path = element.path;
-    if (element.type == SharedMediaType.IMAGE) {
-      ImageLib.Image thumbnail = await compressImage(path: path);
-      File thumbnailImage = await saveToDevice(
-        path: IMAGE_THUMBNAIL_PATH,
-        bytes: ImageLib.encodePng(thumbnail),
-        extension: '.png',
-      );
 
-      File image = await saveToDevice(
-          path: IMAGE_PATH, file: File(path), extension: getExtension(path));
+    switch (element.type) {
+      case SharedMediaType.IMAGE:
+        Uint8List thumbnail = await compressImage(path: path, thumbnail: true);
 
-      newList.add({
-        C.TYPE: E.IMAGE,
-        C.FILE: image,
-        C.THUMBNAIL: thumbnailImage,
-        C.TITLE: getFileName(filePath: path)
-      });
+        Uint8List compressedFile = await compressImage(path: path);
+
+        Map file = await saveToDevice(
+          bytes: compressedFile,
+          extension: getExtension(path),
+          type: FileType.IMAGE,
+          name: FileName.MAIN,
+        );
+        File image = file[C.FILE];
+
+        Map thumbnailFile = await saveToDevice(
+          bytes: thumbnail,
+          extension: '.jpg',
+          type: FileType.IMAGE,
+          name: FileName.THUMBNAIL,
+          filename: file[C.NAME],
+        );
+
+        var thumbnailImage = thumbnailFile[C.FILE];
+
+        newList.add({
+          C.TYPE: E.IMAGE,
+          C.FILE: image,
+          C.THUMBNAIL: thumbnailImage,
+          C.TITLE: getFileName(filePath: path)
+        });
+        break;
+
+      case SharedMediaType.VIDEO:
+        final thumbnail = await VideoThumbnail.thumbnailData(
+          video: path,
+          imageFormat: ImageFormat.PNG,
+          maxWidth: 200,
+          quality: 25,
+        );
+
+        // Save thumbnail to local
+        Map thumbnailFile = await saveToDevice(
+          bytes: thumbnail,
+          extension: '.png',
+          type: FileType.VIDEO,
+          name: FileName.THUMBNAIL,
+          filename: getFileName(filePath: path),
+        );
+
+        var thumbnailImage = thumbnailFile[C.FILE];
+
+        newList.add({
+          C.TYPE: E.VIDEO,
+          C.FILE: File(path),
+          C.THUMBNAIL: thumbnailImage,
+          C.TITLE: getFileName(filePath: path)
+        });
+        break;
+      case SharedMediaType.FILE:
+        Map file = await saveToDevice(
+          file: File(path),
+          extension: getExtension(path),
+          type: FileType.DOC,
+          name: FileName.MAIN,
+        );
+
+        var pdfFile = file[C.FILE];
+
+        File thumbnailImage =
+            await getPdfCoverImage(path: path, filename: file[C.NAME]);
+
+        newList.add({
+          C.TYPE: E.PDF,
+          C.FILE: pdfFile,
+          C.THUMBNAIL: thumbnailImage,
+          C.TITLE: getFileName(filePath: path),
+        });
+        break;
     }
   }
 

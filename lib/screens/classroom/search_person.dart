@@ -1,3 +1,5 @@
+import 'package:apna_classroom_app/analytics/analytics_constants.dart';
+import 'package:apna_classroom_app/analytics/analytics_manager.dart';
 import 'package:apna_classroom_app/api/user.dart';
 import 'package:apna_classroom_app/components/skeletons/details_skeleton.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
@@ -24,6 +26,10 @@ class _SearchPersonState extends State<SearchPerson> {
   @override
   void initState() {
     super.initState();
+
+    // Track Search Person Screen
+    trackScreen(ScreenNames.SearchPerson);
+
     loadPerson();
   }
 
@@ -61,19 +67,19 @@ class _SearchPersonState extends State<SearchPerson> {
   // On person long
   List selectedPersons = [];
   bool isSelectable = false;
-  onLongPressPerson(String id) {
+  onLongPressPerson(person) {
     setState(() {
       isSelectable = true;
-      selectedPersons.add(id);
+      selectedPersons.add(person);
     });
   }
 
-  onSelected(String id, bool selected) {
+  onSelected(person, bool selected) {
     setState(() {
       if (selected)
-        selectedPersons.add(id);
+        selectedPersons.add(person);
       else {
-        selectedPersons.remove(id);
+        selectedPersons.removeWhere((element) => person[C.ID] == element[C.ID]);
         if (selectedPersons.length == 0) {
           isSelectable = false;
         }
@@ -82,11 +88,13 @@ class _SearchPersonState extends State<SearchPerson> {
   }
 
   onSelect() {
-    Get.back(
-      result: users
-          .where((element) => selectedPersons.contains(element[C.ID]))
-          .toList(),
-    );
+    Get.back(result: selectedPersons);
+
+    // Track add person
+    track(EventName.ADD_MEMBER, {
+      EventProp.COUNT: selectedPersons?.length,
+      EventProp.SEARCH: searchController.text,
+    });
   }
 
   // On refresh
@@ -159,16 +167,15 @@ class _SearchPersonState extends State<SearchPerson> {
                     bool isSelected;
                     if (isSelectable) {
                       isSelected = selectedPersons
-                          .any((element) => element == _person[C.ID]);
+                          .any((element) => element[C.ID] == _person[C.ID]);
                     }
                     return PersonCard(
                       person: _person,
                       onTap: () => onPersonTap(_person),
                       isSelected: isSelected,
                       onLongPress: ({BuildContext context}) =>
-                          onLongPressPerson(_person[C.ID]),
-                      onSelected: (selected) =>
-                          onSelected(_person[C.ID], selected),
+                          onLongPressPerson(_person),
+                      onSelected: (selected) => onSelected(_person, selected),
                     );
                   },
                 ),
