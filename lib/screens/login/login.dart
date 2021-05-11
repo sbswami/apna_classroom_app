@@ -46,6 +46,10 @@ class _LoginState extends State<Login> {
   }
 
   void submitOtp() async {
+    String otpStr = otp.join('');
+    if (otpStr.length != 6 || otpStr == '000000') {
+      return ok(title: S.WRONG_OTP.tr, msg: S.OTP_MESSAGE.tr);
+    }
     showProgress();
     UserCredential userCredential = await signInWithPhoneNumber(otp.join(''));
     // Tack Event
@@ -98,6 +102,7 @@ class _LoginState extends State<Login> {
               child:
                   Container(child: Image.asset(A.APP_ICON_ALONE), height: 350),
             ),
+            SizedBox(height: 16),
             Form(
               key: _formKey,
               child: Row(
@@ -111,7 +116,8 @@ class _LoginState extends State<Login> {
                         decoration:
                             InputDecoration(hintText: Hint.COUNTRY_CODE),
                         onSaved: (value) => formData[C.PHONE_CODE] = value,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.phone,
+                        maxLength: 4,
                       ),
                     ),
                   ),
@@ -127,9 +133,10 @@ class _LoginState extends State<Login> {
                           FilteringTextInputFormatter(new RegExp('[0-9]'),
                               allow: true)
                         ],
+                        maxLength: 10,
                         focusNode: phoneInput,
                         onSaved: (value) => formData[C.PHONE_NUMBER] = value,
-                        keyboardType: TextInputType.phone,
+                        keyboardType: TextInputType.number,
                         validator: phoneValidate,
                       ),
                     ),

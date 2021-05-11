@@ -326,7 +326,7 @@ class _AddNotesState extends State<AddNotes> {
                         InputDecoration(labelText: S.ENTER_NOTES_TITLE.tr),
                     validator: validTitle,
                     onSaved: (value) => notesData[C.TITLE] = value,
-                    maxLength: 30,
+                    maxLength: 50,
                   ),
                   SizedBox(height: 8),
                   // Add Subjects list

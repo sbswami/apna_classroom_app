@@ -466,7 +466,7 @@ class _AddExamState extends State<AddExam> {
                           FilteringTextInputFormatter(new RegExp('[0-9]'),
                               allow: true)
                         ],
-                        maxLength: 3,
+                        maxLength: 4,
                         onChanged: onChangeMarks,
                         validator: validRequired,
                         onSaved: saveMarks,

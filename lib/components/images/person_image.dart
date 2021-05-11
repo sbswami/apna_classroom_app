@@ -20,22 +20,25 @@ class PersonImage extends StatelessWidget {
   final File thumbnailImage;
   final Function onPhotoSelect;
 
-  const PersonImage(
-      {Key key,
-      this.size,
-      this.editMode,
-      this.image,
-      this.url,
-      this.thumbnailImage,
-      this.onPhotoSelect,
-      this.stopPreview})
-      : super(key: key);
+  const PersonImage({
+    Key key,
+    this.size,
+    this.editMode,
+    this.image,
+    this.url,
+    this.thumbnailImage,
+    this.onPhotoSelect,
+    this.stopPreview,
+  }) : super(key: key);
 
   onTap() {
-    Get.to(ImageViewer(
-      image: image,
-      url: url,
-    ));
+    if (url != null || image != null)
+      Get.to(
+        ImageViewer(
+          image: image,
+          url: url,
+        ),
+      );
   }
 
   @override

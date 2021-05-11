@@ -137,6 +137,7 @@ class _ChatState extends State<Chat> {
                     type: DetailsType.Chat,
                   );
                 }
+
                 if (messagesLength == 0) {
                   return EmptyList(
                     type: EmptyListType.Chat,

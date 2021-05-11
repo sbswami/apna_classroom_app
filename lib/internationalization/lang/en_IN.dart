@@ -113,6 +113,12 @@ const EN_IN = {
   S.ACCEPTED_FORMATS: 'PDF, JPEG, MP4',
   S.EDITOR: 'Editor',
   S.UPLOAD: 'Upload',
+  S.UPLOADED: 'Uploaded',
+  S.UPLOADING_FILE: 'Uploading File',
+  S.DOWNLOADING_FILE: 'Downloading File',
+  S.DOWNLOADED: 'Downloaded',
+  S.UPLOADING_BY_CREATOR:
+      'Creator uploading this file, Please check after some time.',
 
   // Notes
   S.ADD_NOTES: 'Add Notes',

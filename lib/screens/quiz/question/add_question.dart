@@ -679,6 +679,7 @@ class _AddQuestionState extends State<AddQuestion> {
                       FilteringTextInputFormatter(new RegExp('[0-9]'),
                           allow: true)
                     ],
+                    maxLength: 4,
                     onSaved: saveMarks,
                   ),
                   SizedBox(height: 16.0),

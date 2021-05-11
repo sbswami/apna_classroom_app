@@ -95,7 +95,7 @@ sendOtp(String phoneNumber, {Function onCodeSent}) async {
     Get.offAll(Home());
   }, (authException) async {
     Get.back();
-    ok(msg: S.WRONG_PHONE_NUMBER_LIMIT_EXCEED.tr);
+    ok(title: S.PHONE_NUMBER.tr, msg: S.WRONG_PHONE_NUMBER_LIMIT_EXCEED.tr);
   }, () async {
     Get.back();
     onCodeSent();

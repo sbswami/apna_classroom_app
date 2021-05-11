@@ -49,7 +49,7 @@ class _ScheduleExamState extends State<ScheduleExam> {
 
       if (formData[C.EXAM] == null) {
         return ok(
-            title: S.SELECT_EXAM, msg: S.PLEASE_SELECT_EXAM_TO_SCHEDULE.tr);
+            title: S.SELECT_EXAM.tr, msg: S.PLEASE_SELECT_EXAM_TO_SCHEDULE.tr);
       }
 
       if (formData[C.SCHEDULE_EXAM_FOR_LATER] &&

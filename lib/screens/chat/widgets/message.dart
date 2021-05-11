@@ -11,6 +11,7 @@ import 'package:apna_classroom_app/components/share/apna_share.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
 import 'package:apna_classroom_app/screens/chat/controllers/chat_messages_controller.dart';
 import 'package:apna_classroom_app/screens/chat/widgets/classroom_message_card.dart';
+import 'package:apna_classroom_app/screens/classroom/controllers/classroom_list_controller.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_card.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/exam_conducted_list.dart';
 import 'package:apna_classroom_app/screens/exam_conducted/widgets/message_sender_name.dart';
@@ -89,6 +90,16 @@ class Message extends StatelessWidget {
         title: S.SOMETHING_WENT_WRONG.tr,
         msg: S.CAN_NOT_DELETE_NOW.tr,
       );
+
+    // Delete last message from classroom
+    ClassroomListController.to.addMessage(message[C.CLASSROOM], {
+      C.TYPE: message[C.TYPE],
+      C.CREATED_BY: message[C.CREATED_BY],
+      C.CLASSROOM: message[C.CLASSROOM],
+      C.CREATED_AT: message[C.CREATED_AT],
+    });
+
+    // Update delete message
     ChatMessagesController.to.updateMessageObj(message[C.ID], {
       C.TYPE: message[C.TYPE],
       C.CREATED_BY: message[C.CREATED_BY],

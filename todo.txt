@@ -198,8 +198,13 @@ ____Done // 69. Time out exam is not showing result on complete, instead showing
 5. Crash on first time classroom open after login // Done - might be
 6. Show photos from device // Not - Now
 7. encrypt media files // Not - Now => Files are safe in unrooted device only
-8. Local string for Hi, en_IN
-9.
+8. Local string for Hi, en_IN // Done
+9. sort the text on apna-media picker // Done
+10. PDF hide on pdf share from another
+11. Set marks limit in question and exam // Done
+12. message after delete message // Done
+13. Fix empty image click open icon logo // Done
+14.
 
 
 

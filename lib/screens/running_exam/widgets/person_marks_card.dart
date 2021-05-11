@@ -1,4 +1,3 @@
-import 'package:apna_classroom_app/components/images/person_image.dart';
 import 'package:apna_classroom_app/util/c.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +13,7 @@ class PersonMarksCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           border: Border.symmetric(
@@ -24,15 +23,6 @@ class PersonMarksCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: PersonImage(
-                stopPreview: true,
-                url: attender[C.URL],
-                size: 50,
-              ),
-            ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

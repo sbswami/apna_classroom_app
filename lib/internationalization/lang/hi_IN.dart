@@ -113,6 +113,12 @@ const HI_IN = {
   S.ACCEPTED_FORMATS: 'PDF, JPEG, MP4',
   S.EDITOR: 'संपादक',
   S.UPLOAD: 'भेजें',
+  S.UPLOADED: 'अपलोड किया गया ',
+  S.UPLOADING_FILE: 'फ़ाइल अपलोड कर रहा है',
+  S.DOWNLOADING_FILE: 'डाउनलोडिंग फ़ाइल',
+  S.DOWNLOADED: 'डाउनलोड किया गया ',
+  S.UPLOADING_BY_CREATOR:
+      'निर्माता इस फ़ाइल को अपलोड कर रहा है, कृपया कुछ समय बाद देखें।',
 
   // Notes
   S.ADD_NOTES: 'नोट्स जोड़ें',

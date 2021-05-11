@@ -161,17 +161,14 @@ class _OldMediaListState extends State<OldMediaList> {
                               decoration: BoxDecoration(
                                 color: Theme.of(context).cardColor,
                                 borderRadius: BorderRadius.circular(4),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.5),
-                                    spreadRadius: 1,
-                                    blurRadius: 2,
-                                  )
-                                ],
                               ),
                               padding: const EdgeInsets.all(4),
                               margin: const EdgeInsets.only(bottom: 4),
-                              child: Text(media[C.TITLE]),
+                              child: Text(
+                                media[C.TITLE],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             alignment: Alignment.center,
                           ),
