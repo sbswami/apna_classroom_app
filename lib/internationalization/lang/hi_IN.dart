@@ -106,6 +106,7 @@ const HI_IN = {
       'हमें आपकी शिकायत मिल गई है, हम जल्द से जल्द इसकी जांच और समाधान करेंगे।',
   S.ARE_YOU_SURE_YOU_WANT_TO_DISCARD: 'क्या आप वाकई इसे छोड़ना चाहते हैं?',
   S.DISCARD: 'छोड़ें',
+  S.ADVANCE: 'अधिक देखें',
 
   // Notes + Quiz
   S.OPEN_EDITOR: 'संपादक खोलें',
@@ -149,6 +150,7 @@ const HI_IN = {
   S.EXAM_TITLE: 'परीक्षा का शीर्षक',
   S.EXAM_INSTRUCTION: 'परीक्षा निर्देश',
   S.PLUS_QUESTION: '+ प्रश्न',
+  S.NEW_QUESTION: 'नया प्रश्न',
   S.MINUS_MARKING: 'माइनस मार्किंग',
   S.MINUS_MARKS_PER_QUESTION: 'प्रति प्रश्न माइनस मार्किंग',
   S.EXAM_SOLVING_TIME: 'परीक्षा हल करने में लगने वाला समय',

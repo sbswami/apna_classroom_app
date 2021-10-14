@@ -8,6 +8,8 @@ class RecentlyUsedController extends GetxController {
   List<String> lastUsedSubjects = [];
   List<String> lastUsedExams = [];
 
+  String lastUsedAnswerType;
+
   static RecentlyUsedController get to => Get.find<RecentlyUsedController>();
 
   RecentlyUsedController() {
@@ -16,6 +18,8 @@ class RecentlyUsedController extends GetxController {
 
     getRecentlyAddedExams().then((value) => exams = value);
     getLastAddedExams().then((value) => lastUsedExams = value);
+
+    getLastUsedAnswerType().then((value) => lastUsedAnswerType = value);
   }
 
   void setSubjects(List<String> list) {
@@ -58,5 +62,10 @@ class RecentlyUsedController extends GetxController {
   void setLastUsedExams(List<String> list) {
     lastUsedExams = list;
     setLastAddedExams(list);
+  }
+
+  void setUsedAnswerType(String type) {
+    lastUsedAnswerType = type;
+    setLastUsedAnswerType(type);
   }
 }

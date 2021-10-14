@@ -163,6 +163,7 @@ class _ChatState extends State<Chat> {
                     childrenDelegate: SliverChildBuilderDelegate(
                       (BuildContext context, int index) {
                         final message = messages[index];
+
                         String creatorId = messageCreatedById(
                           message[C.CREATED_BY],
                         );
@@ -173,14 +174,17 @@ class _ChatState extends State<Chat> {
                           key: ValueKey(message[C.ID]),
                           isMe: isMe,
                           message: message,
+                          index: index,
                         );
                       },
                       childCount: messagesLength,
                       findChildIndexCallback: (Key key) {
                         final ValueKey valueKey = key;
                         final String id = valueKey.value;
-                        return messages
-                            .indexWhere((element) => element[C.ID] == id);
+                        int index = messages.indexWhere(
+                          (element) => element[C.ID] == id,
+                        );
+                        return index;
                       },
                     ),
                   ),

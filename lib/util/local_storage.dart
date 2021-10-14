@@ -9,6 +9,7 @@ const String LOCALE = 'LOCALE';
 const String IS_DARK_MODE = 'IS_DARK_MODE';
 const String SKIP_VERSION = 'SKIP_VERSION';
 const String ENV = 'ENV';
+const String LAST_USED_ANSWER_TYPE = 'LAST_USED_ANSWER_TYPE';
 
 Future<SharedPreferences> getStorage() {
   return SharedPreferences.getInstance();
@@ -47,6 +48,15 @@ Future<List<String>> getLastAddedExams() async {
 
 Future<void> setLastAddedExams(List<String> list) async {
   (await getStorage()).setStringList(GET_LAST_ADDED_EXAMS, list);
+}
+
+// Answer type
+Future<String> getLastUsedAnswerType() async {
+  return (await getStorage()).getString(LAST_USED_ANSWER_TYPE);
+}
+
+Future<void> setLastUsedAnswerType(String type) async {
+  (await getStorage()).setString(LAST_USED_ANSWER_TYPE, type);
 }
 
 Future<void> setLocale({String localeString, Locale locale}) async {

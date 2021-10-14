@@ -14,6 +14,7 @@ class TextEditor extends StatelessWidget {
   final data;
 
   const TextEditor({Key key, this.data}) : super(key: key);
+
   void _onDoneWithEditor(BuildContext context) {
     var data = Provider.of<EditorProvider>(context, listen: false).getString();
     if (data.first[C.DATA].length > 1) {
@@ -23,7 +24,15 @@ class TextEditor extends StatelessWidget {
     }
   }
 
-  // On Back
+  // _getFromImage(BuildContext context) async {
+  //   String text = await apnaTextScanner();
+  //   var _provider = Provider.of<EditorProvider>(context, listen: false);
+  //
+  //   int index = _provider.length;
+  //
+  //   _provider.insert(index: index - 1, text: text.replaceAll('\n', ' '));
+  // }
+
   Future<bool> _onBack() async {
     var result = await wantToDiscard(() => true, S.TEXT_EDITOR_DISCARD.tr);
     return (result ?? false);
@@ -40,10 +49,14 @@ class TextEditor extends StatelessWidget {
                 appBar: AppBar(
                   title: Text(S.EDITOR.tr),
                   actions: [
+                    // IconButton(
+                    //   icon: Icon(Icons.camera_alt_rounded),
+                    //   onPressed: () => _getFromImage(context),
+                    // ),
                     IconButton(
                       icon: Icon(Icons.check),
                       onPressed: () => _onDoneWithEditor(context),
-                    )
+                    ),
                   ],
                 ),
                 body: Stack(

@@ -97,7 +97,7 @@ class _DetailedQuestionState extends State<DetailedQuestion> {
     // Track screen back
     trackScreen(ScreenNames.DetailedQuestion);
 
-    if (result ?? false) {
+    if (result != null) {
       setState(() {
         isLoading = true;
         question = null;

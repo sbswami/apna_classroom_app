@@ -12,6 +12,7 @@ import 'package:apna_classroom_app/components/tags/exam_tag_input.dart';
 import 'package:apna_classroom_app/components/tags/subject_tag_input.dart';
 import 'package:apna_classroom_app/controllers/subjects_controller.dart';
 import 'package:apna_classroom_app/internationalization/strings.dart';
+import 'package:apna_classroom_app/screens/quiz/question/add_question.dart';
 import 'package:apna_classroom_app/screens/quiz/question/question_picker.dart';
 import 'package:apna_classroom_app/screens/quiz/widgets/question_card.dart';
 import 'package:apna_classroom_app/util/c.dart';
@@ -177,6 +178,24 @@ class _AddExamState extends State<AddExam> {
       isMarksCalculated = true;
       if (questions.length > 0) questionError = null;
     });
+    setTotalSolvingTime();
+    setTotalMarks();
+  }
+
+  // Add new question
+  _addNewQuestion() async {
+    var _question = await Get.to(() => AddQuestion());
+
+    if (_question == null) return;
+
+    setState(() {
+      questions.removeWhere((element) => _question[C.ID] == element[C.ID]);
+      questions.insert(0, _question);
+      isSolvingTimeCalculated = true;
+      isMarksCalculated = true;
+      if (questions.length > 0) questionError = null;
+    });
+
     setTotalSolvingTime();
     setTotalMarks();
   }
@@ -377,14 +396,21 @@ class _AddExamState extends State<AddExam> {
                         maxLines: null,
                         onSaved: (value) => onSaved(C.INSTRUCTION, value),
                       ),
+                      SizedBox(height: 16),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           SecondaryButton(
                             onPress: addQuestion,
                             text: S.PLUS_QUESTION.tr,
                           ),
+                          SecondaryButton(
+                            onPress: _addNewQuestion,
+                            text: S.NEW_QUESTION.tr,
+                          ),
                         ],
                       ),
+                      SizedBox(height: 16),
                       Text('${questions.length} ${S.QUESTION_ADDED.tr}'),
                       if (questionError != null)
                         Text(
@@ -393,6 +419,7 @@ class _AddExamState extends State<AddExam> {
                             color: Theme.of(context).errorColor,
                           ),
                         ),
+                      SizedBox(height: 16),
                     ],
                   ),
                 ),
@@ -408,11 +435,13 @@ class _AddExamState extends State<AddExam> {
                       )
                       .toList(),
                 ),
+                SizedBox(height: 16),
                 LabeledCheckBox(
                   checked: formData[C.MINUS_MARKING],
                   text: S.MINUS_MARKING.tr,
                   onChanged: onChangeMinusMarking,
                 ),
+                SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Column(
@@ -450,7 +479,7 @@ class _AddExamState extends State<AddExam> {
                         ],
                         maxLength: 3,
                         onChanged: onChangeSolvingTime,
-                        validator: validRequired,
+                        validator: validNumber,
                         onSaved: saveSolvingTime,
                       ),
                       TextFormField(
@@ -468,7 +497,7 @@ class _AddExamState extends State<AddExam> {
                         ],
                         maxLength: 4,
                         onChanged: onChangeMarks,
-                        validator: validRequired,
+                        validator: validNumber,
                         onSaved: saveMarks,
                       ),
                       // Exam Tags

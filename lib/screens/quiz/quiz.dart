@@ -79,7 +79,7 @@ class _QuizState extends State<Quiz> with SingleTickerProviderStateMixin {
         // Track screen back
         trackScreen(ScreenNames.QuestionsTab);
 
-        update.updateQuestion = (result ?? false);
+        update.updateQuestion = (result != null);
         break;
     }
   }

@@ -213,3 +213,14 @@ ____Done // 69. Time out exam is not showing result on complete, instead showing
 
 
 // DONE: argent fix all on select things checkout with question picker in add exams and do like that on all location start with schedule exam classroom picker
+
+
+
++_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_+_
+
+1. Photo wan't upload on first attempt in create profile
+2. Notes share option on private notes // Done
+3. Message vibrate // Done
+4. Double message on single send
+
+

@@ -14,9 +14,10 @@ class ClassroomListController extends GetxController {
 
   // Add Message
   addMessage(String id, message, {bool setUnseen = false}) {
-    int index = classrooms.indexWhere((element) => element[C.ID] == id);
-    var classroom = classrooms[index];
-    classrooms.removeAt(index);
+    int classroomIndex =
+        classrooms.indexWhere((element) => element[C.ID] == id);
+    var classroom = classrooms[classroomIndex];
+    classrooms.removeAt(classroomIndex);
     classroom[C.MESSAGE] = message;
     classroom[C.UPDATED_AT] = DateTime.now().toString();
     if (setUnseen) ++classroom[C.UNSEEN];

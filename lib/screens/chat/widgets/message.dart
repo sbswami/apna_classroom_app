@@ -30,10 +30,13 @@ import 'package:url_launcher/url_launcher.dart';
 class Message extends StatelessWidget {
   final message;
   final bool isMe;
+  final int index;
 
-  const Message({Key key, this.message, this.isMe}) : super(key: key);
+  const Message({Key key, this.message, this.isMe, this.index})
+      : super(key: key);
 
-  _onTap() {
+  _onTap(BuildContext context) {
+    FocusScope.of(context).unfocus();
     switch (message[C.TYPE]) {
       case E.MEDIA:
         showMedia(message[C.MEDIA]);
@@ -91,25 +94,40 @@ class Message extends StatelessWidget {
         msg: S.CAN_NOT_DELETE_NOW.tr,
       );
 
+    String classroomId;
+    if (message[C.CLASSROOM].runtimeType == String) {
+      classroomId = message[C.CLASSROOM];
+    } else {
+      classroomId = message[C.CLASSROOM][C.ID];
+    }
+
     // Delete last message from classroom
-    ClassroomListController.to.addMessage(message[C.CLASSROOM], {
-      C.TYPE: message[C.TYPE],
-      C.CREATED_BY: message[C.CREATED_BY],
-      C.CLASSROOM: message[C.CLASSROOM],
-      C.CREATED_AT: message[C.CREATED_AT],
-    });
+    if (index == 0) {
+      ClassroomListController.to.addMessage(
+        classroomId,
+        {
+          C.TYPE: message[C.TYPE],
+          C.CREATED_BY: message[C.CREATED_BY],
+          C.CLASSROOM: classroomId,
+          C.CREATED_AT: message[C.CREATED_AT],
+          C.ID: message[C.ID],
+        },
+      );
+    }
 
     // Update delete message
     ChatMessagesController.to.updateMessageObj(message[C.ID], {
       C.TYPE: message[C.TYPE],
       C.CREATED_BY: message[C.CREATED_BY],
-      C.CLASSROOM: message[C.CLASSROOM],
+      C.CLASSROOM: classroomId,
       C.CREATED_AT: message[C.CREATED_AT],
       C.DELETED: true,
+      C.ID: message[C.ID],
     });
   }
 
   _onLongPress(BuildContext context) async {
+    FocusScope.of(context).unfocus();
     if (message[C.DELETED] ?? false) return;
     List<MenuItem> list = [];
     if (message[C.TYPE] != E.EXAM_CONDUCTED) {
@@ -174,7 +192,7 @@ class Message extends StatelessWidget {
           ),
         ),
         GestureDetector(
-          onTap: _onTap,
+          onTap: () => _onTap(context),
           onLongPress: () => _onLongPress(context),
           child: Column(
             children: [

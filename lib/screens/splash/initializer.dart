@@ -49,6 +49,7 @@ class _InitializerState extends State<Initializer> {
     await initRemoteConfig();
     _checkForUpdate();
     _checkMaintenance();
+
     int _useLevel = await checkUser();
 
     setState(() {

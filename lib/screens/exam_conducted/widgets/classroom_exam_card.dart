@@ -10,7 +10,6 @@ class ClassroomExamCard extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    print(classroom[C.MEDIA][C.URL]);
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
@@ -24,7 +23,7 @@ class ClassroomExamCard extends StatelessWidget {
         children: [
           PersonImage(
             stopPreview: true,
-            url: classroom[C.MEDIA][C.URL],
+            url: (classroom[C.MEDIA] ?? {})[C.URL],
             size: 50,
           ),
           SizedBox(width: 8.0),

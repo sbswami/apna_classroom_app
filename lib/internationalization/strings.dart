@@ -105,6 +105,7 @@ class S {
   static const String ARE_YOU_SURE_YOU_WANT_TO_DISCARD =
       'are_you_sure_you_want_to_discard';
   static const String DISCARD = 'discard';
+  static const String ADVANCE = 'advance';
 
   // Quiz + Notes
   static const String OPEN_EDITOR = 'open_editor';
@@ -147,6 +148,7 @@ class S {
   static const String EXAM_TITLE = 'exam_title';
   static const String EXAM_INSTRUCTION = 'exam_instruction';
   static const String PLUS_QUESTION = 'plus_question';
+  static const String NEW_QUESTION = 'new_question';
   static const String MINUS_MARKING = 'minus_marking';
   static const String MINUS_MARKS_PER_QUESTION = 'minus_marks_per_question';
   static const String EXAM_SOLVING_TIME = 'exam_solving_time';

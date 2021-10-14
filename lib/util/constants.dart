@@ -5,8 +5,8 @@ class Constants {
   static const String PLAY_STORE_LINK =
       'https://play.google.com/store/apps/details?id=com.srewa.classroom_quiz_notes';
   static const String APP_STORE_LINK = 'https://www.apple.com/app-store/';
-  static const int APP_VERSION = 5;
-  static const String VERSION_NAME = '0.0.5';
+  static const int APP_VERSION = 9;
+  static const String VERSION_NAME = '0.0.9';
 
   // Social Media
   static const String FACEBOOK_LINK =

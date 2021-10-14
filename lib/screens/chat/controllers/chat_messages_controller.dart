@@ -15,7 +15,6 @@ class ChatMessagesController extends GetxController {
 
   insertMessages(List _messages) {
     this.messages.insertAll(0, _messages);
-    messageVibrate();
   }
 
   addMessages(List _messages) {

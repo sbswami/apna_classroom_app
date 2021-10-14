@@ -70,6 +70,6 @@ openUrl(String url) async {
 // message vibrate
 messageVibrate() {
   Vibration.hasVibrator().then((value) {
-    if (value) Vibration.vibrate(intensities: [0, 1], duration: 50);
+    if (value) Vibration.vibrate(intensities: [0, 0], duration: 30);
   });
 }

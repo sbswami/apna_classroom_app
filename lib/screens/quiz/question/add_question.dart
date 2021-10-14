@@ -40,9 +40,12 @@ class _AddQuestionState extends State<AddQuestion> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   Map<String, dynamic> formData = {};
 
+  final TextEditingController titleController = TextEditingController();
+
+  bool advanceOptions = false;
+
   @override
   void initState() {
-    formData[C.ANSWER_TYPE] = E.SINGLE_CHOICE;
     if (widget.question != null) {
       formData = {
         C.ID: widget.question[C.ID],
@@ -56,6 +59,7 @@ class _AddQuestionState extends State<AddQuestion> {
         C.DIFFICULTY: widget.question[C.DIFFICULTY],
       };
 
+      titleController.text = widget.question[C.TITLE];
       subjects = widget.question[C.SUBJECT].cast<String>().toSet();
       exams = widget.question[C.EXAM].cast<String>().toSet();
       images = widget.question[C.MEDIA].cast<Map<String, dynamic>>() ?? [];
@@ -84,8 +88,24 @@ class _AddQuestionState extends State<AddQuestion> {
           };
         }
       }
+    } else {
+      if (RecentlyUsedController.to.lastUsedAnswerType != null) {
+        formData[C.ANSWER_TYPE] = RecentlyUsedController.to.lastUsedAnswerType;
+      } else {
+        formData[C.ANSWER_TYPE] = E.SINGLE_CHOICE;
+      }
     }
+
     super.initState();
+
+    if (widget.question == null) {
+      if (RecentlyUsedController.to.lastUsedExams.length != 0) {
+        addAllLastUsedExam();
+      }
+      if (RecentlyUsedController.to.lastUsedSubjects.length != 0) {
+        addAllLastUsed();
+      }
+    }
 
     // Track Screen
     trackScreen(ScreenNames.AddQuestion);
@@ -137,12 +157,6 @@ class _AddQuestionState extends State<AddQuestion> {
       formData[C.SUBJECT] = subjects.toList();
 
       form.save();
-
-      int totalUploads = images.length +
-          options.where((element) => element[C.MEDIA] != null).length;
-      if (solution != null && solution[C.TYPE] != E.TEXT) {
-        totalUploads++;
-      }
 
       showProgress();
       List media = await Future.wait(images.map((image) async {
@@ -283,8 +297,9 @@ class _AddQuestionState extends State<AddQuestion> {
 
       RecentlyUsedController.to.setLastUsedSubjects(subjects.toList());
       RecentlyUsedController.to.setLastUsedExams(exams.toList());
+      RecentlyUsedController.to.setUsedAnswerType(formData[C.ANSWER_TYPE]);
       Get.back();
-      if (question != null) Get.back(result: true);
+      if (question != null) Get.back(result: question);
     }
   }
 
@@ -465,6 +480,12 @@ class _AddQuestionState extends State<AddQuestion> {
     });
   }
 
+  // Get from image
+  // _getFromImage() async {
+  //   String text = await apnaTextScanner();
+  //   titleController.text += text;
+  // }
+
   // On Back
   Future<bool> _onBack() async {
     var result = await wantToDiscard(() => true, S.QUESTION_DISCARD.tr);
@@ -487,15 +508,30 @@ class _AddQuestionState extends State<AddQuestion> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  TextFormField(
-                    key: Key('Hi'),
-                    initialValue: formData[C.TITLE],
-                    decoration: InputDecoration(labelText: S.QUESTION.tr),
-                    validator: validQuestion,
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                    onSaved: (String value) => formData[C.TITLE] = value,
-                    maxLength: 500,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          key: ValueKey('Hi'),
+                          // initialValue: formData[C.TITLE],
+                          controller: titleController,
+                          decoration: InputDecoration(labelText: S.QUESTION.tr),
+                          validator: validQuestion,
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          onSaved: (String value) => formData[C.TITLE] = value,
+                          maxLength: 500,
+                        ),
+                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(top: 16.0),
+                      //   child: IconButton(
+                      //     icon: Icon(Icons.camera_alt_rounded),
+                      //     onPressed: _getFromImage,
+                      //   ),
+                      // )
+                    ],
                   ),
                   Container(
                     alignment: Alignment.centerLeft,
@@ -537,6 +573,7 @@ class _AddQuestionState extends State<AddQuestion> {
                       onChange: onChooseAnswerType,
                     ),
                   ),
+                  SizedBox(height: 16.0),
                   if (formData[C.ANSWER_TYPE] == E.MULTI_CHOICE ||
                       formData[C.ANSWER_TYPE] == E.SINGLE_CHOICE)
                     Container(
@@ -597,6 +634,7 @@ class _AddQuestionState extends State<AddQuestion> {
                           ).values),
                       ),
                     ),
+                  SizedBox(height: 16.0),
                   if (formData[C.ANSWER_TYPE] == E.DIRECT_ANSWER)
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -630,6 +668,7 @@ class _AddQuestionState extends State<AddQuestion> {
                         ],
                       ),
                     ),
+                  SizedBox(height: 16.0),
                   // Exam Tag
                   ExamTagInput(
                     exams: exams,
@@ -640,6 +679,7 @@ class _AddQuestionState extends State<AddQuestion> {
                     addAllLastUsedExam: addAllLastUsedExam,
                     focusNode: examFocusNode,
                   ),
+                  SizedBox(height: 16.0),
                   // Subject Tag
                   SubjectTagInput(
                     subjects: subjects,
@@ -650,85 +690,110 @@ class _AddQuestionState extends State<AddQuestion> {
                     addAllLastUsed: addAllLastUsed,
                     focusNode: subjectFocusNode,
                   ),
-                  TextFormField(
-                    onSaved: (String value) => onSaved(C.ANSWER_HINT, value),
-                    initialValue: formData[C.ANSWER_HINT],
-                    decoration: InputDecoration(
-                      labelText: S.ANSWER_HINT.tr,
-                    ),
-                    maxLength: 100,
-                  ),
-                  TextFormField(
-                    initialValue:
-                        '${getMinute(formData[C.SOLVING_TIME]) ?? ''}',
-                    decoration: InputDecoration(
-                        labelText: S.SOLVING_TIME.tr, hintText: S.MINUTE.tr),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter(new RegExp('[0-9]'),
-                          allow: true)
-                    ],
-                    maxLength: 3,
-                    onSaved: saveSolvingTime,
-                  ),
-                  TextFormField(
-                    initialValue: '${formData[C.MARKS] ?? ''}',
-                    decoration: InputDecoration(labelText: S.ENTER_MARKS.tr),
-                    keyboardType: TextInputType.number,
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter(new RegExp('[0-9]'),
-                          allow: true)
-                    ],
-                    maxLength: 4,
-                    onSaved: saveMarks,
-                  ),
-                  SizedBox(height: 16.0),
-                  if (!showAddSolution)
-                    Row(
+                  if (!advanceOptions)
+                    Column(
                       children: [
+                        SizedBox(height: 16),
                         SecondaryButton(
-                          text: S.ADD_SOLUTION.tr,
-                          onPress: () {
+                          text: S.ADVANCE.tr,
+                          onPress: () => setState(() {
+                            advanceOptions = true;
+                          }),
+                          iconData: Icons.more_horiz_rounded,
+                        ),
+                      ],
+                    ),
+                  Visibility(
+                    child: Column(children: [
+                      TextFormField(
+                        onSaved: (String value) =>
+                            onSaved(C.ANSWER_HINT, value),
+                        initialValue: formData[C.ANSWER_HINT],
+                        decoration: InputDecoration(
+                          labelText: S.ANSWER_HINT.tr,
+                        ),
+                        maxLength: 100,
+                      ),
+                      TextFormField(
+                        initialValue:
+                            '${getMinute(formData[C.SOLVING_TIME]) ?? ''}',
+                        decoration: InputDecoration(
+                            labelText: S.SOLVING_TIME.tr,
+                            hintText: S.MINUTE.tr),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter(new RegExp('[0-9]'),
+                              allow: true)
+                        ],
+                        maxLength: 3,
+                        onSaved: saveSolvingTime,
+                      ),
+                      TextFormField(
+                        initialValue: '${formData[C.MARKS] ?? ''}',
+                        decoration:
+                            InputDecoration(labelText: S.ENTER_MARKS.tr),
+                        keyboardType: TextInputType.number,
+                        inputFormatters: <TextInputFormatter>[
+                          FilteringTextInputFormatter(new RegExp('[0-9]'),
+                              allow: true)
+                        ],
+                        maxLength: 4,
+                        onSaved: saveMarks,
+                      ),
+                      SizedBox(height: 16.0),
+                      if (!showAddSolution)
+                        Row(
+                          children: [
+                            SecondaryButton(
+                              text: S.ADD_SOLUTION.tr,
+                              onPress: () {
+                                setState(() {
+                                  showAddSolution = true;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      if (showAddSolution && solution == null)
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FlatIconTextButton(
+                              onPressed: getSolutionFromEditor,
+                              iconData: Icons.edit,
+                              text: S.OPEN_EDITOR.tr,
+                            ),
+                            FlatIconTextButton(
+                              onPressed: getSolutionFromFile,
+                              iconData: Icons.attach_file,
+                              text: S.UPLOAD_FILE.tr,
+                              note: S.ACCEPTED_FORMATS.tr,
+                            )
+                          ],
+                        ),
+                      SizedBox(height: 16),
+                      Visibility(
+                        child: NoteView(
+                          note: solution,
+                          onDelete: () {
                             setState(() {
-                              showAddSolution = true;
+                              solution = null;
                             });
                           },
+                          onChangeTitle: (value) => solution[C.TITLE] = value,
+                          onEdit: () =>
+                              getSolutionFromEditor(list: solution[C.TEXT]),
+                          isQuestion: true,
                         ),
-                      ],
-                    ),
-                  if (showAddSolution && solution == null)
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        FlatIconTextButton(
-                          onPressed: getSolutionFromEditor,
-                          iconData: Icons.edit,
-                          text: S.OPEN_EDITOR.tr,
-                        ),
-                        FlatIconTextButton(
-                          onPressed: getSolutionFromFile,
-                          iconData: Icons.attach_file,
-                          text: S.UPLOAD_FILE.tr,
-                          note: S.ACCEPTED_FORMATS.tr,
-                        )
-                      ],
-                    ),
-                  SizedBox(height: 16),
-                  Visibility(
-                    child: NoteView(
-                      note: solution,
-                      onDelete: () {
-                        setState(() {
-                          solution = null;
-                        });
-                      },
-                      onChangeTitle: (value) => solution[C.TITLE] = value,
-                      onEdit: () =>
-                          getSolutionFromEditor(list: solution[C.TEXT]),
-                      isQuestion: true,
-                    ),
-                    visible: solution != null,
+                        visible: solution != null,
+                      ),
+                    ]),
+                    maintainState: true,
+                    maintainSemantics: true,
+                    maintainSize: true,
+                    maintainAnimation: true,
+                    visible: advanceOptions,
                   ),
                   SizedBox(height: 64),
                 ],

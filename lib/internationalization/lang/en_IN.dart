@@ -106,6 +106,7 @@ const EN_IN = {
       'We got your complaint, we will check and resolve it as soon as possible.',
   S.ARE_YOU_SURE_YOU_WANT_TO_DISCARD: 'Are you sure you want to discard it?',
   S.DISCARD: 'Discard',
+  S.ADVANCE: 'Advance',
 
   // Notes + Quiz
   S.OPEN_EDITOR: 'Open Editor',
@@ -149,6 +150,7 @@ const EN_IN = {
   S.EXAM_TITLE: 'Exam Title',
   S.EXAM_INSTRUCTION: 'Exam Instruction',
   S.PLUS_QUESTION: '+ Question',
+  S.NEW_QUESTION: 'New Question',
   S.MINUS_MARKING: 'Minus Marking',
   S.MINUS_MARKS_PER_QUESTION: 'Minus marking per question',
   S.EXAM_SOLVING_TIME: 'Exam Solving Time',

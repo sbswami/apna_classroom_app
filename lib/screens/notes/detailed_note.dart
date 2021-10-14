@@ -134,16 +134,17 @@ class _DetailedNoteState extends State<DetailedNote> {
   @override
   Widget build(BuildContext context) {
     int listCount = (note ?? {})[C.LIST]?.length ?? 0;
+    bool _isCreator = isCreator((note ?? {})[C.CREATED_BY]);
     return WillPopScope(
       onWillPop: _onBack,
       child: Scaffold(
         appBar: AppBar(
           title: Text(S.NOTES.tr),
           actions: [
-            if (isCreator((note ?? {})[C.CREATED_BY]))
+            if (_isCreator)
               IconButton(
                   icon: Icon(Icons.delete_rounded), onPressed: _onDelete),
-            if (note != null)
+            if (note != null && (note[C.PRIVACY] == E.PUBLIC || _isCreator))
               IconButton(icon: Icon(Icons.share), onPressed: shareNote),
           ],
         ),

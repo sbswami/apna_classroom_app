@@ -48,3 +48,10 @@ String validRequired(String value) {
   }
   return null;
 }
+
+String validNumber(String value) {
+  if (value.isEmpty || int.parse(value) == 0) {
+    return S.THIS_FIELD_IS_REQUIRED.tr;
+  }
+  return null;
+}
